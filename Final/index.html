@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kalajay</title>
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+  </head>
+  <body>
+    <header class="header">
+      <span class="logo">
+        <img src="images/KalaJayLogo.jpg" class="logo" />
+        <nav><h3>Kalajay</h3></nav>
+      </span>
+      <a
+        class="whatsapp"
+        href="https://wa.me/919740540847?text=I%20am%20interested%20in%20your%20product"
+      >
+        <svg
+          class="whatsapp_direct_message"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 640 640"
+        >
+          <path
+            d="M476.9 161.1C435 119.1 379.2 96 319.9 96C197.5 96 97.9 195.6 97.9 318C97.9 357.1 108.1 395.3 127.5 429L96 544L213.7 513.1C246.1 530.8 282.6 540.1 319.8 540.1L319.9 540.1C442.2 540.1 544 440.5 544 318.1C544 258.8 518.8 203.1 476.9 161.1zM319.9 502.7C286.7 502.7 254.2 493.8 225.9 477L219.2 473L149.4 491.3L168 423.2L163.6 416.2C145.1 386.8 135.4 352.9 135.4 318C135.4 216.3 218.2 133.5 320 133.5C369.3 133.5 415.6 152.7 450.4 187.6C485.2 222.5 506.6 268.8 506.5 318.1C506.5 419.9 421.6 502.7 319.9 502.7zM421.1 364.5C415.6 361.7 388.3 348.3 383.2 346.5C378.1 344.6 374.4 343.7 370.7 349.3C367 354.9 356.4 367.3 353.1 371.1C349.9 374.8 346.6 375.3 341.1 372.5C308.5 356.2 287.1 343.4 265.6 306.5C259.9 296.7 271.3 297.4 281.9 276.2C283.7 272.5 282.8 269.3 281.4 266.5C280 263.7 268.9 236.4 264.3 225.3C259.8 214.5 255.2 216 251.8 215.8C248.6 215.6 244.9 215.6 241.2 215.6C237.5 215.6 231.5 217 226.4 222.5C221.3 228.1 207 241.5 207 268.8C207 296.1 226.9 322.5 229.6 326.2C232.4 329.9 268.7 385.9 324.4 410C359.6 425.2 373.4 426.5 391 423.9C401.7 422.3 423.8 410.5 428.4 397.5C433 384.5 433 373.4 431.6 371.1C430.3 368.6 426.6 367.2 421.1 364.5z"
+          />
+        </svg>
+        <svg
+          class="whatsapp_send_cart_items"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 640 640"
+        >
+          <path
+            d="M24 48C10.7 48 0 58.7 0 72C0 85.3 10.7 96 24 96L69.3 96C73.2 96 76.5 98.8 77.2 102.6L129.3 388.9C135.5 423.1 165.3 448 200.1 448L456 448C469.3 448 480 437.3 480 424C480 410.7 469.3 400 456 400L200.1 400C188.5 400 178.6 391.7 176.5 380.3L171.4 352L475 352C505.8 352 532.2 330.1 537.9 299.8L568.9 133.9C572.6 114.2 557.5 96 537.4 96L124.7 96L124.3 94C119.5 67.4 96.3 48 69.2 48L24 48zM208 576C234.5 576 256 554.5 256 528C256 501.5 234.5 480 208 480C181.5 480 160 501.5 160 528C160 554.5 181.5 576 208 576zM432 576C458.5 576 480 554.5 480 528C480 501.5 458.5 480 432 480C405.5 480 384 501.5 384 528C384 554.5 405.5 576 432 576z"
+          />
+        </svg>
+        <span class="whatsapp_count" data-cart-items-count="0"></span>
+      </a>
+    </header>
+    <div class="container">
+      <section class="filters">
+        <button data-category="All" class="filtering_on">
+          <img src="images/KalaJayLogo.jpg" alt="Logo" />
+          <span> All</span>
+        <!--  
+        </button>
+        <button data-category="KeyChain">
+          <img src="images/AlphabetKeyChain2.jpg" alt="Logo" />
+          <span> Key Chain</span>
+        </button>
+        -->
+        <button data-category="KeyRings">
+          <img src="images/KeyRings/KeyRing1.jpg" alt="Logo" />
+          <span> Key Rings</span>
+        </button>
+        <button data-category="Handbag">
+          <img src="images/HandBags/Bag1.jpg" alt="Logo" />
+          <span>Handbags</span>
+        </button>
+        <button data-category="Mat">
+          <img src="images/KalaJayLogo.jpg" alt="Logo" />
+          <span>Mats & Coasters</span>
+        </button>
+        <button data-category="AirpodCase">
+          <img src="images/KalaJayLogo.jpg" alt="Logo" />
+          <span>Airpod Cases</span>
+        </button>
+        <button data-category="Organiser">
+          <img src="images/KalaJayLogo.jpg" alt="Logo" />
+          <span>Organisers</span>
+        </button>
+        <button data-category="BraStraps">
+          <img src="images/KalaJayLogo.jpg" alt="Logo" />
+          <span>Bra Straps</span>
+        </button>
+      </section>
+    </div>
+    <main class="categories">
+      <section class="category" data-category="KeyRings">
+        <h1 class="category-header">Key Rings </h1>
+        <main class="category-items">
+          <category-item
+            image-url="images/KeyRings/KeyRing1.jpg"
+            image-alt="It is key rings of English Alphabet"
+            item-header="Alphabet Key Ring"
+            item-price="250"
+          ></category-item>
+          <category-item
+            image-url="images/KeyRings/KeyRing3.jpg"
+            image-alt="It is key chain made in the shape of a heart"
+            item-header="Heart ❤️ Key Ring"
+            item-price="200"
+          ></category-item>
+          <category-item
+            image-url="images/KeyRings/KeyRing4.jpg"
+            image-alt="It is a key ring"
+            item-header="Kaudi Key Ring"
+            item-price="200"
+          ></category-item>
+          <category-item
+            image-url="images/KeyRings/KeyRing5.jpg"
+            image-alt="It is a heart shaped threaded key chain"
+            item-header="Threaded 💚 Key Ring"
+            item-price="200"
+          ></category-item>
+          <category-item
+            image-url="images/KeyRings/KeyRing6.jpg"
+            image-alt="It is a heart shaped key chain in purple color"
+            item-header="Threaded 💜 Key Ring"
+            item-price="200"
+          ></category-item>
+          <category-item
+            image-url="images/KeyRings/KeyRing2.jpg"
+            image-alt="mobile hand bag"
+            item-header="Alphabet Key Ring"
+            item-price="250"
+          ></category-item>
+        </main>
+      </section>
+      <!--
+      <section class="category" data-category="KeyChain">
+        <h1 class="category-header">Key Chain </h1>
+        <main class="category-items">
+          <category-item
+            image-url="images/8.jpeg"
+            image-alt="Key chain"
+            item-header="Key Chain 1"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/8.jpeg"
+            image-alt="Key chain"
+            item-header="Key Chain 2"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/8.jpeg"
+            image-alt="Key chain"
+            item-header="Key Chain 3"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/8.jpeg"
+            image-alt="Key chain"
+            item-header="Key chain 4"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/8.jpeg"
+            image-alt="Key chain"
+            item-header="Key Chain 5"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/8.jpeg"
+            image-alt="Key chain"
+            item-header="Key Chain 6"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/8.jpeg"
+            image-alt="Key chain"
+            item-header="Key Chain 7"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/8.jpeg"
+            image-alt="Key chain"
+            item-header="Key Chain 8"
+            item-price="534.34"
+          ></category-item>
+        </main>
+      </section>
+      -->
+      <section class="category" data-category="Handbag">
+        <h1 class="category-header">Handbags </h1>
+        <main class="category-items">
+          <category-item
+            image-url="images/HandBags/Bag1.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Human Handbag 3"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/HandBags/Bag2.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Human Handbag 4"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/HandBags/Bag3.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Human Handbag 5"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/HandBags/Bag4.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Human Handbag 6"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/HandBags/Bag5.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Human Handbag 7"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/HandBags/Bag6.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Human Handbag 8"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/HandBags/Bag7.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Human Handbag 9"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/HandBags/Bag8.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Human Handbag 9"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/HandBags/Bag9.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Human Handbag 9"
+            item-price="534.34"
+          ></category-item>
+        </main>
+      <!--
+      <section class="category" data-category="NewLineHandbags">
+        <h1 class="category-header">NewLine Handbags </h1>
+        <main class="category-items">
+          <category-item
+            image-url="images/4.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 1"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/4.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 2"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/4.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 3"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/4.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 4"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/4.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 5"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/4.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 6"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/4.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 7"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/4.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 8"
+            item-price="534.34"
+          ></category-item>
+        </main>
+      </section>
+      -->
+      <section class="category" data-category="AirpodCase">
+        <h1 class="category-header">Airpod Cases </h1>
+        <main class="category-items">
+          <category-item
+            image-url="images/AirpodCases/Case1.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 1"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/AirpodCases/Case2.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 2"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/AirpodCases/Case3.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 3"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/AirpodCases/Case4.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 4"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/AirpodCases/Case5.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 5"
+            item-price="534.34"
+          ></category-item>
+          <!--
+          <category-item
+            image-url="images/5.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 6"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/5.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 7"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/5.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 8"
+            item-price="534.34"
+          ></category-item>
+          -->
+        </main>
+      </section>
+            </section>
+      <section class="category" data-category="Mat">
+        <h1 class="category-header">Mat </h1>
+        <main class="category-items">
+          <category-item
+            image-url="images/Mats/Mat1.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 1"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/Mats/Mat2.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 2"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/Mats/Mat3.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 3"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/Mats/Mat4.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 4"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/Mats/Mat5.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 5"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/Mats/Mat6.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 6"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/Mats/Mat7.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 7"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/Mats/Mat8.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 8"
+            item-price="534.34"
+          ></category-item>
+           <category-item
+            image-url="images/Mats/Mat9.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 8"
+            item-price="534.34"
+          ></category-item>
+           <category-item
+            image-url="images/Mats/Mat10_1.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 8"
+            item-price="534.34"
+          ></category-item>
+           <category-item
+            image-url="images/Mats/Mat11.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 8"
+            item-price="534.34"
+          ></category-item>
+           <category-item
+            image-url="images/Mats/Mat12_1.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 8"
+            item-price="534.34"
+          ></category-item>
+           <category-item
+            image-url="images/Mats/Mat13.jpg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key ring 8"
+            item-price="534.34"
+          ></category-item>
+        </main>
+      </section>
+      <section class="category" data-category="Organiser">
+        <h1 class="category-header">Organisers </h1>
+        <main class="category-items">
+          <category-item
+            image-url="images/Organisers/Org1_1.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 1"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/Organisers/Org2.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 2"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/Organisers/Org3_2.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 3"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/Organisers/Org4_1.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 4"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/Organisers/Org5.png"
+            image-alt="Human Looking Key Ring"
+            item-header="Key bling 5"
+            item-price="534.34"
+          ></category-item>
+        </main>
+      </section>
+      <!--
+      <section class="category" data-category="BraStraps">
+        <h1 class="category-header">Bra Straps </h1>
+        <main class="category-items">
+          <category-item
+            image-url="images/5.jpeg"
+            image-alt="A"
+            item-header="BS 1"
+            item-price="600"
+          ></category-item>
+          <category-item
+            image-url="images/5.jpeg"
+            image-alt="B"
+            item-header="Purse 2"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/5.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 3"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/5.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 4"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/5.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 5"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/5.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 6"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/5.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 7"
+            item-price="534.34"
+          ></category-item>
+          <category-item
+            image-url="images/5.jpeg"
+            image-alt="Human Looking Key Ring"
+            item-header="Purse 8"
+            item-price="534.34"
+          ></category-item>
+        </main>
+      </section>
+      -->
+    </main>
+    <footer class="footer">
+      <section class="footer_customer_support large_screen">
+        <details class="footer_resources" open>
+          <summary>Resource</summary>
+          <nav class="footer_resources_navigation">
+            <li><a href="#">Product Advice</a></li>
+            <li><a href="#">Send Us Feedback</a></li>
+          </nav>
+        </details>
+        <details class="footer_resources" open>
+          <summary>Help</summary>
+          <nav class="footer_resources_navigation">
+            <li><a href="#">Contact Us</a></li>
+          </nav>
+        </details>
+        <details class="footer_resources" open>
+          <summary>Company</summary>
+          <address class="footer_resources_navigation">
+            Kalajay, Mumbai, Maharashtra
+          </address>
+        </details>
+      </section>
+      <section class="footer_customer_support small_screen">
+        <details class="footer_resources">
+          <summary>Resource</summary>
+          <nav class="footer_resources_navigation">
+            <li><a href="#">Product Advice</a></li>
+            <li><a href="#">Send Us Feedback</a></li>
+          </nav>
+        </details>
+        <details class="footer_resources">
+          <summary>Help</summary>
+          <nav class="footer_resources_navigation">
+            <li><a href="#">Contact Us</a></li>
+          </nav>
+        </details>
+        <details class="footer_resources">
+          <summary>Company</summary>
+          <address class="footer_resources_navigation">
+            Kalajay, Mumbai, Maharashtra
+          </address>
+        </details>
+      </section>
+      <section class="footer_copyright">
+        <span>&copy; 2025 Kalajay all rights reserved</span>
+      </section>
+    </footer>
+    <template id="template-category-item">
+      <style>
+        figure {
+          margin: 0;
+          padding: 0;
+        }
+        .category-item {
+          display: grid;
+          grid-template-columns: 1fr;
+          grid-template-rows: 1fr min-content;
+
+          .category-item-price {
+            font-size: 1rem;
+            text-align: center;
+            &::before {
+              content: "\20B9";
+            }
+          }
+          figure {
+            grid-row: 1/2;
+            grid-column: 1/2;
+
+            > img {
+              width: var(--card-width);
+              height: var(--card-height);
+              object-fit: cover;
+              object-position: center;
+              border-radius: 2.4rem;
+            }
+
+            > figcaption {
+              font-size: 1.2rem;
+              font-weight: 800;
+              padding-block-start: 0.8rem;
+              text-align: center;
+            }
+          }
+
+          .category-item-cart {
+            grid-row: 1/2;
+            grid-column: 1/2;
+            justify-self: end;
+            width: 4rem;
+            height: 4rem;
+            text-align: center;
+            margin-inline-end: 0.4rem;
+            margin-block-start: 0.4rem;
+
+            > svg {
+              width: 24px;
+              height: 24px;
+              background-color: rgb(8, 64, 92);
+              outline: red;
+              padding: 0.4rem;
+              border: 1px solid rgb(73, 71, 71);
+              border-radius: 24px;
+              box-shadow: 2px 2px solid rgba(54, 54, 54, 0.746);
+              margin-block-start: 0.4rem;
+              margin-inline-end: 0.4rem;
+              cursor: pointer;
+            }
+
+            &.category-item-cart__selected {
+              & > svg {
+                border: 1px solid red;
+                fill: red;
+              }
+            }
+          }
+        }
+      </style>
+      <article class="category-item">
+        <figure>
+          <img src="images/9.jpeg" alt="some alt text" />
+          <figcaption>Iphone Bag</figcaption>
+        </figure>
+        <h2 class="category-item-price">5450</h2>
+        <span class="category-item-cart">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+            <path
+              d="M24 48C10.7 48 0 58.7 0 72C0 85.3 10.7 96 24 96L69.3 96C73.2 96 76.5 98.8 77.2 102.6L129.3 388.9C135.5 423.1 165.3 448 200.1 448L456 448C469.3 448 480 437.3 480 424C480 410.7 469.3 400 456 400L200.1 400C188.5 400 178.6 391.7 176.5 380.3L171.4 352L475 352C505.8 352 532.2 330.1 537.9 299.8L568.9 133.9C572.6 114.2 557.5 96 537.4 96L124.7 96L124.3 94C119.5 67.4 96.3 48 69.2 48L24 48zM208 576C234.5 576 256 554.5 256 528C256 501.5 234.5 480 208 480C181.5 480 160 501.5 160 528C160 554.5 181.5 576 208 576zM432 576C458.5 576 480 554.5 480 528C480 501.5 458.5 480 432 480C405.5 480 384 501.5 384 528C384 554.5 405.5 576 432 576z"
+            />
+          </svg>
+        </span>
+      </article>
+    </template>
+  </body>
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --v_font_size_root: 10px;
+      --card-width: 22rem;
+      --card-height: 22rem;
+      --header-height: 4.8rem;
+      --header-font-size: 2rem;
+      --header-font-style: sans-serif;
+      --category-width: 22rem;
+      --footer-font-weight-light: 100;
+      --footer-font-weight-medium: 400;
+      --footer-font-weight-heavy: 800;
+      --clr-black: rgb(0, 0, 0);
+      --clr-white: rgb(16, 67, 87);
+
+      --text-black: var(--clr-black);
+      --text-white: var(--clr-white);
+
+      --bg-color: var(--clr-white);
+    }
+
+    @media (width > 900px) {
+      :root {
+        --v_font_size_root: 12px;
+      }
+    }
+
+    @media (width > 1200px) {
+      :root {
+        --v_font_size_root: 14px;
+      }
+    }
+
+    html {
+      box-sizing: border-box;
+      font-size: var(--v_font_size_root);
+      scrollbar-width: none;
+      width: 100vw;
+    }
+
+    body {
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      font-family: "Inter", sans-serif;
+      gap: 3.2rem;
+      justify-content: center;
+      margin-inline: auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 1.6rem;
+      justify-self: center;
+      align-self: center;
+      width: 100%;
+      border-block-end: 1px solid black;
+      position: sticky;
+      top: 0;
+      background-color: light-dark(var(--clr-white), var(--clr-black));
+
+      &::after {
+        content: "";
+        height: 4px;
+        width: 100%;
+        background-color: black;
+        position: absolute;
+        bottom: 0;
+        scale: 0 1;
+        animation-name: ScrollTracker;
+        animation-timing-function: linear;
+        animation-timeline: scroll(y);
+        transform-origin: left;
+      }
+
+      .logo {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-inline-start: 1.6rem;
+
+        img {
+          max-width: 2.4rem;
+          max-height: 2.4rem;
+        }
+
+        nav {
+          font-size: 2rem;
+          font-weight: lighter;
+        }
+      }
+
+      .whatsapp {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        width: 2.8rem;
+        height: 2.8rem;
+        border: 0;
+        background-color: none;
+        text-decoration: none;
+        margin-inline-end: 1.8rem;
+
+        .whatsapp_direct_message,
+        & .whatsapp_send_cart_items {
+          width: 2.8rem;
+          height: 2.8rem;
+        }
+
+        &:has(span[data-cart-items-count="0"]) {
+          .whatsapp_send_cart_items {
+            display: none;
+          }
+
+          .whatsapp_direct_message {
+            display: inline-block;
+          }
+        }
+
+        /* keep it hidden by default */
+        .whatsapp_direct_message {
+          display: none;
+        }
+
+        & > * {
+          grid-row-start: 1;
+          grid-row-end: 2;
+          grid-column-start: 1;
+          grid-column-end: 2;
+        }
+
+        & > .whatsapp_count {
+          font-size: 1rem;
+          height: 1.4rem;
+          width: 1.4rem;
+          margin-inline-start: 50%;
+          margin-block-end: 50%;
+          text-align: center;
+          background-color: aqua;
+          padding: 0.2rem;
+          font-weight: bold;
+          border-radius: 100%;
+        }
+
+        & > span[data-cart-items-count="0"] {
+          visibility: hidden;
+        }
+      }
+    }
+
+    .logo {
+      width: 5.6rem;
+      height: 5.6rem;
+      border-radius: 8rem;
+    }
+
+    .categories {
+      --display-children: flex;
+      display: flex;
+      flex-direction: column;
+      gap: 2.4rem;
+      padding: 2.4rem;
+    }
+
+    .category {
+      display: var(--display-children);
+      view-transition-name: attr(data-category);
+      flex-direction: column;
+      gap: 1.8rem;
+
+      .category-header {
+        font-size: 1.4rem;
+        align-self: start;
+      }
+    }
+
+    .category-items {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: var(--category-width);
+      gap: 1.2rem;
+      overflow: scroll;
+      scroll-snap-stop: var(--card-width);
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+    }
+
+    .footer {
+      font-size: 1.2rem;
+      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+
+      .footer_customer_support {
+        display: flex;
+        gap: 1rem;
+        flex-direction: column;
+        padding-top: 3.2rem;
+        padding-bottom: 2rem;
+        justify-content: stretch;
+
+        .footer_resources {
+          &[open] {
+            & summary {
+              border-bottom: 0;
+            }
+          }
+
+          & summary {
+            border-bottom: 1px solid rgb(188, 183, 183);
+            padding-bottom: 1.6rem;
+            display: flex;
+            justify-content: space-between;
+            padding-left: 1rem;
+            padding-right: 1rem;
+
+            &::after {
+              content: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20640%22%3E%3Cpath%20d%3D%22M297.4%20470.6C309.9%20483.1%20330.2%20483.1%20342.7%20470.6L534.7%20278.6C547.2%20266.1%20547.2%20245.8%20534.7%20233.3C522.2%20220.8%20501.9%20220.8%20489.4%20233.3L320%20402.7L150.6%20233.4C138.1%20220.9%20117.8%20220.9%20105.3%20233.4C92.8%20245.9%2092.8%20266.2%20105.3%20278.7L297.3%20470.7z%22%2F%3E%3C%2Fsvg%3E");
+              width: 2rem;
+              height: 2rem;
+            }
+
+            &::marker {
+              font-size: 0;
+            }
+          }
+        }
+
+        & .footer_resources_navigation {
+          font-weight: var(--footer-font-weight-medium);
+          padding-left: 1rem;
+          li {
+            list-style: none;
+          }
+          a {
+            text-decoration: none;
+            color: black;
+          }
+        }
+      }
+
+      & .footer_copyright {
+        padding-inline-start: 1rem;
+        font-weight: var(--footer-font-weight-medium);
+        text-align: center;
+        margin-block-end: 2.4rem;
+      }
+
+      & .large_screen {
+        display: none;
+
+        @media (width > 600px) {
+          display: flex;
+          flex-direction: row;
+          flex-grow: 1;
+          gap: 10rem;
+          justify-content: center;
+
+          & .footer_resources {
+            & summary {
+              border: 0;
+              &::after {
+                content: none;
+              }
+            }
+
+            & .footer_resources_navigation {
+              & *:not(:first-of-type) {
+                margin-top: 0.4rem;
+              }
+            }
+          }
+        }
+      }
+
+      @media (min-width: 600px) {
+        & .small_screen {
+          display: none;
+        }
+      }
+    }
+
+    .container {
+      min-width: 32rem;
+      max-width: 90%;
+      margin-inline: auto;
+    }
+
+    @keyframes ScrollTracker {
+      to {
+        scale: 1 1;
+      }
+    }
+
+    /* style filters  */
+    .filters {
+      display: flex;
+      gap: 1rem;
+      overflow: scroll;
+      scrollbar-width: none;
+
+      button {
+        font-size: 1.6rem;
+        border: 1px solid black;
+        padding-inline: 1rem;
+        padding-block: 0.8rem;
+        border-radius: 0.4rem;
+        cursor: pointer;
+        white-space: nowrap;
+        display: flex;
+        gap: 0.4rem;
+        align-items: center;
+        font-weight: bold;
+        background-color: transparent;
+
+        img {
+          width: 2.4rem;
+          height: 2.4rem;
+          border-radius: 0.4rem;
+        }
+
+        &:hover,
+        &:focus {
+          background-color: rgb(176, 138, 138);
+          color: white;
+        }
+
+        &.filtering_on {
+          background-color: black;
+          color: yellow;
+        }
+      }
+    }
+    @view-transition {
+      navigation: auto;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+
+  <script>
+    const templateCategoryItemNode = document.getElementById( "template-category-item");
+    const categoryItemContent = templateCategoryItemNode.content;
+
+    const cartSelectedClass = "category-item-cart__selected";
+			// compose functions
+    function compose(...fns) {
+      return (input) => fns.reduceRight((val, fn) => fn(val), input);
+    }
+
+    // calls functions in sequence - one after the another
+    function sequence(...fns) {
+      fns.forEach((fn) => fn());
+    }
+
+		/**
+		* call multiple methods with the same input
+		*/
+		function sequenceWith(...fns){
+			return input => fns.forEach(fn => fn(input));
+		}
+
+		function withInput(input) {
+			return {
+				callEach(...fns) {
+					fns.forEach(fn => fn(input));
+				}
+			}
+		}
+
+    customElements.define(
+      "category-item",
+      class extends HTMLElement {
+        constructor() {
+          super();
+          this.root = this.attachShadow({ mode: "closed" });
+          this.root.appendChild(categoryItemContent.cloneNode(true));
+        }
+
+        selectOne(query) {
+          return this.root.querySelector(query);
+        }
+
+        updateChildAttribute(childNode) {
+          return (attributeName, value) => (childNode[attributeName] = value);
+        }
+
+        static get observedAttributes() {
+          return ["image-url", "image-alt", "item-header", "item-price"];
+        }
+
+						// updates childattribute
+        updateFunction = compose( this.updateChildAttribute, this.selectOne.bind(this));
+
+        attributeChangedCallback(name, oldValue, newValue) {
+          requestAnimationFrame(() => {
+            switch (name) {
+              case "image-url":
+                this.updateFunction("img")("src", newValue);
+                break;
+              case "image-alt":
+                this.updateFunction("img")("alt", newValue);
+                break;
+              case "item-header":
+                this.updateFunction("figcaption")("textContent", newValue);
+                break;
+              case "item-price":
+                this.updateFunction(".category-item-price")( "textContent", newValue);
+                break;
+              default:
+                console.log(`Invalid Attribute ${name}`);
+                break;
+            }
+          });
+        }
+
+        connectedCallback() {
+					this.setAttribute('id', crypto.randomUUID().replaceAll('-', ''));
+          const itemHeader = this.getAttribute("item-header");
+          const itemPrice = this.getAttribute("item-price");
+
+          // add event listener for adding to cart
+          const cartNode = this.selectOne(".category-item-cart");
+
+          const eventOptions = { composed: true, bubbles: true, detail: { id: this.id, itemHeader, itemPrice }, };
+          const itemAddedEvent = new CustomEvent( "Kalajay:ItemAddedToCart", eventOptions);
+          const itemRemovedEvent = new CustomEvent( "Kalajay:ItemRemovedFromCart", eventOptions);
+
+          cartNode.addEventListener("click", () => cartNode.dispatchEvent( cartNode.classList.toggle(cartSelectedClass) ? itemAddedEvent : itemRemovedEvent));
+        }
+      }
+    );
+
+    document.addEventListener("Kalajay:ItemAddedToCart", (e) => {
+      queueMicrotask(() => addToCart(e.detail.id, e.detail.itemHeader, e.detail.itemPrice));
+    });
+
+    document.addEventListener("Kalajay:ItemRemovedFromCart", (e) => {
+      queueMicrotask(() => removeFromCart(e.detail.id, e.detail.itemPrice));
+    });
+
+    class Maybe {
+      static EMPTY = new Maybe(null);
+      constructor(value) {
+        this.value = value;
+      }
+
+      map(func) {
+        if (!this.value) return EMPTY;
+        return new Maybe(func(this.value));
+      }
+
+      ifOrElse(ifFunc, elseFunc) {
+        if (this.value) ifFunc(this.value);
+        else elseFunc();
+      }
+    }
+
+    const whatsappNode      = document.getElementsByClassName("whatsapp")[0];
+    const whatsappCountNode = document.getElementsByClassName("whatsapp_count")[0];
+
+    const updateNodesWithCount = compose(
+			 count => whatsappCountNode.setAttribute("data-cart-items-count", count),
+       count => whatsappCountNode.textContent = count,
+       store => store.size
+    );
+
+    const udpateWhatsappUrl = compose(
+      url   => whatsappNode.setAttribute("href", url),
+      store => getUrl(store)
+    );
+
+    function useState(cart) {
+      function render() {
+        requestAnimationFrame(() => withInput(cart).callEach(updateNodesWithCount, udpateWhatsappUrl));
+      }
+
+      const addToCart = new Proxy(cart.set.bind(cart), {
+        apply(target, _, [key, itemName, price]) {
+          new Maybe(cart.get(key)).ifOrElse(
+            ([, currentItemCount]) => {
+              const totalCount = currentItemCount + 1;
+              const totalPrice = totalCount * price;
+              target(key, [itemName, totalCount, totalPrice]);
+            },
+            () => target(key, [itemName, 1, price])
+          );
+
+          render();
+        },
+      });
+
+      const removeFromCart = new Proxy(cart.delete.bind(cart), {
+        apply(target, _, [key, itemPrice]) {
+          new Maybe(cart.get(key)).ifOrElse(
+            ([itemName, itemCount, totalPrice]) => {
+              if (itemCount == 1) {
+                // if only one left then remvoe the key
+                // we are deleting the last element
+                cart.delete(key);
+              } else {
+                cart.set(key, [
+                  itemName,
+                  itemCount - 1,
+                  totalPrice - itemPrice,
+                ]);
+              }
+
+              render();
+            },
+            () => {}
+          );
+        },
+      });
+
+      return [addToCart, removeFromCart];
+    }
+
+    const [addToCart, removeFromCart] = useState(new Map());
+
+    const host = "https://wa.me/919740540847?text=";
+    function getUrl(cart) {
+      if (cart.size < 1)
+        return "https://wa.me/919740540847?text=I%20am%20interested%20in%20your%20product";
+      let itemList = "*List Of Items* : \n";
+      let totalCostOfAllTheItems = 0;
+      cart.entries().forEach(([_, [productName, productCount, cost]]) => {
+        itemList = `${itemList}*${productName.trim()}* => ${productCount} \n`;
+        totalCostOfAllTheItems += parseInt(cost);
+      });
+      itemList = `${itemList}\n*TotalPrice = ${totalCostOfAllTheItems}*\n`;
+      const encodedItemList = encodeURIComponent(itemList);
+      return `${host}${encodedItemList}`;
+    }
+    // filter button logic
+    const categories = document.querySelector("main.categories");
+    const filtersSection = document.querySelector(".filters");
+    const buttonForAllCategory = filtersSection.querySelector(
+      'button[data-category="All"]'
+    );
+    const buttonForEachCategory = filtersSection.querySelectorAll(
+      "button:not([data-category='All'])"
+    );
+
+    buttonForEachCategory.forEach((button) => {
+      const targetCategory = categories.querySelectorAll(
+        `.category[data-category="${button.dataset.category}"]`
+      );
+      const notTargetCategory = categories.querySelectorAll(
+        `.category:not([data-category="${button.dataset.category}"])`
+      );
+      button.addEventListener("click", (event) => {
+        buttonForAllCategory.classList.remove("filtering_on");
+
+        button.classList.toggle("filtering_on");
+
+        buttonForEachCategory.forEach((button) => {
+          const linkedCategory = categories.querySelector(
+            `.category[data-category="${button.dataset.category}"]`
+          );
+          if (button.classList.contains("filtering_on")) {
+            linkedCategory.classList.remove("hidden");
+          } else {
+            linkedCategory.classList.add("hidden");
+          }
+        });
+
+        if (filtersSection.querySelectorAll("button.filtering_on").length < 1) {
+          buttonForAllCategory.click();
+          buttonForAllCategory.focus();
+        }
+      });
+    });
+    // make all category visible
+    buttonForAllCategory.addEventListener("click", () => {
+      buttonForAllCategory.classList.add("filtering_on");
+      buttonForEachCategory.forEach((button) =>
+        button.classList.remove("filtering_on")
+      );
+      categories.querySelectorAll(".category").forEach((category) => {
+        category.classList.remove("hidden");
+        category.classList.add("InView");
+      });
+    });
+
+  </script>
+</html>
