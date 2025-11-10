@@ -38,7 +38,6 @@
         <span class="whatsapp_count" data-cart-items-count="0"></span>
       </a>
     </header>
-		<!-- <div class="logMessage"></div> -->
     <div class="container">
       <section class="filters">
         <button data-category="All" class="filtering_on">
@@ -435,8 +434,8 @@
 
             &.category-item-cart__selected {
               & > svg {
-                outline: 2px solid rgb(255, 230, 0);
-                fill: rgb(255, 247, 0);
+                fill: var(--clr-accent-yellow);
+                outline: 2px solid var(--clr-accent-yellow);
               }
             }
           }
@@ -472,6 +471,7 @@
       --clr-white: rgb(227, 232, 232);
       --clr-brand: rgb(16, 67, 87);
 			--clr-accent: rgb(166, 240, 166);
+			--clr-accent-yellow : rgb(255 230 0);
 
       --v_font_size_root: 10px;
 
@@ -616,12 +616,12 @@
 
         & > .whatsapp_count {
           font-size: 1rem;
-          height: 1.4rem;
-          width: 1.4rem;
+          height: 1.6rem;
+          width: 1.6rem;
           margin-inline-start: 50%;
           margin-block-end: 50%;
           text-align: center;
-          background-color: aqua;
+          background-color: var(--clr-accent-yellow);
           padding: 0.2rem;
           font-weight: bold;
           border-radius: 100%;
@@ -783,6 +783,8 @@
       gap: 1rem;
       overflow: scroll;
       scrollbar-width: none;
+			padding-block: .2rem;
+			padding-inline: .1rem;
 
       button {
         font-size: 1.6rem;
@@ -810,13 +812,13 @@
 
         &:hover,
         &:focus {
-          background-color: rgb(176, 138, 138);
-          color: white;
+					outline: 1px solid var(--header-background-color);
         }
 
+
         &.filtering_on {
-          background-color: black;
-					color: var(--clr-accent);
+          background-color: var(--header-background-color);
+					color: var(--clr-white);
         }
       }
     }
