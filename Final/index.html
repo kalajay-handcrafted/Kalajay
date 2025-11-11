@@ -75,18 +75,21 @@
             image-alt="It is key rings of English Alphabet"
             item-header="Alphabet Key Ring"
             item-price="250"
+						item-message="❤️ Most Sold"
           ></category-item>
           <category-item
             image-url="images/KeyRings/KeyRing3.jpg"
             image-alt="It is key chain made in the shape of a heart"
             item-header="Heart ❤️ Key Ring"
             item-price="200"
+						item-message="😃 Guest Favorite"
           ></category-item>
           <category-item
             image-url="images/KeyRings/KeyRing4.jpg"
             image-alt="It is a key ring"
             item-header="Kaudi Key Ring"
             item-price="200"
+						item-message="🔥 Hot Selling"
           ></category-item>
           <category-item
             image-url="images/KeyRings/KeyRing5.jpg"
@@ -116,6 +119,7 @@
             image-alt="Human Looking Key Ring"
             item-header="Human Handbag 3"
             item-price="534.34"
+						item-message="Most Selling"
           ></category-item>
           <category-item
             image-url="images/HandBags/Bag2.jpg"
@@ -211,18 +215,21 @@
             image-alt="Human Looking Key Ring"
             item-header="Key ring 1"
             item-price="534.34"
+						item-message="Only Few Left"
           ></category-item>
           <category-item
             image-url="images/Mats/Mat2.jpg"
             image-alt="Human Looking Key Ring"
             item-header="Key ring 2"
             item-price="534.34"
+						item-message="🔥 Hot Selling"
           ></category-item>
           <category-item
             image-url="images/Mats/Mat3.jpg"
             image-alt="Human Looking Key Ring"
             item-header="Key ring 3"
             item-price="534.34"
+						item-message="🔥 Hot Selling"
           ></category-item>
           <category-item
             image-url="images/Mats/Mat4.jpg"
@@ -300,6 +307,7 @@
             image-alt="Human Looking Key Ring"
             item-header="Key bling 2"
             item-price="534.34"
+						item-message="🔥 Hot Selling"
           ></category-item>
           <category-item
             image-url="images/Organisers/Org3_2.jpeg"
@@ -371,6 +379,12 @@
     </footer>
     <template id="template-category-item">
       <style>
+				:host{
+					--chip-bg-clr : var(--clr-brand);
+					--chip-fg-clr : var(--clr-white);
+					--chip-radius : 1.2rem;
+					--chip-box-shadow-color : var(--clr-gray-light-3);
+				}
         figure {
           margin: 0;
           padding: 0;
@@ -379,6 +393,23 @@
           display: grid;
           grid-template-columns: 1fr;
           grid-template-rows: 1fr min-content;
+					position: relative;
+
+					&[data-chip]::before {
+						content: attr(data-chip);
+						text-align: center;
+						height: 2.4rem;
+						border-radius: var(--chip-radius);
+						background-color: var(--chip-bg-clr);
+						position: absolute;
+						top: 0.8rem;
+						left: 0.8rem;
+						opacity: 0.9;
+						font-weight: bold;
+						line-height: 2.4rem;
+						color: var(--chip-fg-clr);
+						padding-inline: 1rem;
+					}
 
           .category-item-price {
             font-size: 1rem;
@@ -467,6 +498,12 @@
     }
 
     :root {
+			--clr-gray : gray;
+			--clr-gray-light-1 : rgb(172, 168, 168);
+			--clr-gray-light-2 : rgb(200, 197, 197);
+			--clr-gray-light-3 : rgb(221, 219, 219);
+			--clr-gray-light-4 : rgb(237, 234, 234);
+
       --clr-black: rgb(0, 0, 0);
       --clr-white: rgb(227, 232, 232);
       --clr-brand: rgb(16, 67, 87);
@@ -540,6 +577,7 @@
       position: sticky;
       top: 0;
       background-color: var(--header-background-color);
+			z-index: 9999;
 
       &::after {
         content: "";
@@ -887,7 +925,7 @@
         }
 
         static get observedAttributes() {
-          return ["image-url", "image-alt", "item-header", "item-price"];
+          return ["image-url", "image-alt", "item-header", "item-price", "item-message"];
         }
 
 						// updates childattribute
@@ -908,6 +946,10 @@
               case "item-price":
                 this.updateFunction(".category-item-price")( "textContent", newValue);
                 break;
+							case "item-message" : 
+								const article = this.selectOne('.category-item');
+								article.dataset.chip = newValue;
+								break;
               default:
                 console.log(`Invalid Attribute ${name}`);
                 break;
