@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
   </head>
   <body>
-    <header class="header">
+    <header class="header stick" style="--top: 0; --z-index: 9999;">
       <span class="logo">
         <img src="images/KalaJayLogo.jpg" class="logo" />
         <h3>Kalajay</h3>
@@ -38,7 +38,7 @@
         <span class="whatsapp_count" data-cart-items-count="0"></span>
       </a>
     </header>
-    <div class="container">
+    <div class="container stick" style="--top: 5.5rem; --z-index: 9999;">
       <section class="filters">
         <button data-category="All" class="filtering_on">
           <img src="images/KalaJayLogo.jpg" alt="Logo" />
@@ -505,6 +505,7 @@
 			--clr-gray-light-4 : rgb(237, 234, 234);
 
       --clr-black: rgb(0, 0, 0);
+			--clr-white-pure : white;
       --clr-white: rgb(227, 232, 232);
       --clr-brand: rgb(16, 67, 87);
 			--clr-accent: rgb(166, 240, 166);
@@ -574,10 +575,10 @@
       align-self: center;
       width: 100%;
       border-block-end: 1px solid black;
-      position: sticky;
-      top: 0;
+      /* position: sticky; */
+      /* top: 0; */
       background-color: var(--header-background-color);
-			z-index: 9999;
+			/* z-index: 9999; */
 
       &::after {
         content: "";
@@ -805,10 +806,19 @@
     }
 
     .container {
-      min-width: 32rem;
-      max-width: 90%;
+			width: 100%;
       margin-inline: auto;
+			background-color: var(--clr-white-pure);
+			padding-inline: 1rem;
+			container-type: inline-size;
+			container-name: Container;
     }
+
+		.stick{
+			position : sticky;
+			top      : var(--top, 0);
+			z-index  : var(--z-index, 9999);
+		}
 
     @keyframes ScrollTracker {
       to {
@@ -816,7 +826,6 @@
       }
     }
 
-    /* style filters  */
     .filters {
       display: flex;
       gap: 1rem;
@@ -824,6 +833,10 @@
       scrollbar-width: none;
 			padding-block: .2rem;
 			padding-inline: .1rem;
+
+			@container Container (width > 900px) {
+				justify-content: center;
+			}
 
       button {
         font-size: 1.6rem;
