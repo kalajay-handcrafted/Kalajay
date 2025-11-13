@@ -80,7 +80,6 @@
             image-alt="Org2"
             item-header="Pen Stand"
             item-price="649"
-						item-message="🔥 Hot Selling"
           ></category-item>
           <category-item
             image-url="images/Organisers/Org3_2.jpeg"
@@ -128,21 +127,18 @@
             image-alt="Mat1"
             item-header="Mat - Adidas Collection"
             item-price="549"
-						item-message="Only Few Left"
           ></category-item>
           <category-item
             image-url="images/Mats/Mat2.jpg"
             image-alt="Mat2"
             item-header="Mat - Evil Eye"
             item-price="549"
-						item-message="🔥 Hot Selling"
           ></category-item>
           <category-item
             image-url="images/Mats/Mat3.jpg"
             image-alt="Mat3"
             item-header="Mat - Heart"
             item-price="549"
-						item-message="🔥 Hot Selling"
           ></category-item>
           <category-item
             image-url="images/Mats/Mat4.jpg"
@@ -220,7 +216,6 @@
             image-alt="Bag1"
             item-header="Bag 1"
             item-price="799"
-						item-message="Most Selling"
           ></category-item>
           <category-item
             image-url="images/Bags/Bag2.jpg"
@@ -316,21 +311,18 @@
             image-alt="Ring1"
             item-header="Key Ring 1"
             item-price="229"
-						item-message="❤️ Most Sold"
           ></category-item>
           <category-item
             image-url="images/KeyRings/KeyRing2.png"
             image-alt="Ring2"
             item-header="Key Ring 2"
             item-price="229"
-						item-message="😃 Guest Favorite"
           ></category-item>
           <category-item
             image-url="images/KeyRings/KeyRing3.jpg"
             image-alt="Ring3"
             item-header="Key Ring 3"
             item-price="229"
-						item-message="🔥 Hot Selling"
           ></category-item>
           <category-item
             image-url="images/KeyRings/KeyRing4.jpeg"
@@ -395,15 +387,10 @@
       </section>
       <section class="footer_customer_support small_screen">
         <details class="footer_resources">
-          <summary>Resource</summary>
+          <summary>Support</summary>
           <nav class="footer_resources_navigation">
-            <li><a href="#">Send Us Feedback</a></li>
-          </nav>
-        </details>
-        <details class="footer_resources">
-          <summary>Help</summary>
-          <nav class="footer_resources_navigation">
-            <li><a href="#">Contact Us</a></li>
+            <li><a href="https://forms.gle/LjZ6Aw4yhiSuX98Z8" target="_blank">Send Us Feedback</a></li>
+            <li><a href="https://wa.me/919740540847" target="_blank">Contact Us</a></li>
           </nav>
         </details>
         <details class="footer_resources">
@@ -419,12 +406,6 @@
     </footer>
     <template id="template-category-item">
       <style>
-				:host{
-					--chip-bg-clr : var(--clr-brand);
-					--chip-fg-clr : var(--clr-white);
-					--chip-radius : 1.2rem;
-					--chip-box-shadow-color : var(--clr-gray-light-3);
-				}
         figure {
           margin: 0;
           padding: 0;
@@ -544,10 +525,14 @@
 			--clr-gray-light-3 : rgb(221, 219, 219);
 			--clr-gray-light-4 : rgb(237, 234, 234);
 
+			--clr-accent-golden: #ffa600;
+			--clr-accent-teal  : #008b56;
+
       --clr-black: rgb(0, 0, 0);
 			--clr-white-pure : white;
       --clr-white: rgb(227, 232, 232);
       --clr-brand: rgb(16, 67, 87);
+			--clr-brand-2 : #00696d;
 			--clr-accent: rgb(166, 240, 166);
 			--clr-accent-yellow : rgb(255 230 0);
 
@@ -575,7 +560,12 @@
 
       --bg-color: var(--clr-white);
 
-			--scroll-tracker-vertical-color: var(--clr-accent);
+			--scroll-tracker-vertical-color: var(--clr-accent-golden);
+
+			--chip-bg-clr : var(--clr-brand);
+			--chip-fg-clr : var(--clr-white);
+			--chip-radius : 1.2rem;
+			--chip-box-shadow-color : var(--clr-gray-light-3);
     }
 
     @media (width > 900px) {
@@ -615,14 +605,11 @@
       align-self: center;
       width: 100%;
       border-block-end: 1px solid black;
-      /* position: sticky; */
-      /* top: 0; */
       background-color: var(--header-background-color);
-			/* z-index: 9999; */
 
       &::after {
         content: "";
-        height: 4px;
+        height: .4rem;
         width: 100%;
         background-color: var(--scroll-tracker-vertical-color);
         position: absolute;
