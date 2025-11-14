@@ -38,7 +38,7 @@
         <span class="whatsapp_count" data-cart-items-count="0"></span>
       </a>
     </header>
-    <div class="container stick" style="--top: 5.5rem; --z-index: 9999;">
+    <div class="container stick" style="--top: 6.8rem; --z-index: 9999;">
       <section class="filters">
         <button data-category="All" class="filtering_on">
           <img src="images/KalaJayLogo.jpg" alt="Logo" />
@@ -405,7 +405,7 @@
         </details>
       </section>
       <section class="footer_copyright">
-        <span>&copy; 2025 Kalajay all rights reserved</span>
+        <span class="copy">&copy; 2025 Kalajay</span> <span class="right">All rights reserved</span>
       </section>
     </footer>
     <template id="template-category-item">
@@ -515,12 +515,17 @@
   </body>
   <style>
     *,
-    *::before,
-    *::after {
+		::backdrop,
+    ::before,
+    ::after {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
+		a {
+			font: inherit;
+			color: inherit !important;
+		}
 
     :root {
 			--clr-gray : gray;
@@ -610,14 +615,15 @@
       width: 100%;
       border-block-end: 1px solid black;
       background-color: var(--header-background-color);
+			padding-block: 1.6rem;
 
-      &::after {
+      &::before{
         content: "";
         height: .4rem;
         width: 100%;
         background-color: var(--scroll-tracker-vertical-color);
         position: absolute;
-        bottom: 0;
+        top: 0;
         scale: 0 1;
         animation-name: ScrollTracker;
         animation-timing-function: linear;
@@ -714,8 +720,10 @@
       display: flex;
       flex-direction: column;
       gap: 2.4rem;
-      padding: 2.4rem;
+      padding-inline: 2.4rem;
+			padding-block-start: .8rem;
 			flex-grow: 1;
+			background-color: var(--clr-white-pure);
     }
 
     .category {
@@ -746,6 +754,15 @@
       font-weight: bold;
       display: flex;
       flex-direction: column;
+			flex-grow: 1;
+
+			@media (width > 600px) {
+				background-color: var(--clr-brand);
+				color: var(--clr-white);
+				height: 70vh;
+				justify-content: center;
+				gap: 8rem;
+			}
 
       .footer_customer_support {
         display: flex;
@@ -802,15 +819,15 @@
         margin-block-end: 2.4rem;
       }
 
-      & .large_screen {
+   & .large_screen {
         display: none;
 
         @media (width > 600px) {
           display: flex;
           flex-direction: row;
-          flex-grow: 1;
           gap: 10rem;
           justify-content: center;
+					align-items: start;
 
           & .footer_resources {
             & summary {
@@ -837,10 +854,7 @@
     }
 
     .container {
-			width: 100%;
-      margin-inline: auto;
 			background-color: var(--clr-white-pure);
-			padding-inline: 1rem;
 			container-type: inline-size;
 			container-name: Container;
     }
@@ -862,10 +876,10 @@
       gap: 1rem;
       overflow: scroll;
       scrollbar-width: none;
-			padding-block: .2rem;
-			padding-inline: .1rem;
+			padding-block: 1.2rem;
+			padding-inline: 2.4rem;
 
-			@container Container (width > 900px) {
+			@container Container (width > 950px) {
 				justify-content: center;
 			}
 
