@@ -473,7 +473,6 @@
             text-align: center;
             margin-inline-end: 0.4rem;
             margin-block-start: 0.4rem;
-						/* outline: 4px solid red; */
 						display: flex;
 						justify-content: center;
 						align-items: center;
@@ -489,35 +488,31 @@
               cursor: pointer;
 							fill: var(--whatsapp-svg-bg-color);
             }
+
 						&::after{
 							content: '';
-							border: 4px solid var(--clr-accent-yellow);
-							height: 4rem;
-							width: 4rem;
+							border: 0.2rem solid var(--clr-accent-yellow);
+							height: 90%;
+							width: 90%;
 							position: absolute;
 							border-radius: 50%;
 							scale: 0;
+							transition-property: scale;
+							transition-duration: .4s;
 						}
 
             &.category-item-cart__selected {
-							outline: .24rem solid var(--clr-accent-yellow);
               & > svg {
                 fill: var(--clr-accent-yellow);
               }
 
 							&::after{
-								animation-name: CartSelection;
-								animation-duration: .4s;
+								scale: 1;
 							}
             }
           }
         }
 
-				@keyframes CartSelection {
-					to {
-						scale: 1;
-					}
-				}
       </style>
       <article class="category-item">
         <figure>
