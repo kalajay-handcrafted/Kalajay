@@ -464,6 +464,7 @@
           }
 
           .category-item-cart {
+						position: relative;
             grid-row: 1/2;
             grid-column: 1/2;
             justify-self: end;
@@ -474,8 +475,8 @@
             margin-block-start: 0.4rem;
 
             > svg {
-              width: 24px;
-              height: 24px;
+              width: 2.4rem;
+              height: 2.4rem;
               background-color: rgb(8, 64, 92);
               outline: red;
               padding: 0.4rem;
@@ -487,15 +488,39 @@
               cursor: pointer;
 							fill: var(--whatsapp-svg-bg-color);
             }
+						&::after{
+							content: '';
+							border: 2px solid var(--clr-accent-yellow);
+							height: 4rem;
+							width: 4rem;
+							position: absolute;
+							border-radius: 50%;
+							top: -10%;
+							left: -8%;
+							margin-inline-end: 0.4rem;
+							margin-block-start: 0.4rem;
+							scale: 0;
+						}
 
             &.category-item-cart__selected {
               & > svg {
                 fill: var(--clr-accent-yellow);
                 outline: 2px solid var(--clr-accent-yellow);
               }
+
+							&::after{
+								animation-name: CartSelection;
+								animation-duration: .4s;
+							}
             }
           }
         }
+
+				@keyframes CartSelection {
+					to {
+						scale: 1;
+					}
+				}
       </style>
       <article class="category-item">
         <figure>
