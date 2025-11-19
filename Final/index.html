@@ -394,7 +394,7 @@
           <summary>Support</summary>
           <nav class="footer_resources_navigation">
             <li><a href="https://forms.gle/LjZ6Aw4yhiSuX98Z8" target="_blank">Send Us Feedback</a></li>
-            <li><a href="https://wa.me/919740540847" target="_blank">Contact Us</a></li>
+            <li><a href="https://wa.me/919740540847" target="_blank" class="contact_us">Contact Us</a></li>
           </nav>
         </details>
         <details class="footer_resources">
@@ -689,6 +689,7 @@
           width: 2.8rem;
           height: 2.8rem;
 					fill: var(--whatsapp-svg-bg-color);
+					pointer-events: none;
         }
 
         &:has(span[data-cart-items-count="0"]) {
@@ -1102,10 +1103,12 @@
 		}
 
     document.addEventListener("Kalajay:ItemAddedToCart", (e) => {
+			if(navigator.vibrate) navigator.vibrate(20);
       queueMicrotask(() => addToCart(e.detail.id, e.detail.itemHeader, e.detail.itemPrice));
     });
 
     document.addEventListener("Kalajay:ItemRemovedFromCart", (e) => {
+			if(navigator.vibrate) navigator.vibrate(20);
       queueMicrotask(() => removeFromCart(e.detail.id, e.detail.itemPrice));
     });
 
@@ -1259,6 +1262,13 @@
 
 			handleCategorySpecificButton(button);
 		}, true);
+
+		document.querySelectorAll('a.whatsapp').forEach(
+			element => element.addEventListener("click", event => navigator.vibrate(50))
+		)
+		document.querySelectorAll('a.contact_us').forEach(
+			element => element.addEventListener("click", event => navigator.vibrate(50))
+		)
 
   </script>
 </html>
