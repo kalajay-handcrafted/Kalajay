@@ -10,7 +10,6 @@
   <body>
     <header class="header stick" style="--top: 0; --z-index: 9999;">
       <span class="logo">
-        <img src="images/KalaJayLogo.jpg" class="logo" />
 				<a href="/"> <h3>Kalajay</h3> </a>
       </span>
       <a
@@ -40,6 +39,7 @@
     </header>
     <div class="container stick" style="--top: 6.8rem; --z-index: 9999;">
       <section class="filters">
+				<span class="circle"> <img class="kalajay_logo_image" src="images/KalaJayLogo.jpg" /> </span>
         <button data-category="All" class="filtering_on">
           <img src="images/KalaJayLogo.jpg" alt="Logo" />
           <span> All</span>
@@ -896,6 +896,8 @@
       scrollbar-width: none;
 			padding-block: 1.2rem;
 			padding-inline: 2.4rem;
+			position: relative;
+			align-items: center;
 
 			@container Container (width > 950px) {
 				justify-content: center;
@@ -914,6 +916,8 @@
         align-items: center;
         font-weight: bold;
         background-color: transparent;
+				height: 4rem;
+
 
 				* {
 					pointer-events: none;
@@ -937,6 +941,17 @@
         }
       }
     }
+
+		.circle {
+			height: 8rem;
+			width: 8rem;
+			border-radius: 50%;
+			overflow: hidden;
+		}
+		.kalajay_logo_image{
+			object-position: 50% 50%;
+			object-fit: cover;
+		}
 
     .hidden {
       display: none;
