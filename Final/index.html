@@ -911,6 +911,7 @@
       scrollbar-width: none;
 			padding-block: 1.2rem;
 			padding-inline: 2.4rem;
+			position: relative;
 			align-items: center;
 
 			@container Container (width > 950px) {
@@ -943,6 +944,8 @@
         align-items: center;
         font-weight: bold;
         background-color: transparent;
+				height: 4rem;
+
 
 				* {
 					pointer-events: none;
@@ -966,6 +969,17 @@
         }
       }
     }
+
+		.circle {
+			height: 8rem;
+			width: 8rem;
+			border-radius: 50%;
+			overflow: hidden;
+		}
+		.kalajay_logo_image{
+			object-position: 50% 50%;
+			object-fit: cover;
+		}
 
     .hidden {
       display: none;
