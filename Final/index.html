@@ -11,7 +11,7 @@
     <header class="header stick" style="--top: 0; --z-index: 9999;">
       <span class="logo">
         <img src="images/KalaJayLogo.jpg" class="logo" />
-        <h3>Kalajay</h3>
+				<a href="/"> <h3>Kalajay</h3> </a>
       </span>
       <a
         class="whatsapp"
@@ -568,8 +568,9 @@
       --card-height: 22rem;
 
       --header-height: 4.8rem;
-      --header-font-size: 2rem;
+      --header-font-size: 4rem;
       --header-font-style: sans-serif;
+			--header-font-color: var(--clr-white);
 			--header-background-color: var(--clr-brand);
 
 			--whatsapp-svg-bg-color: var(--clr-white);
@@ -656,15 +657,14 @@
         gap: 1rem;
         margin-inline-start: 1.6rem;
 
-        img {
-          max-width: 2.4rem;
-          max-height: 2.4rem;
-        }
+				a {
+					text-decoration: none;
+				}
 
         h3 {
-          font-size: 2rem;
+          font-size: var(--header-font-size);
           font-weight: 600;
-					color: var(--text-white);
+					color: var(--header-font-color);
         }
       }
 
