@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
   </head>
   <body>
+		<h3 class="NoNetworkConnection hide">You are not connected to the internet.</h3>
     <header class="header stick" style="--top: 0; --z-index: 9999;">
       <span class="logo">
 				<a href="/"> <h3>Kalajay</h3> </a>
@@ -622,7 +623,22 @@
       font-family: "Inter", samarkan;
       gap: 3.2rem;
       margin-inline: auto;
+			position: relative;
     }
+
+		.hide {
+			display: none;
+		}
+		.NoNetworkConnection{
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			text-align: center;
+			background-color: var(--clr-accent-golden);
+			z-index: 999999;
+			color: var(--clr-white);
+		}
 
     .header {
       display: flex;
@@ -1269,6 +1285,10 @@
 		document.querySelectorAll('a.contact_us').forEach(
 			element => element.addEventListener("click", event => navigator.vibrate(50))
 		)
+
+		const offlineMessage = document.querySelector('.NoNetworkConnection');
+		window.addEventListener("online", () => offlineMessage.classList.add('hide'));
+		window.addEventListener("offline", () => offlineMessage.classList.remove('hide'));
 
   </script>
 </html>
