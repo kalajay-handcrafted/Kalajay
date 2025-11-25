@@ -42,28 +42,29 @@
     <div class="container stick" style="--top: 6.8rem; --z-index: 9999;">
       <section class="filters">
 				<span class="circle"> <img src="images/KalaJayLogo.jpg" /> </span>
-        <button data-category="All" class="filtering_on">
+        <button data-category="All" >
+        <!-- <button data-category="All" class="filtering_on"> -->
           <img src="images/KalaJayLogo.jpg" alt="Logo" />
-          <span> All</span>
+          <span data-label="All">All</span>
         </button>
         <button data-category="Organiser">
           <img src="images/Organisers/Org2.jpeg" alt="Logo" />
-          <span>Organisers</span>
+          <span class="rotate" data-label="Organisers">Organisers</span>
         </button>
         <button data-category="Mat">
           <img src="images/Mats/Mat1.jpg" alt="Logo" />
-          <span>Mats & Coasters</span>
+          <span data-label="Mats & Coasters">Mats & Coasters</span>
         <button data-category="Bag">
           <img src="images/Bags/Bag1.jpg" alt="Logo" />
-          <span>Bags</span>
+          <span data-label="Bags">Bags</span>
         </button>
         <button data-category="AirpodCase">
           <img src="images/AirpodCases/Case3.jpeg" alt="Logo" />
-          <span>Airpod Cases</span>
+          <span data-label="Airpod Cases">Airpod Cases</span>
         </button>
-		<button data-category="KeyRings">
+				<button data-category="KeyRings">
           <img src="images/KeyRings/KeyRing1.jpg" alt="Logo" />
-          <span> Key Rings</span>
+          <span data-label="Key Rings"> Key Rings</span>
         </button>
       </section>
     </div>
@@ -757,7 +758,6 @@
     }
 
     .categories {
-      --display-children: flex;
       display: flex;
       flex-direction: column;
       gap: 2.4rem;
@@ -768,10 +768,13 @@
     }
 
     .category {
-      display: var(--display-children);
-      view-transition-name: attr(data-category);
+      display: var(--display-children, flex);
       flex-direction: column;
       gap: 1.8rem;
+
+			&.hidden{
+				--display-children: none;
+			}
 
       .category-header {
         font-size: 1.4rem;
@@ -949,11 +952,9 @@
 			}
 
       button {
-				height: 4rem;
         font-size: 1.6rem;
         border: 1px solid black;
-        padding-inline: 1rem;
-        padding-block: 0.8rem;
+        padding-inline-start: 1rem;
         border-radius: 0.4rem;
         cursor: pointer;
         white-space: nowrap;
@@ -963,7 +964,8 @@
         font-weight: bold;
         background-color: transparent;
 				height: 4rem;
-
+				color: transparent;
+				position: relative;
 
 				* {
 					pointer-events: none;
@@ -975,17 +977,86 @@
           border-radius: 0.4rem;
         }
 
-        &:hover,
         &:focus {
 					outline: 1px solid var(--header-background-color);
         }
 
+        &.filtering_on span{
+					&::before {
+						transform: translateY(-100%) rotateX(-90deg);
+					}
 
-        &.filtering_on {
-          background-color: var(--header-background-color);
-					color: var(--clr-white);
+					&::after{
+					transform: translateY(0) rotateX(0);
+					}
         }
-      }
+
+				&:not(.filtering_on) {
+					span {
+						&::before {
+							transform: translateY(0) rotateX(0);
+						}
+
+						&::after{
+							transform: translateY(100%) rotateX(90deg);
+						}
+					}
+
+					&:hover{
+					 span {
+							&::before {
+								transform: translateY(-100%) rotateX(-90deg);
+							}
+
+							&::after{
+							transform: translateY(0) rotateX(0);
+							}
+						}
+
+					}
+
+				}
+
+				span {
+					position: relative;
+					height: 100%;
+					align-self: stretch;
+					align-self: stretch;
+					padding-inline: 1rem;
+					color: transparent;
+					overflow: hidden;
+
+					&::before {
+						content: attr(data-label);
+						position: absolute;
+						height: 100%;
+						width: 100%;
+						top:0;
+						right: 0;
+						color: black;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						transition-delay: .2s;
+						transition-duration: .5s;
+					}
+
+					&::after{
+						content: attr(data-label);
+						position: absolute;
+						height: 100%;
+						width: 100%;
+						top:0;
+						right: 0;
+						background-color: var(--clr-brand);
+						color: var(--clr-white);
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						transition-delay: .2s;
+						transition-duration: .5s;
+					}
+				}
     }
 
 		.circle {
@@ -999,9 +1070,6 @@
 			object-fit: cover;
 		}
 
-    .hidden {
-      display: none;
-    }
   </style>
 
   <script>
@@ -1236,6 +1304,7 @@
     const buttonForEachCategory = filtersSection.querySelectorAll("button:not([data-category='All'])");
 
 		function makeVisible(category){
+			 console.log(category)
 					category.classList.remove("hidden");
 					category.classList.add("InView");
 		}
@@ -1254,6 +1323,7 @@
       buttonForEachCategory.forEach((btn) => {
 				const selector =  `.category[data-category="${btn.dataset.category}"]`;
         const linkedCategory = categories.querySelector(selector);
+				console.log(linkedCategory)
           if (btn.classList.contains("filtering_on")) {
             linkedCategory.classList.remove("hidden");
           } else {
