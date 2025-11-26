@@ -1291,38 +1291,31 @@
 		}
 
 		function handleAllCategoryButton(button){
-			 document.startViewTransition(() => {
 				button.classList.add("filtering_on");
 				buttonForEachCategory.forEach((button) => button.classList.remove("filtering_on"));
 				categories.querySelectorAll(".category").forEach(makeVisible);
-			 });
 		}
 
 		function handleCategorySpecificButton(button){
-				 document.startViewTransition(
-					() => {
-						buttonForAllCategory.classList.remove("filtering_on");
+			buttonForAllCategory.classList.remove("filtering_on");
 
-						button.classList.toggle("filtering_on");
+			button.classList.toggle("filtering_on");
 
-						buttonForEachCategory.forEach((btn) => {
-							const selector =  `.category[data-category="${btn.dataset.category}"]`;
-							const linkedCategory = categories.querySelector(selector);
-							console.log(linkedCategory)
-								if (btn.classList.contains("filtering_on")) {
-										linkedCategory.classList.remove("hidden");
-								} else {
-										linkedCategory.classList.add("hidden");
-								}
-							});
+			buttonForEachCategory.forEach((btn) => {
+				const selector =  `.category[data-category="${btn.dataset.category}"]`;
+				const linkedCategory = categories.querySelector(selector);
+					if (btn.classList.contains("filtering_on")) {
+							linkedCategory.classList.remove("hidden");
+					} else {
+							linkedCategory.classList.add("hidden");
+					}
+				});
 
-							// in case user has remove selection from all the buttons - then make 'all' button selected
-							if (filtersSection.querySelectorAll("button.filtering_on").length < 1) {
-								buttonForAllCategory.click();
-								buttonForAllCategory.focus();
-							}
-
-					});
+				// in case user has remove selection from all the buttons - then make 'all' button selected
+				if (filtersSection.querySelectorAll("button.filtering_on").length < 1) {
+					buttonForAllCategory.click();
+					buttonForAllCategory.focus();
+				}
 		}
 
 		filtersSection.addEventListener("click", event => {
@@ -1330,11 +1323,15 @@
 			const button = event.target;
 
 			if(button.dataset.category === 'All') {
-				handleAllCategoryButton(button);
+			  if(document.startViewTransition) document.startViewTransition(() => handleAllCategoryButton(button));
+			  else                             handleAllCategoryButton(button);
+
 				return;
 			}
 
-			handleCategorySpecificButton(button);
+			if(document.startViewTransition) document.startViewTransition(() => handleCategorySpecificButton(button));
+			else                            handleCategorySpecificButton(button);
+
 		}, true);
 
 		document.querySelectorAll('a.whatsapp').forEach(
