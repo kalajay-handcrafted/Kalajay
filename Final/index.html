@@ -42,8 +42,7 @@
     <div class="container stick" style="--top: 6.8rem; --z-index: 9999;">
       <section class="filters">
 				<span class="circle"> <img src="images/KalaJayLogo.jpg" /> </span>
-        <button data-category="All" >
-        <!-- <button data-category="All" class="filtering_on"> -->
+        <button data-category="All" class="filtering_on">
           <img src="images/KalaJayLogo.jpg" alt="Logo" />
           <span data-label="All">All</span>
         </button>
@@ -1060,6 +1059,10 @@
 			object-fit: cover;
 		}
 
+		::view-transition-group(root){
+			animation-duration: 5s;
+		}
+
   </style>
 
   <script>
@@ -1288,44 +1291,54 @@
 
 		// filter button logic
     const categories     = document.querySelector("main.categories");
+
+		let viewTranstionGroupCount = 0;
+		categories.querySelectorAll('.category')
+		.forEach(category => category.style.viewTransitionName = `Category-ViewTransition-Group-${++viewTranstionGroupCount}`);
+
     const filtersSection = document.querySelector(".filters");
 
     const buttonForAllCategory  = filtersSection.querySelector('button[data-category="All"]');
     const buttonForEachCategory = filtersSection.querySelectorAll("button:not([data-category='All'])");
 
 		function makeVisible(category){
-			 console.log(category)
-					category.classList.remove("hidden");
-					category.classList.add("InView");
+			category.classList.remove("hidden");
+			category.classList.add("InView");
 		}
 
 		function handleAllCategoryButton(button){
+			 document.startViewTransition(() => {
 				button.classList.add("filtering_on");
 				buttonForEachCategory.forEach((button) => button.classList.remove("filtering_on"));
 				categories.querySelectorAll(".category").forEach(makeVisible);
+			 });
 		}
 
 		function handleCategorySpecificButton(button){
-      buttonForAllCategory.classList.remove("filtering_on");
+				 document.startViewTransition(
+					() => {
+						buttonForAllCategory.classList.remove("filtering_on");
 
-      button.classList.toggle("filtering_on");
+						button.classList.toggle("filtering_on");
 
-      buttonForEachCategory.forEach((btn) => {
-				const selector =  `.category[data-category="${btn.dataset.category}"]`;
-        const linkedCategory = categories.querySelector(selector);
-				console.log(linkedCategory)
-          if (btn.classList.contains("filtering_on")) {
-            linkedCategory.classList.remove("hidden");
-          } else {
-            linkedCategory.classList.add("hidden");
-          }
-        });
+						buttonForEachCategory.forEach((btn) => {
+							const selector =  `.category[data-category="${btn.dataset.category}"]`;
+							const linkedCategory = categories.querySelector(selector);
+							console.log(linkedCategory)
+								if (btn.classList.contains("filtering_on")) {
+										linkedCategory.classList.remove("hidden");
+								} else {
+										linkedCategory.classList.add("hidden");
+								}
+							});
 
-				// in case user has remove selection from all the buttons - then make 'all' button selected
-        if (filtersSection.querySelectorAll("button.filtering_on").length < 1) {
-          buttonForAllCategory.click();
-          buttonForAllCategory.focus();
-        }
+							// in case user has remove selection from all the buttons - then make 'all' button selected
+							if (filtersSection.querySelectorAll("button.filtering_on").length < 1) {
+								buttonForAllCategory.click();
+								buttonForAllCategory.focus();
+							}
+
+					});
 		}
 
 		filtersSection.addEventListener("click", event => {
@@ -1353,4 +1366,3 @@
 
   </script>
 </html>
-
