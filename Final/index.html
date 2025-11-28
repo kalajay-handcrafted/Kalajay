@@ -696,29 +696,41 @@
           height: 2.8rem;
 					fill: var(--whatsapp-svg-bg-color);
 					pointer-events: none;
+					transition-duration: .3s;
+					transform-origin: top right;
+					display: inline-block;
         }
+
+				.whatsapp_direct_message {
+					scale: 1;
+					transform-origin: bottom left;
+				}
+
+				.whatsapp_send_cart_items {
+					scale: 0;
+					transform-origin: top right;
+				}
 
         &:has(span[data-cart-items-count="0"]) {
           .whatsapp_send_cart_items {
-            display: none;
+						scale: 0;
           }
 
           .whatsapp_direct_message {
-            display: inline-block;
+						scale: 1;
           }
         }
 
-        /* keep it hidden by default */
-        .whatsapp_direct_message {
-          display: none;
-        }
+				&:has(span:not([data-cart-items-count="0"])) {
+          .whatsapp_send_cart_items {
+						scale: 1;
+          }
 
-        & > * {
-          grid-row-start: 1;
-          grid-row-end: 2;
-          grid-column-start: 1;
-          grid-column-end: 2;
-        }
+					.whatsapp_direct_message {
+						scale: 0;
+					}
+				}
+
 
         & > .whatsapp_count {
           font-size: 1rem;
@@ -733,9 +745,27 @@
           border-radius: 100%;
         }
 
-        & > span[data-cart-items-count="0"] {
-          visibility: hidden;
+				.whatsapp_count{
+					transform-origin: top right;
+				}
+        span[data-cart-items-count="0"] {
+					transition-duration: .6s;
+					scale : 0;
         }
+
+        span:not([data-cart-items-count="0"]) {
+					transition-duration: .4s;
+					transition-timing-function: ease-in-out;
+					scale : 1;
+        }
+
+        & > * {
+          grid-row-start: 1;
+          grid-row-end: 2;
+          grid-column-start: 1;
+          grid-column-end: 2;
+        }
+
       }
     }
 
