@@ -398,8 +398,10 @@
       </section>
     </footer>
 		<dialog class="shopping-cart-modal">
-			<h2>hello</h2>
-			<button class="CloseCartView">Close</button>
+			<header class="CartViewHeader">
+				<span>Cart</span>
+				<button class="CloseCartView">X</button>
+			</header>
 		</dialog>
     <template id="template-category-item">
       <style>
@@ -735,6 +737,7 @@
           padding: 0.2rem;
           font-weight: bold;
           border-radius: 100%;
+					pointer-events: none;
         }
 
 				.whatsapp_count{
@@ -1086,16 +1089,52 @@
 		}
 
 		.shopping-cart-modal {
-				height: 40rem;
+				height: 80rem;
 				width: 40rem;
 				position-anchor: --shopping-cart;
 				top: anchor(bottom);
 				margin-inline: auto;
 
-				.card {
-					height: var(--card-height);
-					width: var(--card-width);
+				.CartViewHeader{
+					width: 100%;
+					height: 6.4rem;
+					background-color: var(--clr-brand);
+					color: var(--clr-white);
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+
+					span {
+						font-size: 2.4rem;
+					}
+
+					.CloseCartView {
+						padding: 1.4rem;
+						background-color: var(--clr-brand);
+						color: var(--clr-white);
+						font-size: 2.4rem;
+						cursor: pointer;
+						border: 1px solid var(--clr-white);
+						border-radius: 50%;
+					}
 				}
+
+				.cards {
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					gap: 1rem;
+					margin-block-start: 1.6rem;
+					.card {
+						text-align: center;
+						img {
+							height: var(--card-height);
+							width: var(--card-width);
+							border-radius: 2rem;
+						}
+					}
+				}
+
 		}
 
   </style>
@@ -1248,12 +1287,12 @@
 
     document.addEventListener("Kalajay:ItemAddedToCart", (e) => {
 			if(navigator.vibrate) navigator.vibrate(20);
-      queueMicrotask(() => addToCart(e.detail.id, e.detail.itemHeader, e.detail.itemPrice));
+      queueMicrotask(() => CartItems.instance().addToCart(e.detail.id));
     });
 
     document.addEventListener("Kalajay:ItemRemovedFromCart", (e) => {
 			if(navigator.vibrate) navigator.vibrate(20);
-      queueMicrotask(() => removeFromCart(e.detail.id, e.detail.itemPrice));
+      queueMicrotask(() => CartItems.instance().removeFromCart(e.detail.id));
     });
 
     class Maybe {
@@ -1288,59 +1327,36 @@
        store => store.size
     );
 
-    const udpateWhatsappUrl = compose(
-      url   => whatsappNode.setAttribute("href", url),
-      store => getUrl(store)
-    );
+		class CartItems {
+			#set = new Set();
+			static #instance  = null;
 
-    function useState(cart) {
-      function render() {
-        requestAnimationFrame(() => withInput(cart).callEach(updateNodesWithCount, udpateWhatsappUrl));
-      }
+			static instance(){
+				if(CartItems.#instance == null) {
+					CartItems.#instance = new CartItems();
+				}
 
-      const addToCart = new Proxy(cart.set.bind(cart), {
-        apply(target, _, [key, itemName, price]) {
-					console.log(key, itemName, price);
-          new Maybe(cart.get(key)).ifOrElse(
-            ([, currentItemCount]) => {
-              const totalCount = currentItemCount + 1;
-              const totalPrice = totalCount * price;
-              target(key, [itemName, totalCount, totalPrice]);
-            },
-            () => target(key, [itemName, 1, price])
-          );
+				return this.#instance;
+			}
 
-          render();
-        },
-      });
+			forEach(operator) {
+				this.#set.forEach(operator);
+			}
 
-      const removeFromCart = new Proxy(cart.delete.bind(cart), {
-        apply(target, _, [key, itemPrice]) {
-          new Maybe(cart.get(key)).ifOrElse(
-            ([itemName, itemCount, totalPrice]) => {
-              if (itemCount == 1) {
-                // if only one left then remvoe the key
-                // we are deleting the last element
-                cart.delete(key);
-              } else {
-                cart.set(key, [
-                  itemName,
-                  itemCount - 1,
-                  totalPrice - itemPrice,
-                ]);
-              }
+			addToCart(itemId){
+				this.#set.add(itemId);
+				this.render();
+			}
 
-              render();
-            },
-            () => {}
-          );
-        },
-      });
+			removeFromCart(itemId){
+				this.#set.delete(itemId);
+				this.render();
+			}
 
-      return [addToCart, removeFromCart];
-    }
-
-    const [addToCart, removeFromCart] = useState(new Map());
+			render(){
+				requestAnimationFrame(() => withInput(this.#set).callEach(updateNodesWithCount));
+			}
+		}
 
     const host = "https://wa.me/919740540847?text=";
     function getUrl(cart) {
@@ -1443,6 +1459,39 @@
 				event.preventDefault();
 				// show the cart modal
 				cartViewModal.showModal();
+				cartViewModal.querySelector('.cards')?.remove();
+
+				const listOfCards = new DocumentFragment();
+
+				CartItems.instance().forEach((itemId) => { 
+					const categoryItem = document.getElementById(itemId)
+					const imageSrc = categoryItem.getAttribute('image-url');
+					const imageAlt = categoryItem.getAttribute('image-alt');
+
+					console.log(imageSrc, imageAlt);
+
+					const cardDiv = document.createElement('div');
+					cardDiv.classList.add('card');
+					const image = document.createElement('img');
+					image.src = imageSrc;
+					image.alt = imageAlt;
+
+					const itemName = categoryItem.getAttribute('item-header');
+					const h3 = document.createElement('h3');
+					h3.textContent = itemName;
+
+					cardDiv.appendChild(image);
+					cardDiv.appendChild(h3);
+					listOfCards.appendChild(cardDiv);
+				});
+
+				const cardsWrapper = document.createElement('div');
+				cardsWrapper.classList.add('cards');
+
+				requestAnimationFrame(() => {
+					cardsWrapper.appendChild(listOfCards);
+					cartViewModal.append(cardsWrapper);
+				});
 			}
 		});
 
