@@ -1105,6 +1105,38 @@
 
 		if(!crypto.randomUUID) crypto.randomUUID = generateUUID;
 
+		const filterMenuTemplate = document.getElementById('FilterButton').content;
+
+		customElements.define('filter-menu', 
+			class extends HTMLElement {
+				static observedAttributes = ['category', 'image-src', 'imageAlt', 'label', 'class'];
+				constructor(){
+					super();
+					this.appendChild(filterMenuTemplate.cloneNode(true));
+				}
+
+				attributeChangedCallback(name, oldValue, newValue){
+					console.log('attribute changed', name, oldValue, newValue)
+					if(name == 'category') {
+						this.querySelector('button').dataset.category = newValue;
+					}
+					if(name == 'image-src') {
+						this.querySelector('button img').src = newValue;
+					}
+					if(name == 'imageAlt') {
+						this.querySelector('button img').alt = newValue;
+					}
+					if(name == 'label'   ) {
+						const span = this.querySelector('button span');
+						span.dataset.label = newValue;
+						span.textContent   = newValue;
+					}
+					if(name == 'class') {
+						this.querySelector('button').classList.add(newValue);
+					}
+				}
+			}
+		);
     customElements.define(
       "category-item",
       class extends HTMLElement {
