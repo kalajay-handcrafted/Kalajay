@@ -16,6 +16,7 @@
       </span>
       <a
         class="whatsapp"
+				id="ClickToShop"
         href="https://wa.me/919740540847?text=I%20am%20interested%20in%20your%20product"
       >
         <svg
@@ -396,6 +397,10 @@
         <span class="copy">&copy; 2025 Kalajay</span> <span class="right">All rights reserved</span>
       </section>
     </footer>
+		<dialog class="shopping-cart-modal">
+			<h2>hello</h2>
+			<button class="CloseCartView">Close</button>
+		</dialog>
     <template id="template-category-item">
       <style>
         figure {
@@ -675,6 +680,7 @@
         background-color: none;
         text-decoration: none;
         margin-inline-end: 1.8rem;
+				anchor-name: --shopping-cart;
 
         .whatsapp_direct_message,
         & .whatsapp_send_cart_items {
@@ -1063,6 +1069,35 @@
 			object-fit: cover;
 		}
 
+		}
+		.developer {
+			a {
+				svg {
+					height: 1.4rem;
+					width: 1.4rem;
+					path {
+						stroke: var(--clr-white);
+						@media (width <= 600px) {
+							stroke : var(--clr-black);
+						}
+					}
+				}
+			}
+		}
+
+		.shopping-cart-modal {
+				height: 40rem;
+				width: 40rem;
+				position-anchor: --shopping-cart;
+				top: anchor(bottom);
+				margin-inline: auto;
+
+				.card {
+					height: var(--card-height);
+					width: var(--card-width);
+				}
+		}
+
   </style>
 
   <script>
@@ -1247,7 +1282,8 @@
     const whatsappCountNode = document.getElementsByClassName("whatsapp_count")[0];
 
     const updateNodesWithCount = compose(
-			 count => whatsappCountNode.setAttribute("data-cart-items-count", count),
+			 count => whatsappNode.setAttribute("data-cart-items-count", count),
+			 count => { whatsappCountNode.setAttribute("data-cart-items-count", count); return count},
        count => whatsappCountNode.textContent = count,
        store => store.size
     );
@@ -1264,6 +1300,7 @@
 
       const addToCart = new Proxy(cart.set.bind(cart), {
         apply(target, _, [key, itemName, price]) {
+					console.log(key, itemName, price);
           new Maybe(cart.get(key)).ifOrElse(
             ([, currentItemCount]) => {
               const totalCount = currentItemCount + 1;
@@ -1391,6 +1428,28 @@
 		const offlineMessage = document.querySelector('.NoNetworkConnection');
 		window.addEventListener("online", () => offlineMessage.classList.add('hide'));
 		window.addEventListener("offline", () => offlineMessage.classList.remove('hide'));
+
+		const cartViewModal = document.querySelector('.shopping-cart-modal');
+		const clickToShop   = document.getElementById('ClickToShop');
+
+		clickToShop.addEventListener('click', event => { 
+			if(event.target == clickToShop) {
+				const cartItemsCount = event.target.getAttribute('data-cart-items-count');
+				// we have no items in the cart
+				if(!cartItemsCount || parseInt(cartItemsCount) < 1) return;
+				
+				// we are here - that means we have items in the cart
+				// so, stop the link from moving forward
+				event.preventDefault();
+				// show the cart modal
+				cartViewModal.showModal();
+			}
+		});
+
+		const closeCartViewModal = document.querySelector('.CloseCartView');
+		closeCartViewModal.addEventListener('click', event => {
+			cartViewModal.close();
+		});
 
   </script>
 </html>
