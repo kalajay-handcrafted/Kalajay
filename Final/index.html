@@ -42,29 +42,15 @@
     <div class="container stick" style="--top: 6.8rem; --z-index: 9999;">
       <section class="filters">
 				<span class="circle"> <img src="images/KalaJayLogo.jpg" /> </span>
-        <button data-category="All" class="filtering_on">
-          <img src="images/KalaJayLogo.jpg" alt="Logo" />
-          <span data-label="All">All</span>
-        </button>
-        <button data-category="Organiser">
-          <img src="images/Organisers/Org2.jpeg" alt="Logo" />
-          <span class="rotate" data-label="Organisers">Organisers</span>
-        </button>
-        <button data-category="Mat">
-          <img src="images/Mats/Mat1.jpg" alt="Logo" />
-          <span data-label="Mats & Coasters">Mats & Coasters</span>
-        <button data-category="Bag">
-          <img src="images/Bags/Bag1.jpg" alt="Logo" />
-          <span data-label="Bags">Bags</span>
-        </button>
-        <button data-category="AirpodCase">
-          <img src="images/AirpodCases/Case3.jpeg" alt="Logo" />
-          <span data-label="Airpod Cases">Airpod Cases</span>
-        </button>
-				<button data-category="KeyRings">
-          <img src="images/KeyRings/KeyRing1.jpg" alt="Logo" />
-          <span data-label="Key Rings"> Key Rings</span>
-        </button>
+
+				<template id="FilterButton"> <button> <img /> <span></span> </button> </template>
+
+				<filter-menu category="All" image-src="images/KalaJayLogo.jpg" image-alt="Logo" label="All" class="filtering_on"></filter-menu>
+				<filter-menu category="Organiser" image-src="images/Organisers/Org2.jpeg" image-alt="Organiser Category Photo" label="Organiser"></filter-menu>
+				<filter-menu category="Mat" image-src="images/Mats/Mat1.jpg" image-alt="Mats & Coasters Category Filter Button" label="Mats & Coasters"></filter-menu>
+				<filter-menu category="Bag" image-src="images/Bags/Bag1.jpg" image-alt="Bags category filter button" label="Bags"></filter-menu>
+				<filter-menu category="AirpodCase" image-src="images/AirpodCases/Case3.jpeg" image-alt="Airpod case filter button" label="Airpod Cases"></filter-menu>
+				<filter-menu category="KeyRings" image-src="images/KeyRings/KeyRing1.jpg" image-alt="Key rings case filter button" label="Key Rings"></filter-menu>
       </section>
     </div>
     <main class="categories">
