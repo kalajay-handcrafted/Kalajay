@@ -1116,7 +1116,6 @@
 				}
 
 				attributeChangedCallback(name, oldValue, newValue){
-					console.log('attribute changed', name, oldValue, newValue)
 					if(name == 'category') {
 						this.querySelector('button').dataset.category = newValue;
 					}
