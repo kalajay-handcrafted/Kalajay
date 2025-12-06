@@ -1500,10 +1500,6 @@
 				// we are here - that means we have items in the cart
 				// so, stop the link from moving forward
 				event.preventDefault();
-				// show the cart modal
-				cartViewModal.showModal();
-				cartViewModal.querySelector('.cards')?.remove();
-
 				const listOfCards = new DocumentFragment();
 
 				CartItems.instance().forEach((itemId) => { 
@@ -1572,6 +1568,9 @@
 				cardsWrapper.classList.add('cards');
 
 				requestAnimationFrame(() => {
+					cartViewModal.showModal();
+					cartViewModal.querySelector('.cards')?.remove();
+
 					cardsWrapper.appendChild(listOfCards);
 					cartViewModal.append(cardsWrapper);
 				});
