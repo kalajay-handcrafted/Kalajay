@@ -1094,6 +1094,14 @@
 			}
 		}
 
+	::backdrop{
+		background-color: var(--clr-gray-light-4);
+		opacity: .8;
+	}
+	body:has(:modal) {
+		height: 100vh;
+		overflow : hidden;
+	}
 		.shopping-cart-modal {
 				height: 80rem;
 				width: 40rem;
