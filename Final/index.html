@@ -411,7 +411,7 @@
         .category-item {
           display: grid;
           grid-template-columns: 1fr;
-          grid-template-rows: 1fr min-content;
+          grid-template-rows: 1fr auto auto;
 					position: relative;
 
 					&[data-chip]::before {
@@ -435,24 +435,30 @@
             text-align: center;
             &::before {
               content: "\20B9";
+							height: auto;
+							width: auto;
             }
           }
           figure {
-            grid-row: 1/2;
+            grid-row: 1/3;
             grid-column: 1/2;
+						width: var(--card-width);
+						background-color: var(--clr-gray-light-4);
+            border-radius: 2.4rem;
+						position: relative;
 
             > img {
               width: var(--card-width);
               height: var(--card-height);
               object-fit: cover;
               object-position: center;
-              border-radius: 2.4rem;
+							border-radius: 2.4rem;
             }
 
             > figcaption {
               font-size: 1.2rem;
               font-weight: 800;
-              padding-block-start: 0.8rem;
+              padding-block: 0.8rem;
               text-align: center;
             }
           }
