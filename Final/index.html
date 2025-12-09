@@ -15,6 +15,7 @@
       </span>
       <a
         class="whatsapp"
+				id="ClickToShop"
         href="https://wa.me/919740540847?text=I%20am%20interested%20in%20your%20product"
       >
         <svg
@@ -398,6 +399,13 @@
 					<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Interface / External_Link"> <path id="Vector" d="M10.0002 5H8.2002C7.08009 5 6.51962 5 6.0918 5.21799C5.71547 5.40973 5.40973 5.71547 5.21799 6.0918C5 6.51962 5 7.08009 5 8.2002V15.8002C5 16.9203 5 17.4801 5.21799 17.9079C5.40973 18.2842 5.71547 18.5905 6.0918 18.7822C6.5192 19 7.07899 19 8.19691 19H15.8031C16.921 19 17.48 19 17.9074 18.7822C18.2837 18.5905 18.5905 18.2839 18.7822 17.9076C19 17.4802 19 16.921 19 15.8031V14M20 9V4M20 4H15M20 4L13 11" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
 				</a></span> 
     </footer>
+		<dialog class="shopping-cart-modal">
+			<a class="PlaceOrderLink">Put Order</a>
+			<header class="CartViewHeader">
+				<span>Your items</span>
+				<button class="CloseCartView">X</button>
+			</header>
+		</dialog>
     <template id="template-category-item">
       <style>
         figure {
@@ -407,7 +415,7 @@
         .category-item {
           display: grid;
           grid-template-columns: 1fr;
-          grid-template-rows: 1fr min-content;
+          grid-template-rows: 1fr auto auto;
 					position: relative;
 
 					&[data-chip]::before {
@@ -431,24 +439,30 @@
             text-align: center;
             &::before {
               content: "\20B9";
+							height: auto;
+							width: auto;
             }
           }
           figure {
-            grid-row: 1/2;
+            grid-row: 1/3;
             grid-column: 1/2;
+						width: var(--card-width);
+						background-color: var(--clr-gray-light-4);
+            border-radius: 2.4rem;
+						position: relative;
 
             > img {
               width: var(--card-width);
               height: var(--card-height);
               object-fit: cover;
               object-position: center;
-              border-radius: 2.4rem;
+							border-radius: 2.4rem;
             }
 
             > figcaption {
               font-size: 1.2rem;
               font-weight: 800;
-              padding-block-start: 0.8rem;
+              padding-block: 0.8rem;
               text-align: center;
             }
           }
@@ -506,7 +520,7 @@
       </style>
       <article class="category-item">
         <figure>
-          <img src="" alt="some alt text" />
+          <img loading="lazy" />
           <figcaption>Iphone Bag</figcaption>
         </figure>
         <h2 class="category-item-price">5450</h2>
@@ -535,7 +549,8 @@
 		}
 
     :root {
-			--clr-gray : gray;
+			--clr-gray-1 : rgb(68, 65, 65);
+			--clr-gray-2 : gray;
 			--clr-gray-light-1 : rgb(172, 168, 168);
 			--clr-gray-light-2 : rgb(200, 197, 197);
 			--clr-gray-light-3 : rgb(221, 219, 219);
@@ -677,6 +692,7 @@
         background-color: none;
         text-decoration: none;
         margin-inline-end: 1.8rem;
+				anchor-name: --shopping-cart;
 
         .whatsapp_direct_message,
         & .whatsapp_send_cart_items {
@@ -731,6 +747,7 @@
           padding: 0.2rem;
           font-weight: bold;
           border-radius: 100%;
+					pointer-events: none;
         }
 
 				.whatsapp_count{
@@ -1079,6 +1096,135 @@
 					}
 				}
 			}
+		}
+
+	::backdrop{
+		background-color: var(--clr-gray-light-4);
+		opacity: .8;
+	}
+	body:has(:modal) {
+		height: 100vh;
+		overflow : hidden;
+	}
+		.shopping-cart-modal {
+				height: 80rem;
+				width: 40rem;
+				position-anchor: --shopping-cart;
+				top: anchor(bottom);
+				margin-inline: auto;
+				border: none;
+				border-radius: 1.6rem;
+				overflow-y: scroll;
+				scroll-behavior: smooth;
+				scrollbar-width: none;
+
+				> * {
+					pointer-events: none;
+				}
+
+				.PlaceOrderLink {
+					display: none;
+				}
+
+				.CartViewHeader{
+					width: 100%;
+					height: 6.4rem;
+					background-color: var(--clr-brand);
+					color: var(--clr-white);
+					align-items: center;
+					position: relative;
+
+					span {
+						font-size: 1.6rem;
+						margin-inline: auto;
+						display: flex;
+						height: 100%;
+						width: 100%;
+						justify-content: center;
+						align-items: center;
+					}
+
+					.CloseCartView {
+						position: absolute;
+						right: .2rem;
+						top: .2rem;
+						padding: 1.4rem;
+						background-color: var(--clr-brand);
+						color: var(--clr-accent-yellow);
+						font-size: 1.6rem;
+						cursor: pointer;
+						border-radius: 50%;
+						border: none;
+						pointer-events: all;
+					}
+				}
+
+				.cards {
+					display: flex;
+					flex-direction: column;
+					gap: 1rem;
+					margin-block-start: 1.6rem;
+					align-items: center;
+
+					.card {
+						text-align: center;
+						width: fit-content;
+
+						img {
+							height: var(--card-height);
+							width: var(--card-width);
+							border-radius: 2rem;
+						}
+
+						.OperationWrapper{
+							display: flex;
+							justify-content: space-between;
+							align-items: center;
+							button {
+								padding-inline: 2.4rem;
+								padding-block: .8rem;
+								cursor: pointer;
+								background-color: var(--clr-brand-2);
+								color: var(--clr-white);
+								font-size: 2.4rem;
+								border-radius: .8rem;
+								border: none;
+								pointer-events: all;
+
+								> * {
+									pointer-events: none;
+								}
+
+								&:active{
+									box-shadow: 1px 1px var(--clr-brand);
+								}
+							}
+							span {
+								font-size: 2.4rem;
+							}
+						}
+					}
+
+					.CartSubmitButton {
+						background-color: var(--clr-brand-2);
+						inline-size: 12rem;
+						block-size: 6.4rem;
+						border: 0;
+						color: var(--clr-white);
+						pointer-events: all;
+						cursor: pointer;
+						margin-block: 2.4rem;
+						border-radius: .8rem;
+
+						&:hover {
+							background-color: var(--clr-brand);
+							color: var(--clr-accent-yellow);
+						}
+
+					}
+				}
+
+		}
 
   </style>
 
@@ -1230,12 +1376,12 @@
 
     document.addEventListener("Kalajay:ItemAddedToCart", (e) => {
 			if(navigator.vibrate) navigator.vibrate(20);
-      queueMicrotask(() => addToCart(e.detail.id, e.detail.itemHeader, e.detail.itemPrice));
+      queueMicrotask(() => CartItems.instance().addToCart(e.detail.id));
     });
 
     document.addEventListener("Kalajay:ItemRemovedFromCart", (e) => {
 			if(navigator.vibrate) navigator.vibrate(20);
-      queueMicrotask(() => removeFromCart(e.detail.id, e.detail.itemPrice));
+      queueMicrotask(() => CartItems.instance().removeFromCart(e.detail.id));
     });
 
     class Maybe {
@@ -1264,75 +1410,57 @@
     const whatsappCountNode = document.getElementsByClassName("whatsapp_count")[0];
 
     const updateNodesWithCount = compose(
-			 count => whatsappCountNode.setAttribute("data-cart-items-count", count),
+			 count => whatsappNode.setAttribute("data-cart-items-count", count),
+			 count => { whatsappCountNode.setAttribute("data-cart-items-count", count); return count},
        count => whatsappCountNode.textContent = count,
        store => store.size
     );
 
-    const udpateWhatsappUrl = compose(
-      url   => whatsappNode.setAttribute("href", url),
-      store => getUrl(store)
-    );
+		class CartItems {
+			#set = new Set();
+			static #instance  = null;
 
-    function useState(cart) {
-      function render() {
-        requestAnimationFrame(() => withInput(cart).callEach(updateNodesWithCount, udpateWhatsappUrl));
-      }
+			static instance(){
+				if(CartItems.#instance == null) {
+					CartItems.#instance = new CartItems();
+				}
 
-      const addToCart = new Proxy(cart.set.bind(cart), {
-        apply(target, _, [key, itemName, price]) {
-          new Maybe(cart.get(key)).ifOrElse(
-            ([, currentItemCount]) => {
-              const totalCount = currentItemCount + 1;
-              const totalPrice = totalCount * price;
-              target(key, [itemName, totalCount, totalPrice]);
-            },
-            () => target(key, [itemName, 1, price])
-          );
+				return this.#instance;
+			}
 
-          render();
-        },
-      });
+			forEach(operator) {
+				this.#set.forEach(operator);
+			}
 
-      const removeFromCart = new Proxy(cart.delete.bind(cart), {
-        apply(target, _, [key, itemPrice]) {
-          new Maybe(cart.get(key)).ifOrElse(
-            ([itemName, itemCount, totalPrice]) => {
-              if (itemCount == 1) {
-                // if only one left then remvoe the key
-                // we are deleting the last element
-                cart.delete(key);
-              } else {
-                cart.set(key, [
-                  itemName,
-                  itemCount - 1,
-                  totalPrice - itemPrice,
-                ]);
-              }
+			addToCart(itemId){
+				this.#set.add(itemId);
+				this.render();
+			}
 
-              render();
-            },
-            () => {}
-          );
-        },
-      });
+			removeFromCart(itemId){
+				this.#set.delete(itemId);
+				this.render();
+			}
 
-      return [addToCart, removeFromCart];
-    }
-
-    const [addToCart, removeFromCart] = useState(new Map());
+			render(){
+				requestAnimationFrame(() => withInput(this.#set).callEach(updateNodesWithCount));
+			}
+		}
 
     const host = "https://wa.me/919740540847?text=";
     function getUrl(cart) {
-      if (cart.size < 1)
-        return "https://wa.me/919740540847?text=I%20am%20interested%20in%20your%20product";
+      if (!cart || cart.length < 1) return "https://wa.me/919740540847?text=I%20am%20interested%20in%20your%20product";
+
       let itemList = "*List Of Items* : \n";
       let totalCostOfAllTheItems = 0;
-      cart.entries().forEach(([_, [productName, productCount, cost]]) => {
-        itemList = `${itemList}*${productName.trim()}* => ${productCount} \n`;
-        totalCostOfAllTheItems += parseInt(cost);
+			let totalNumberOfItems = 0;
+				 
+      cart.forEach(([productName, productCount, cost]) => {
+        itemList = `${itemList}*${productName.trim()}* requested ${productCount} ${productCount > 1 ? 'pieces' : 'piece'}, at per piece ${cost} \n`;
+        totalCostOfAllTheItems += parseInt(cost) * productCount;
+				totalNumberOfItems += parseInt(productCount);
       });
-      itemList = `${itemList}\n*TotalPrice = ${totalCostOfAllTheItems}*\n`;
+      itemList = `${itemList}\n*TotalPrice of ${totalNumberOfItems} ${totalNumberOfItems > 1 ? 'items' : 'item'} is ${totalCostOfAllTheItems}*\n`;
       const encodedItemList = encodeURIComponent(itemList);
       return `${host}${encodedItemList}`;
     }
@@ -1408,6 +1536,124 @@
 		const offlineMessage = document.querySelector('.NoNetworkConnection');
 		window.addEventListener("online", () => offlineMessage.classList.add('hide'));
 		window.addEventListener("offline", () => offlineMessage.classList.remove('hide'));
+
+		const cartViewModal = document.querySelector('.shopping-cart-modal');
+		const clickToShop   = document.getElementById('ClickToShop');
+
+		clickToShop.addEventListener('click', event => { 
+			if(event.target == clickToShop) {
+				const cartItemsCount = event.target.getAttribute('data-cart-items-count');
+				// we have no items in the cart
+				if(!cartItemsCount || parseInt(cartItemsCount) < 1) return;
+				
+				// we are here - that means we have items in the cart
+				// so, stop the link from moving forward
+				event.preventDefault();
+				const listOfCards = new DocumentFragment();
+
+				CartItems.instance().forEach((itemId) => { 
+					const categoryItem = document.getElementById(itemId)
+					const imageSrc = categoryItem.getAttribute('image-url');
+					const imageAlt = categoryItem.getAttribute('image-alt');
+
+					const image = document.createElement('img');
+					image.src = imageSrc;
+					image.alt = imageAlt;
+
+					const itemName = categoryItem.getAttribute('item-header');
+					const h3 = document.createElement('h3');
+					h3.textContent = itemName;
+
+					const itemPrice = categoryItem.getAttribute('item-price');
+					const h3Price = document.createElement('h3');
+					h3Price.textContent = "₹ " + itemPrice;
+
+					const buttonDecrement = document.createElement('button');
+					buttonDecrement.textContent = '-';
+
+					const buttonIncrement = document.createElement('button');
+					buttonIncrement.textContent = '+';
+
+					const itemCountNode = document.createElement('span');
+					itemCountNode.textContent = '1';
+
+					const operationWrapper = document.createElement('div');
+					operationWrapper.append(buttonDecrement, itemCountNode, buttonIncrement);
+					operationWrapper.classList.add('OperationWrapper');
+
+					const cardDiv = document.createElement('div');
+					cardDiv.dataset.price = itemPrice;
+					cardDiv.dataset.count = '1';
+					cardDiv.dataset.name  = itemName;
+					cardDiv.classList.add('card');
+					cardDiv.appendChild(image);
+					cardDiv.appendChild(h3);
+					cardDiv.appendChild(h3Price);
+					cardDiv.appendChild(operationWrapper);
+
+					buttonIncrement.onclick = event => {
+						const count = cardDiv.dataset.count;
+						const newCount = parseInt(count) + 1;
+						requestAnimationFrame(
+							() => {
+								cardDiv.dataset.count = newCount;
+								itemCountNode.textContent = newCount;
+							});
+					};
+
+					buttonDecrement.onclick = event => {
+						const count = cardDiv.dataset.count;
+						const newCount = parseInt(count) - 1;
+						if(newCount == -1) return;
+						requestAnimationFrame(() => {
+							cardDiv.dataset.count = newCount;
+							itemCountNode.textContent = newCount;
+						});
+					};
+
+					listOfCards.appendChild(cardDiv);
+				});
+
+				const sendCartItemsToWhatsappButton = document.createElement('button');
+				sendCartItemsToWhatsappButton.classList.add('CartSubmitButton');
+				sendCartItemsToWhatsappButton.textContent = 'Place Order';
+				sendCartItemsToWhatsappButton.onclick = () => {
+					const cartItems = [];
+					cartViewModal.querySelectorAll('.card').forEach( card => {
+						if(parseInt(card.dataset.count) < 1) return;
+						cartItems.push([card.dataset.name, card.dataset.count, card.dataset.price]);
+					});
+					const whatsappMessageUrl = getUrl(cartItems);
+					cartViewModal.close();
+					// fetch(whatsappMessageUrl);
+					const link = document.createElement('a');
+					link.href = whatsappMessageUrl;
+					link.click();
+				};
+				const cardsWrapper = document.createElement('div');
+				cardsWrapper.classList.add('cards');
+
+				requestAnimationFrame(() => {
+					window.scrollTo(0, 0);
+					cartViewModal.showModal();
+					cartViewModal.querySelector('.cards')?.remove();
+
+					cardsWrapper.appendChild(listOfCards);
+					cardsWrapper.appendChild(sendCartItemsToWhatsappButton);
+					cartViewModal.append(cardsWrapper);
+				});
+			}
+		});
+
+		const closeCartViewModal = document.querySelector('.CloseCartView');
+		closeCartViewModal.addEventListener('click', event => {
+			cartViewModal.close();
+		});
+
+		document.body.addEventListener('keydown', event => {
+			if(event.key === 'Escape') cartViewModal.close();
+		});
+
 
   </script>
 </html>
