@@ -397,6 +397,7 @@
       </section>
     </footer>
 		<dialog class="shopping-cart-modal">
+			<a class="PlaceOrderLink">Put Order</a>
 			<header class="CartViewHeader">
 				<span>Your items</span>
 				<button class="CloseCartView">X</button>
@@ -1114,6 +1115,14 @@
 				scroll-behavior: smooth;
 				scrollbar-width: none;
 
+				> * {
+					pointer-events: none;
+				}
+
+				.PlaceOrderLink {
+					display: none;
+				}
+
 				.CartViewHeader{
 					width: 100%;
 					height: 6.4rem;
@@ -1143,6 +1152,7 @@
 						cursor: pointer;
 						border-radius: 50%;
 						border: none;
+						pointer-events: all;
 					}
 				}
 
@@ -1176,6 +1186,7 @@
 								font-size: 2.4rem;
 								border-radius: .8rem;
 								border: none;
+								pointer-events: all;
 
 								> * {
 									pointer-events: none;
@@ -1189,6 +1200,24 @@
 								font-size: 2.4rem;
 							}
 						}
+					}
+
+					.CartSubmitButton {
+						background-color: var(--clr-brand-2);
+						inline-size: 12rem;
+						block-size: 6.4rem;
+						border: 0;
+						color: var(--clr-white);
+						pointer-events: all;
+						cursor: pointer;
+						margin-block: 2.4rem;
+						border-radius: .8rem;
+
+						&:hover {
+							background-color: var(--clr-brand);
+							color: var(--clr-accent-yellow);
+						}
+
 					}
 				}
 
@@ -1417,15 +1446,18 @@
 
     const host = "https://wa.me/919740540847?text=";
     function getUrl(cart) {
-      if (cart.size < 1)
-        return "https://wa.me/919740540847?text=I%20am%20interested%20in%20your%20product";
+      if (!cart || cart.length < 1) return "https://wa.me/919740540847?text=I%20am%20interested%20in%20your%20product";
+
       let itemList = "*List Of Items* : \n";
       let totalCostOfAllTheItems = 0;
-      cart.entries().forEach(([_, [productName, productCount, cost]]) => {
-        itemList = `${itemList}*${productName.trim()}* => ${productCount} \n`;
-        totalCostOfAllTheItems += parseInt(cost);
+			let totalNumberOfItems = 0;
+				 
+      cart.forEach(([productName, productCount, cost]) => {
+        itemList = `${itemList}*${productName.trim()}* requested ${productCount} ${productCount > 1 ? 'pieces' : 'piece'}, at per piece ${cost} \n`;
+        totalCostOfAllTheItems += parseInt(cost) * productCount;
+				totalNumberOfItems += parseInt(productCount);
       });
-      itemList = `${itemList}\n*TotalPrice = ${totalCostOfAllTheItems}*\n`;
+      itemList = `${itemList}\n*TotalPrice of ${totalNumberOfItems} ${totalNumberOfItems > 1 ? 'items' : 'item'} is ${totalCostOfAllTheItems}*\n`;
       const encodedItemList = encodeURIComponent(itemList);
       return `${host}${encodedItemList}`;
     }
@@ -1531,7 +1563,7 @@
 
 					const itemPrice = categoryItem.getAttribute('item-price');
 					const h3Price = document.createElement('h3');
-					h3Price.textContent = itemPrice;
+					h3Price.textContent = "₹ " + itemPrice;
 
 					const buttonDecrement = document.createElement('button');
 					buttonDecrement.textContent = '-';
@@ -1549,6 +1581,7 @@
 					const cardDiv = document.createElement('div');
 					cardDiv.dataset.price = itemPrice;
 					cardDiv.dataset.count = '1';
+					cardDiv.dataset.name  = itemName;
 					cardDiv.classList.add('card');
 					cardDiv.appendChild(image);
 					cardDiv.appendChild(h3);
@@ -1568,7 +1601,7 @@
 					buttonDecrement.onclick = event => {
 						const count = cardDiv.dataset.count;
 						const newCount = parseInt(count) - 1;
-						if(newCount == 0) return;
+						if(newCount == -1) return;
 						requestAnimationFrame(() => {
 							cardDiv.dataset.count = newCount;
 							itemCountNode.textContent = newCount;
@@ -1578,14 +1611,32 @@
 					listOfCards.appendChild(cardDiv);
 				});
 
+				const sendCartItemsToWhatsappButton = document.createElement('button');
+				sendCartItemsToWhatsappButton.classList.add('CartSubmitButton');
+				sendCartItemsToWhatsappButton.textContent = 'Place Order';
+				sendCartItemsToWhatsappButton.onclick = () => {
+					const cartItems = [];
+					cartViewModal.querySelectorAll('.card').forEach( card => {
+						if(parseInt(card.dataset.count) < 1) return;
+						cartItems.push([card.dataset.name, card.dataset.count, card.dataset.price]);
+					});
+					const whatsappMessageUrl = getUrl(cartItems);
+					cartViewModal.close();
+					// fetch(whatsappMessageUrl);
+					const link = document.createElement('a');
+					link.href = whatsappMessageUrl;
+					link.click();
+				};
 				const cardsWrapper = document.createElement('div');
 				cardsWrapper.classList.add('cards');
 
 				requestAnimationFrame(() => {
+					window.scrollTo(0, 0);
 					cartViewModal.showModal();
 					cartViewModal.querySelector('.cards')?.remove();
 
 					cardsWrapper.appendChild(listOfCards);
+					cardsWrapper.appendChild(sendCartItemsToWhatsappButton);
 					cartViewModal.append(cardsWrapper);
 				});
 			}
@@ -1595,6 +1646,11 @@
 		closeCartViewModal.addEventListener('click', event => {
 			cartViewModal.close();
 		});
+
+		document.body.addEventListener('keydown', event => {
+			if(event.key === 'Escape') cartViewModal.close();
+		});
+
 
   </script>
 </html>
