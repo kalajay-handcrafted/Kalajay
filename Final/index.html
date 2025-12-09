@@ -400,7 +400,6 @@
 				</a></span> 
     </footer>
 		<dialog class="shopping-cart-modal">
-			<a class="PlaceOrderLink">Put Order</a>
 			<header class="CartViewHeader">
 				<span>Your items</span>
 				<button class="CloseCartView">X</button>
@@ -1122,10 +1121,6 @@
 					pointer-events: none;
 				}
 
-				.PlaceOrderLink {
-					display: none;
-				}
-
 				.CartViewHeader{
 					width: 100%;
 					height: 6.4rem;
@@ -1624,11 +1619,10 @@
 						cartItems.push([card.dataset.name, card.dataset.count, card.dataset.price]);
 					});
 					const whatsappMessageUrl = getUrl(cartItems);
-					cartViewModal.close();
-					// fetch(whatsappMessageUrl);
 					const link = document.createElement('a');
 					link.href = whatsappMessageUrl;
 					link.click();
+					cartViewModal.close();
 				};
 				const cardsWrapper = document.createElement('div');
 				cardsWrapper.classList.add('cards');
