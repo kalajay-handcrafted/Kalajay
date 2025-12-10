@@ -1571,9 +1571,42 @@
 				// we are here - that means we have items in the cart
 				// so, stop the link from moving forward
 				event.preventDefault();
+
 				const listOfCards = new DocumentFragment();
+				let totalItems = 0;
+				let totalPrice = 0;
+
+				const buttonSpanCount      = document.createElement('span');
+				buttonSpanCount.classList.add('CartSubmitButtonItemCount')
+
+				const textContentPlaceOrderButton = document.createTextNode('Place Order');
+
+				const buttonSpanTotalPrice = document.createElement('span');
+				buttonSpanTotalPrice.classList.add('CartSubmitButtonTotalPrice');
+
+				const sendCartItemsToWhatsappButton = document.createElement('button');
+				sendCartItemsToWhatsappButton.classList.add('CartSubmitButton');
+
+				sendCartItemsToWhatsappButton.appendChild(buttonSpanCount);
+				sendCartItemsToWhatsappButton.appendChild(textContentPlaceOrderButton);
+				sendCartItemsToWhatsappButton.appendChild(buttonSpanTotalPrice);
+
+				sendCartItemsToWhatsappButton.onclick = () => {
+					const cartItems = [];
+					cartViewModal.querySelectorAll('.card').forEach( card => {
+						if(parseInt(card.dataset.count) < 1) return;
+						cartItems.push([card.dataset.name, card.dataset.count, card.dataset.price]);
+					});
+					const whatsappMessageUrl = getUrl(cartItems);
+					const link = document.createElement('a');
+					link.href = whatsappMessageUrl;
+					link.click();
+					cartViewModal.close();
+				};
 
 				CartItems.instance().forEach((itemId) => { 
+					++totalItems;
+
 					const categoryItem = document.getElementById(itemId)
 					const imageSrc = categoryItem.getAttribute('image-url');
 					const imageAlt = categoryItem.getAttribute('image-alt');
@@ -1587,6 +1620,8 @@
 					h3.textContent = itemName;
 
 					const itemPrice = categoryItem.getAttribute('item-price');
+					totalPrice += parseInt(itemPrice);
+
 					const h3Price = document.createElement('h3');
 					h3Price.textContent = "₹ " + itemPrice;
 
@@ -1616,10 +1651,18 @@
 					buttonIncrement.onclick = event => {
 						const count = cardDiv.dataset.count;
 						const newCount = parseInt(count) + 1;
+						++totalItems;
+						totalPrice += parseInt(itemPrice);
 						requestAnimationFrame(
 							() => {
 								cardDiv.dataset.count = newCount;
 								itemCountNode.textContent = newCount;
+
+								buttonSpanCount.textContent = totalItems;
+								buttonSpanCount.dataset.totalItems = totalItems;
+
+								buttonSpanTotalPrice.textContent = totalPrice;
+								buttonSpanTotalPrice.dataset.totalPrice = totalPrice;
 							});
 					};
 
@@ -1627,30 +1670,26 @@
 						const count = cardDiv.dataset.count;
 						const newCount = parseInt(count) - 1;
 						if(newCount == -1) return;
+						if(totalItems != 0) --totalItems;
+						totalPrice -= parseInt(itemPrice);
 						requestAnimationFrame(() => {
 							cardDiv.dataset.count = newCount;
 							itemCountNode.textContent = newCount;
+
+							buttonSpanCount.textContent = totalItems;
+							buttonSpanCount.dataset.totalItems = totalItems;
+
+							buttonSpanTotalPrice.textContent = totalPrice;
+							buttonSpanTotalPrice.dataset.totalPrice = totalPrice;
 						});
 					};
 
 					listOfCards.appendChild(cardDiv);
 				});
 
-				const sendCartItemsToWhatsappButton = document.createElement('button');
-				sendCartItemsToWhatsappButton.classList.add('CartSubmitButton');
-				sendCartItemsToWhatsappButton.textContent = 'Place Order';
-				sendCartItemsToWhatsappButton.onclick = () => {
-					const cartItems = [];
-					cartViewModal.querySelectorAll('.card').forEach( card => {
-						if(parseInt(card.dataset.count) < 1) return;
-						cartItems.push([card.dataset.name, card.dataset.count, card.dataset.price]);
-					});
-					const whatsappMessageUrl = getUrl(cartItems);
-					const link = document.createElement('a');
-					link.href = whatsappMessageUrl;
-					link.click();
-					cartViewModal.close();
-				};
+				buttonSpanCount.textContent = totalItems;
+				buttonSpanTotalPrice.textContent = totalPrice;
+
 				const cardsWrapper = document.createElement('div');
 				cardsWrapper.classList.add('cards');
 
