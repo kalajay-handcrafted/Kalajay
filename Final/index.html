@@ -1226,11 +1226,27 @@
 							}
 						}
 					}
+					.CartSubmitButtonItemCount {
+						margin-block-start: 2.4rem;
+						font-size: 1.6rem;
+						font-weight: bold;
+						&::before {
+							content: 'Number Of Items : ';
+						}
+					}
+
+					.CartSubmitButtonTotalPrice {
+						font-size: 1.6rem;
+						font-weight: bold;
+						&::before {
+							content : 'Total Price : '
+						}
+					}
 
 					.CartSubmitButton {
 						background-color: var(--clr-brand-2);
-						inline-size: 24.8rem;
-						block-size: 7.2rem;
+						inline-size: 12.8rem;
+						block-size: 5.6rem;
 						padding-inline: 1.6rem;
 						border: 0;
 						color: var(--clr-white);
@@ -1238,27 +1254,10 @@
 						cursor: pointer;
 						margin-block: 2.4rem;
 						border-radius: .8rem;
-						display: flex;
-						justify-content: space-between;
-						align-items: center;
 
 						&:hover {
 							background-color: var(--clr-brand);
 							color: var(--clr-accent-yellow);
-						}
-
-						.CartSubmitButtonItemCount {
-							background-color: var(--clr-white);
-							border-radius: 50%;
-							width: 3.2rem;
-							height: 3.2rem;
-							display: flex;
-							flex-direction: column;
-							justify-content: center;
-							color: var(--clr-black);
-						}
-						.CartSubmitButtonTotalPrice {
-							flex-basis: 4.8rem;
 						}
 
 					}
@@ -1594,20 +1593,16 @@
 				let totalItems = 0;
 				let totalPrice = 0;
 
-				const buttonSpanCount      = document.createElement('span');
-				buttonSpanCount.classList.add('CartSubmitButtonItemCount')
-
-				const textContentPlaceOrderButton = document.createTextNode('Place Order Of Total');
-
-				const buttonSpanTotalPrice = document.createElement('span');
-				buttonSpanTotalPrice.classList.add('CartSubmitButtonTotalPrice');
 
 				const sendCartItemsToWhatsappButton = document.createElement('button');
 				sendCartItemsToWhatsappButton.classList.add('CartSubmitButton');
-
-				sendCartItemsToWhatsappButton.appendChild(buttonSpanCount);
+				const textContentPlaceOrderButton = document.createTextNode('Place Order');
 				sendCartItemsToWhatsappButton.appendChild(textContentPlaceOrderButton);
-				sendCartItemsToWhatsappButton.appendChild(buttonSpanTotalPrice);
+
+				const buttonSpanCount      = document.createElement('span');
+				buttonSpanCount.classList.add('CartSubmitButtonItemCount')
+				const buttonSpanTotalPrice = document.createElement('span');
+				buttonSpanTotalPrice.classList.add('CartSubmitButtonTotalPrice');
 
 				sendCartItemsToWhatsappButton.onclick = () => {
 					const cartItems = [];
@@ -1717,6 +1712,8 @@
 					cartViewModal.querySelector('.cards')?.remove();
 
 					cardsWrapper.appendChild(listOfCards);
+					cardsWrapper.appendChild(buttonSpanCount);
+					cardsWrapper.appendChild(buttonSpanTotalPrice);
 					cardsWrapper.appendChild(sendCartItemsToWhatsappButton);
 					cartViewModal.append(cardsWrapper);
 				});
