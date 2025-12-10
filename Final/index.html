@@ -1229,18 +1229,36 @@
 
 					.CartSubmitButton {
 						background-color: var(--clr-brand-2);
-						inline-size: 12rem;
-						block-size: 6.4rem;
+						inline-size: 24.8rem;
+						block-size: 7.2rem;
+						padding-inline: 1.6rem;
 						border: 0;
 						color: var(--clr-white);
 						pointer-events: all;
 						cursor: pointer;
 						margin-block: 2.4rem;
 						border-radius: .8rem;
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
 
 						&:hover {
 							background-color: var(--clr-brand);
 							color: var(--clr-accent-yellow);
+						}
+
+						.CartSubmitButtonItemCount {
+							background-color: var(--clr-white);
+							border-radius: 50%;
+							width: 3.2rem;
+							height: 3.2rem;
+							display: flex;
+							flex-direction: column;
+							justify-content: center;
+							color: var(--clr-black);
+						}
+						.CartSubmitButtonTotalPrice {
+							flex-basis: 4.8rem;
 						}
 
 					}
@@ -1579,7 +1597,7 @@
 				const buttonSpanCount      = document.createElement('span');
 				buttonSpanCount.classList.add('CartSubmitButtonItemCount')
 
-				const textContentPlaceOrderButton = document.createTextNode('Place Order');
+				const textContentPlaceOrderButton = document.createTextNode('Place Order Of Total');
 
 				const buttonSpanTotalPrice = document.createElement('span');
 				buttonSpanTotalPrice.classList.add('CartSubmitButtonTotalPrice');
@@ -1661,7 +1679,7 @@
 								buttonSpanCount.textContent = totalItems;
 								buttonSpanCount.dataset.totalItems = totalItems;
 
-								buttonSpanTotalPrice.textContent = totalPrice;
+								buttonSpanTotalPrice.textContent = "₹ " + totalPrice;
 								buttonSpanTotalPrice.dataset.totalPrice = totalPrice;
 							});
 					};
@@ -1679,7 +1697,7 @@
 							buttonSpanCount.textContent = totalItems;
 							buttonSpanCount.dataset.totalItems = totalItems;
 
-							buttonSpanTotalPrice.textContent = totalPrice;
+							buttonSpanTotalPrice.textContent = "₹ " + totalPrice;
 							buttonSpanTotalPrice.dataset.totalPrice = totalPrice;
 						});
 					};
@@ -1688,7 +1706,7 @@
 				});
 
 				buttonSpanCount.textContent = totalItems;
-				buttonSpanTotalPrice.textContent = totalPrice;
+				buttonSpanTotalPrice.textContent = "₹ " + totalPrice;
 
 				const cardsWrapper = document.createElement('div');
 				cardsWrapper.classList.add('cards');
