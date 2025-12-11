@@ -82,7 +82,13 @@
     </div>
     <main class="categories">
       <section class="category" data-category="Organiser">
-        <h1 class="category-header">Organisers </h1>
+				<header>
+					<h1 class="category-header">Organisers </h1>
+					<div class="NextPreviousButtons">
+						<button type="button" class="PreviousButton"> <span>&LeftAngleBracket;</span> </button>
+						<button type="button" class="NextButton"><span>&RightAngleBracket;</span></button>
+					</div>
+				</header>
         <main class="category-items">
           <category-item
             image-url="images/Organisers/Org1_1.jpeg"
@@ -139,7 +145,13 @@
         </main>
       </section>
       <section class="category" data-category="Mat">
-        <h1 class="category-header">Mat </h1>
+				<header>
+					<h1 class="category-header">Mat</h1>
+					<div class="NextPreviousButtons">
+						<button type="button" class="PreviousButton"> <span>&LeftAngleBracket;</span> </button>
+						<button type="button" class="NextButton"><span>&RightAngleBracket;</span></button>
+					</div>
+				</header>
         <main class="category-items">
           <category-item
             image-url="images/Mats/Mat1.jpg"
@@ -231,7 +243,13 @@
         </main>
       </section>
       <section class="category" data-category="Bag">
-        <h1 class="category-header">Bags </h1>
+				<header>
+					<h1 class="category-header">Bags</h1>
+					<div class="NextPreviousButtons">
+						<button type="button" class="PreviousButton"> <span>&LeftAngleBracket;</span> </button>
+						<button type="button" class="NextButton"><span>&RightAngleBracket;</span></button>
+					</div>
+				</header>
         <main class="category-items">
           <category-item
             image-url="images/Bags/Bag1.jpg"
@@ -291,7 +309,13 @@
         </main>
             </section>
       <section class="category" data-category="AirpodCase">
-        <h1 class="category-header">Airpod Cases </h1>
+				<header>
+					<h1 class="category-header">Airpod Cases </h1>
+					<div class="NextPreviousButtons">
+						<button type="button" class="PreviousButton"> <span>&LeftAngleBracket;</span> </button>
+						<button type="button" class="NextButton"><span>&RightAngleBracket;</span></button>
+					</div>
+				</header>
         <main class="category-items">
           <category-item
             image-url="images/AirpodCases/Case2_1.jpg"
@@ -322,7 +346,13 @@
         </main>
       </section>
       <section class="category" data-category="KeyRings">
-        <h1 class="category-header">Key Rings </h1>
+				<header>
+					<h1 class="category-header">Key Rings </h1>
+					<div class="NextPreviousButtons">
+						<button type="button" class="PreviousButton"> <span>&LeftAngleBracket;</span> </button>
+						<button type="button" class="NextButton"><span>&RightAngleBracket;</span></button>
+					</div>
+				</header>
         <main class="category-items">
           <category-item
             image-url="images/KeyRings/KeyRing1.jpg"
@@ -841,10 +871,45 @@
 				--display-children: none;
 			}
 
-      .category-header {
-        font-size: 1.4rem;
-        align-self: start;
-      }
+
+			header {
+				display: flex;
+				justify-content: space-between;
+
+				.category-header {
+					font-size: 1.4rem;
+					align-self: start;
+				}
+
+				.NextPreviousButtons{
+					button {
+						inline-size: 2.8rem;
+						block-size: 2.8rem;
+						font-size: 1.2rem;
+						font-weight: bold;
+						border-radius: 50%;
+						background-color: var(--clr-gray-light-3);
+						color: var(--clr-gray-1);
+						cursor: pointer;
+						text-align: center;
+						border: none;
+
+						span {
+							display: inline-block;
+							width: fit-content;
+						}
+
+						&:active, &:hover {
+							background-color: var(--clr-gray-light-2);
+						}
+
+						&:active span {
+							scale: 1.2;
+						}
+					}
+				}
+
+			}
     }
 
     .category-items {
@@ -1746,6 +1811,38 @@
 		document.body.addEventListener('keydown', event => {
 			if(event.key === 'Escape') cartViewModal.close();
 		});
+
+		const rootElement = document.documentElement;
+		const rootStyles = window.getComputedStyle(rootElement);
+		const cardWidthCssProperty = rootStyles.getPropertyValue('--card-width')?.trim();
+		const fontSize = rootStyles.getPropertyValue('--v_font_size_root');
+		console.log(cardWidthCssProperty)
+
+		const nextButtons = document.querySelectorAll('.NextButton');
+		nextButtons.forEach(
+			nextButton => nextButton.onclick = event => {
+															event.preventDefault();
+															event.stopPropagation();
+															const parentSection = nextButton.closest('section.category');
+															console.log(parentSection);
+															const categoryItems = parentSection.querySelector('main.category-items');
+															console.log(categoryItems);
+															categoryItems.scrollBy({top: 0, left : parseInt(cardWidthCssProperty) * parseInt(fontSize), behavior : 'smooth'});
+														}
+		);
+
+		const previousButtons = document.querySelectorAll('.PreviousButton');
+		previousButtons.forEach(
+				previousButton => previousButton.onclick = event => {
+																	event.preventDefault();
+																	event.stopPropagation();
+																	const parentSection = previousButton.closest('section.category');
+																	console.log(parentSection);
+																	const categoryItems = parentSection.querySelector('main.category-items');
+																	console.log(categoryItems);
+																	categoryItems.scrollBy({top: 0, left : -parseInt(cardWidthCssProperty) * parseInt(fontSize), behavior : 'smooth'});
+																}
+		);
 
 
   </script>
