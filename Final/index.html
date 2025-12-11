@@ -875,10 +875,17 @@
 			header {
 				display: flex;
 				justify-content: space-between;
+				container-type: inline-size;
 
 				.category-header {
 					font-size: 1.4rem;
 					align-self: start;
+				}
+
+				@container (width <= 100rem) {
+					.NextPreviousButtons {
+						display: none;
+					}
 				}
 
 				.NextPreviousButtons{
@@ -1816,7 +1823,7 @@
 		const rootStyles = window.getComputedStyle(rootElement);
 		const cardWidthCssProperty = rootStyles.getPropertyValue('--card-width')?.trim();
 		const fontSize = rootStyles.getPropertyValue('--v_font_size_root');
-		console.log(cardWidthCssProperty)
+		const cardsScrollWidth = parseInt(cardWidthCssProperty) * parseInt(fontSize);
 
 		const nextButtons = document.querySelectorAll('.NextButton');
 		nextButtons.forEach(
@@ -1824,10 +1831,8 @@
 															event.preventDefault();
 															event.stopPropagation();
 															const parentSection = nextButton.closest('section.category');
-															console.log(parentSection);
 															const categoryItems = parentSection.querySelector('main.category-items');
-															console.log(categoryItems);
-															categoryItems.scrollBy({top: 0, left : parseInt(cardWidthCssProperty) * parseInt(fontSize), behavior : 'smooth'});
+															requestAnimationFrame( () => categoryItems.scrollBy({top: 0, left : cardsScrollWidth, behavior : 'smooth'}));
 														}
 		);
 
@@ -1837,10 +1842,8 @@
 																	event.preventDefault();
 																	event.stopPropagation();
 																	const parentSection = previousButton.closest('section.category');
-																	console.log(parentSection);
 																	const categoryItems = parentSection.querySelector('main.category-items');
-																	console.log(categoryItems);
-																	categoryItems.scrollBy({top: 0, left : -parseInt(cardWidthCssProperty) * parseInt(fontSize), behavior : 'smooth'});
+																	requestAnimationFrame( () => categoryItems.scrollBy({top: 0, left : -cardsScrollWidth, behavior : 'smooth'}));
 																}
 		);
 
