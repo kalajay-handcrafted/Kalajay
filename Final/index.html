@@ -545,6 +545,18 @@
           }
         }
 
+				.category_item_out_of_stock {
+					pointer-events: none;
+					img {
+						filter: grayscale(1);
+						opacity: .5;
+					}
+
+					.category-item-cart {
+						display: none;
+					}
+				}
+
       </style>
       <article class="category-item">
         <figure>
@@ -1357,7 +1369,7 @@
         }
 
         static get observedAttributes() {
-          return ["image-url", "image-alt", "item-header", "item-price", "item-message"];
+          return ["image-url", "image-alt", "item-header", "item-price", "item-message", 'outofstock'];
         }
 
 						// updates childattribute
@@ -1382,6 +1394,9 @@
 								const article = this.selectOne('.category-item');
 								article.dataset.chip = newValue;
 								break;
+							case 'outofstock':
+									this.selectOne('.category-item')?.classList.add('category_item_out_of_stock');
+									break;
               default:
                 console.log(`Invalid Attribute ${name}`);
                 break;
