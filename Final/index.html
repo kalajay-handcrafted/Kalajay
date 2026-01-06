@@ -73,12 +73,15 @@
 				<template id="FilterButton"> <button> <img /> <span></span> </button> </template>
 
 				<filter-menu category="All" image-src="images/KalaJayLogo.jpg" image-alt="Logo" label="All" class="filtering_on"></filter-menu>
-				<filter-menu category="Organiser" image-src="images/Organisers/Org2.jpeg" image-alt="Organiser Category Photo" label="Organiser"></filter-menu>
-				<filter-menu category="Mat" image-src="images/Mats/Mat1.jpg" image-alt="Mats & Coasters Category Filter Button" label="Mats & Coasters"></filter-menu>
-				<filter-menu category="Bag" image-src="images/Bags/Bag1.jpg" image-alt="Bags category filter button" label="Bags"></filter-menu>
-				<filter-menu category="AirpodCase" image-src="images/AirpodCases/Case3.jpeg" image-alt="Airpod case filter button" label="Airpod Cases"></filter-menu>
-				<filter-menu category="KeyRings" image-src="images/KeyRings/KeyRing1.jpg" image-alt="Key rings case filter button" label="Key Rings"></filter-menu>
-      </section>
+				<filter-menu category="Organiser" image-src="images/Organisers/Org2.jpeg" image-alt="Organiser Filter Button" label="Organisers"></filter-menu>
+				<filter-menu category="Mat" image-src="images/Mats/Mat1.jpg" image-alt="Mats & Coasters Filter Button" label="Mats & Coasters"></filter-menu>
+				<filter-menu category="Sling" image-src="images/Slings/Sling4.jpeg" image-alt="Slings Filter button" label="Slings"></filter-menu>
+				<filter-menu category="Bag" image-src="images/Bags/Bag2_1.jpeg" image-alt="Bags Filter button" label="Bags"></filter-menu>
+				<filter-menu category="AirpodCase" image-src="images/AirpodCases/Case3.jpeg" image-alt="Airpod case Filter button" label="Airpod Cases"></filter-menu>
+				<filter-menu category="KeyRing" image-src="images/KeyRings/KeyRing1.jpg" image-alt="Key rings Filter button" label="Key Rings"></filter-menu>
+                <filter-menu category="CrochetMagic" image-src="images/Crochet/Bookmark1.jpeg" image-alt="Crochet Filter button" label="Crochet Magic"></filter-menu>
+
+		</section>
     </div>
     <main class="categories">
       <section class="category" data-category="Organiser">
@@ -248,6 +251,48 @@
           ></category-item>
         </main>
       </section>
+	  <section class="category" data-category="Sling">
+				<header>
+					<h1 class="category-header">Slings</h1>
+					<div class="NextPreviousButtons">
+						<button type="button" class="PreviousButton"> <span>&LeftAngleBracket;</span> </button>
+						<button type="button" class="NextButton"><span>&RightAngleBracket;</span></button>
+					</div>
+				</header>
+        <main class="category-items">
+          <category-item
+            image-url="images/Slings/Sling1.jpg"
+            image-alt="Bag1"
+            item-header="Sling Bag - Triple Tone"
+            item-price="849"
+						item-message="Most Selling"
+          ></category-item>
+          <category-item
+            image-url="images/Slings/Sling2.jpg"
+            image-alt="Bag2"
+            item-header="Sling Bag - Dual Tone"
+            item-price="799"
+          ></category-item>
+          <category-item
+            image-url="images/Slings/Sling3.jpeg"
+            image-alt="Bag2"
+            item-header="Sling Bag - Single Tone"
+            item-price="749"
+          ></category-item>	
+		  <category-item
+            image-url="images/Slings/Sling4.jpeg"
+            image-alt="Sling5"
+            item-header="Sling Bag - Tectured"
+            item-price="849"
+          ></category-item>	  
+          <category-item
+            image-url="images/Slings/Sling5.jpg"
+            image-alt="Sling5"
+            item-header="Sling Bag - Moonlight"
+            item-price="699"
+          ></category-item>
+        </main>
+            </section>
       <section class="category" data-category="Bag">
 				<header>
 					<h1 class="category-header">Bags</h1>
@@ -258,59 +303,46 @@
 				</header>
         <main class="category-items">
           <category-item
-            image-url="images/Bags/Bag1.jpg"
-            image-alt="Bag1"
-            item-header="Phone Sling Bag - Triple Tone"
-            item-price="849"
-						item-message="Most Selling"
-          ></category-item>
-          <category-item
-            image-url="images/Bags/Bag2.jpg"
-            image-alt="Bag2"
-            item-header="Phone Sling Bag - Dual Tone"
-            item-price="849"
-          ></category-item>
-          <category-item
-            image-url="images/Bags/Bag7.jpg"
-            image-alt="Bag7"
-            item-header="Phone Sling Bag - Moonlight"
-            item-price="649"
-          ></category-item>
-          <category-item
-            image-url="images/Bags/Bag6.jpg"
-            image-alt="Bag6"
-            item-header="Backpack - Zoe"
-            item-price="2499"
-          ></category-item>
-          <category-item
-            image-url="images/Bags/Bag3.jpg"
-            image-alt="Bag3"
+            image-url="images/Bags/Bag2_1.jpeg"
+            image-alt="BagTextured_1"
             item-header="Baguette Bag - Dandelion"
-            item-price="1199"
+            item-price="1799"
+          ></category-item>
+          <category-item
+            image-url="images/Bags/Bag2_2.jpg"
+            image-alt="BagTextured_2"
+            item-header="Hobo Bag - HoneyComb"
+            item-price="1399"
+          ></category-item>
+          <category-item
+            image-url="images/Bags/Bag2_3.jpg"
+            image-alt="BagTextured_3"
+            item-header="Bucket Bag - Ethnic"
+            item-price="1299"
+          ></category-item>
+          <category-item
+            image-url="images/Bags/Bag2_4.jpg"
+            image-alt="BagTextured_4"
+            item-header="Backpack - Zoe"
+            item-price="1499"
+          ></category-item>
+          <category-item
+            image-url="images/Bags/Bag3.jpeg"
+            image-alt="BagGloss"
+            item-header="Bag - Pearlescent"
+            item-price="1599"
           ></category-item>
           <category-item
             image-url="images/Bags/Bag4.jpg"
-            image-alt="Bag4"
-            item-header="Hobo Bag - HoneyComb"
-            item-price="1199"
+            image-alt="BagPack"
+            item-header="Bag Pack"
+            item-price="2499"
           ></category-item>
           <category-item
             image-url="images/Bags/Bag5.jpg"
-            image-alt="Bag5"
-            item-header="Bucket Bag - Ethnic"
-            item-price="1699"
-          ></category-item>
-          <category-item
-            image-url="images/Bags/Bag8_1.jpeg"
-            image-alt="Bag8"
-            item-header="Envelope Bag - Starlight"
-            item-price="999"
-          ></category-item>
-          <category-item
-            image-url="images/Bags/Bag9.jpg"
-            image-alt="Bag9"
+            image-alt="BagCardHolder"
             item-header="Card Holder - Pearlescent"
-            item-price="549 "
+            item-price="649"
           ></category-item>
         </main>
             </section>
@@ -324,34 +356,39 @@
 				</header>
         <main class="category-items">
           <category-item
-            image-url="images/AirpodCases/Case2_3.png"
+            image-url="images/AirpodCases/Case1.png"
             image-alt="Case2"
             item-header="Airpod Case - Pastel"
             item-price="599"
             item-message="🔥 Hot Selling"
           ></category-item>
           <category-item
-            image-url="images/AirpodCases/Case3.jpeg"
+            image-url="images/AirpodCases/Case2.jpeg"
             image-alt="Case3"
-            item-header="Airpod Case - Yellow"
-            item-price="349"
+            item-header="Airpod Case - Black Shine"
+            item-price="549"
           ></category-item>
           <category-item
-            image-url="images/AirpodCases/Case4.jpeg"
+            image-url="images/AirpodCases/Case3.jpeg"
             image-alt="Case4"
+            item-header="Airpod Case - Yellow"
+            item-price="399"
+          ></category-item>
+          <category-item
+            image-url="images/AirpodCases/Case4_2.jpg"
+            image-alt="Case5"
             item-header="Airpod Case - Pink"
-            item-price="249"
+            item-price="399"
           ></category-item>
           <category-item
             image-url="images/AirpodCases/Case5.jpeg"
             image-alt="Case5"
             item-header="Airpod Case - Pearl"
             item-price="399"
-          >
-					</category-item>
+          ></category-item>
         </main>
       </section>
-      <section class="category" data-category="KeyRings">
+      <section class="category" data-category="KeyRing">
 				<header>
 					<h1 class="category-header">Key Rings </h1>
 					<div class="NextPreviousButtons">
@@ -363,71 +400,100 @@
           <category-item
             image-url="images/KeyRings/KeyRing1.jpg"
             image-alt="Ring1"
-            item-header="Alphabet Key Ring"
+            item-header="Beaded Alphabet Key Ring"
             item-price="249"
           ></category-item>
 		            <category-item
-            image-url="images/KeyRings/KeyRing1_3.jpeg"
-            image-alt="Ring1_1"
-            item-header="Colorful Alphabet Key Ring"
+            image-url="images/KeyRings/KeyRing1_2.jpeg"
+            image-alt="Ring2"
+            item-header="Beaded Colorful Alphabet Key Ring"
             item-price="299"
 						item-message="❤️ Most Sold"
           ></category-item>
           <category-item
-            image-url="images/KeyRings/KeyRing2.jpg"
-            image-alt="Ring2"
-            item-header="Crochet Candy Key Ring"
-            item-price="299"
-          ></category-item>
-          <category-item
-            image-url="images/KeyRings/KeyRing3.jpg"
+            image-url="images/KeyRings/KeyRing2.png"
             image-alt="Ring3"
-            item-header="Beaded Heart Key Ring"
-            item-price="199"
+            item-header="Beaded Melody Key Ring"
+            item-price="249"
 						item-message="😃 Customer Favorite"
           ></category-item>
           <category-item
-            image-url="images/KeyRings/KeyRing4.jpeg"
+            image-url="images/KeyRings/KeyRing3.jpg"
             image-alt="Ring4"
-            item-header="Crochet Hat Key Ring"
-            item-price="199"
+            item-header="Beaded Heart Key Ring"
+            item-price="229"
           ></category-item>
           <category-item
-            image-url="images/KeyRings/KeyRing5.jpeg"
+            image-url="images/KeyRings/KeyRing4.jpg"
             image-alt="Ring5"
-            item-header="Crochet Frock Key Ring"
-            item-price="199"
-          ></category-item>
-          <category-item
-            image-url="images/KeyRings/KeyRing6.jpeg"
-            image-alt="Ring6"
-            item-header="Crochet Coffee Mug Key Ring"
-            item-price="249"
-          ></category-item>
-          <category-item
-            image-url="images/KeyRings/KeyRing7_1.jpg"
-            image-alt="Ring7"
-            item-header="Threaded Heart Key Ring"
-            item-price="199"
-          ></category-item>
-          <category-item
-            image-url="images/KeyRings/KeyRing8.jpg"
-            image-alt="Ring8"
-            item-header="Crochet Pumpkin Key Ring"
-            item-price="249"
-            item-message="🔥 Hot Selling"
-          ></category-item>
-          <category-item
-            image-url="images/KeyRings/KeyRing9.jpeg"
-            image-alt="Ring9"
-            item-header="Crochet Tote Bag Key Ring"
-            item-price="199"
-          ></category-item>
-          <category-item
-            image-url="images/KeyRings/KeyRing10.jpg"
-            image-alt="Ring10"
             item-header="Playful Kaudi Key Ring"
             item-price="229"
+          ></category-item>
+        </main>
+      </section>
+	<section class="category" data-category="CrochetMagic">
+				<header>
+					<h1 class="category-header">Crochet Magic </h1>
+					<div class="NextPreviousButtons">
+						<button type="button" class="PreviousButton"> <span>&LeftAngleBracket;</span> </button>
+						<button type="button" class="NextButton"><span>&RightAngleBracket;</span></button>
+					</div>
+				</header>
+        <main class="category-items">
+		  <category-item
+            image-url="images/Crochet/WireWrapLock.png"
+            image-alt="WireWrapLock"
+            item-header="Wire Wrap Lock"
+            item-price="299"
+          ></category-item>
+          <category-item
+            image-url="images/Crochet/Bookmark1.jpeg"
+            image-alt="Chicken Bookmark"
+            item-header="Bookmark - Chicken"
+            item-price="349"
+          ></category-item>
+          <category-item
+            image-url="images/Crochet/Bookmark2.png"
+            image-alt="Flower Bookmark"
+            item-header="Bookmark - Flower"
+            item-price="349"
+          ></category-item>	
+          <category-item
+            image-url="images/Crochet/Candy.jpg"
+            image-alt="Candy"
+            item-header="Candy Key Ring"
+            item-price="229"
+          ></category-item>
+          <category-item
+            image-url="images/Crochet/Hat.jpeg"
+            image-alt="Hat"
+            item-header="Hat Key Ring"
+            item-price="229"
+          ></category-item>
+          <category-item
+            image-url="images/Crochet/Frock.jpeg"
+            image-alt="Mug"
+            item-header="Frock Key Ring"
+            item-price="229"
+          ></category-item>
+          <category-item
+            image-url="images/Crochet/Mug.jpeg"
+            image-alt="Mug"
+            item-header="Coffee Mug Key Ring"
+            item-price="229"
+          ></category-item>
+		  <category-item
+            image-url="images/Crochet/Tote.jpeg"
+            image-alt="Tote"
+            item-header="Tote Bag Key Ring"
+            item-price="229"
+          ></category-item>
+          <category-item
+            image-url="images/Crochet/Pumpkin.jpg"
+            image-alt="Pumpkin"
+            item-header="Pumpkin Key Ring"
+            item-price="299"
+            item-message="🔥 Hot Selling"
           ></category-item>
         </main>
       </section>
