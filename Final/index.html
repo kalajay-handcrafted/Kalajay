@@ -1942,5 +1942,8 @@
 		);
 
 
+		// move outofstock items at the end of the category
+		document.querySelectorAll('section.category > main.category-items [outofstock]').forEach(outOfStockItem => outOfStockItem.parentNode.appendChild(outOfStockItem));
+
   </script>
 </html>
