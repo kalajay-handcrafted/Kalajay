@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+<base href="/">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="/api/catalogue.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -17,43 +19,46 @@
   a { color: #A9482A; text-decoration: none; }
   a:hover { color: #8A6318; }
   ::selection { background: #E7D9B0; }
+  .kj-ticker:hover { animation-play-state: paused !important; }
+  @media (prefers-reduced-motion: reduce) { .kj-ticker { animation: none !important; } }
   @keyframes kj-drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-  @keyframes kj-walk-right { 0% { transform: translateX(-62vw); opacity: 0; } 12% { opacity: 1; } 100% { transform: translateX(0); opacity: 1; } }
-  @keyframes kj-walk-left { 0% { transform: translateX(62vw); opacity: 0; } 12% { opacity: 1; } 100% { transform: translateX(0); opacity: 1; } }
-  @keyframes kj-bloom { 0% { transform: scale(.2) rotate(-14deg); opacity: 0; } 65% { transform: scale(1.14) rotate(0); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-  @keyframes kj-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes kj-logo-reveal { from { opacity: 0; transform: translateY(18px) scale(.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
   @keyframes kj-veil { to { opacity: 0; visibility: hidden; } }
   @media (prefers-reduced-motion: reduce) { .kj-veil, .kj-veil * { animation-duration: .01ms !important; animation-delay: 0ms !important; } }
 </style>
 </helmet>
-<div style="display:flow-root">
+<div id="top" style="display:flow-root">
 <sc-if value="{{ intro }}" hint-placeholder-val="{{ false }}">
-  <div class="kj-veil" style="position:fixed;inset:0;z-index:200;background:#FBF7E8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;animation:kj-veil .75s ease 2.75s forwards;overflow:hidden">
-    <div style="position:relative;width:min(460px,78vw);aspect-ratio:409/203">
-      <img src="assets/eleph-big.png" alt="" style="position:absolute;left:0;top:0;width:65.04%;animation:kj-walk-right 1.25s cubic-bezier(.22,.72,.26,1) both">
-      <img src="assets/eleph-small.png" alt="" style="position:absolute;left:65.04%;top:34.98%;width:35.21%;animation:kj-walk-left 1.25s cubic-bezier(.22,.72,.26,1) both">
-      <img src="assets/lotus-dot.png" alt="" style="position:absolute;left:57.21%;top:-5.42%;width:20.29%;transform-origin:50% 100%;animation:kj-bloom .7s cubic-bezier(.3,1.4,.5,1) 1.2s both">
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:center;animation:kj-rise .8s ease 1.55s both">
-      <img src="assets/wordmark-logo.png" alt="Kalajay" style="width:min(340px,62vw);height:auto;display:block">
-    </div>
+  <div class="kj-veil" style="position:fixed;inset:0;z-index:200;background:#F7F0DE;display:flex;align-items:center;justify-content:center;overflow:hidden">
+    <video class="kj-intro-video" autoplay muted playsinline preload="auto" aria-label="Kalajay elephants and lotus animation" style="display:block;width:min(720px,96vw);height:auto;max-height:90vh;object-fit:contain">
+      <source src="assets/intro-elephants-lotus.mp4" type="video/mp4">
+    </video>
   </div>
 </sc-if>
 <div style="background:#A9482A;color:#FBF7E8;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;text-align:center;padding:10px 16px">HANDMADE TO ORDER&nbsp; ·&nbsp; SHIPS ACROSS INDIA&nbsp;&nbsp;·&nbsp; HANDCRAFTED WITH LOVE</div>
 
 <header style="position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px); border-bottom: 1px solid #E7DCC2; background-color: #FBF7E8F0">
   <div style="max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 24px; justify-content: space-between">
-    <a href="#top" style="display:flex;align-items:center;gap:12px;min-width:0">
-      <img src="./kalajay_wordmark_transparent-mtyrts9s-tzhj.png" alt="Kalajay — handcrafted, pretty, you" style="height: 38px; width: auto; object-fit: contain; object-position: left center; display: block; flex: none">
+    <a href="/" style="display:flex;align-items:center;gap:12px;min-width:0">
+      <img src="assets/kalajay-brand.png" alt="Kalajay — handcrafted, pretty, you" style="width: 120px; height: auto; object-fit: contain; object-position: left center; display: block; flex: none">
     </a>
-    <nav style="display:flex;align-items:center;gap:28px;font-size:14px;letter-spacing:0.1em;text-transform:uppercase;flex-wrap:wrap;justify-content:flex-end;margin-left:auto">
-      <a href="#collections" style="color:#40291C">Collections</a>
-      <a href="#shop" style="color:#40291C">Catalogue</a>
-      <a href="#story" style="color:#40291C">Our Story</a>
-      <a href="#custom" style="color:#40291C">Custom</a>
-      <div style="position:relative;display:flex;align-items:center;flex:none">
+    <nav aria-label="Main navigation" style="display:flex;align-items:center;gap:20px;font-size:14px;letter-spacing:0.1em;text-transform:uppercase;flex-wrap:wrap;justify-content:flex-end;margin-left:auto">
+      <a href="/#top" style="color:#40291C">Home</a>
+      <a href="/#collections" style="color:#40291C">Collections</a>
+
+      <a href="/story" style="color:#40291C">Our Story</a>
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:nowrap">
+      <details class="shop-menu" style="position:relative">
+        <summary style="color:#40291C;cursor:pointer;list-style:none;display:flex;align-items:center;gap:7px;padding:8px 0">Shop <span aria-hidden="true" style="font-size:10px">▾</span></summary>
+        <div style="position:absolute;top:100%;left:0;width:220px;max-height:70vh;overflow-y:auto;background:#FBF7E8;border:1px solid #E7DCC2;border-radius:10px;box-shadow:0 10px 28px #40291C20;padding:8px;z-index:30;text-transform:none;letter-spacing:0">
+          <sc-for list="{{ categoryOptions }}" as="o"><a href="{{ o.href }}" style="display:block;padding:10px 12px;border-radius:6px;color:#40291C;font-size:14px" style-hover="background:#F0E6CC;color:#A9482A">{{ o.name }}</a></sc-for>
+        </div>
+      </details>
+      <form onSubmit="{{ searchCatalogue }}" role="search" style="position:relative;display:flex;align-items:center;flex:none">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#8A6318" stroke-width="1.7" stroke-linecap="round" style="position:absolute;left:17px;pointer-events:none"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg>
         <input type="search" value="{{ query }}" onChange="{{ setQuery }}" placeholder="Search" aria-label="Search the catalogue" style="font:inherit;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;width:150px;padding:12px 18px 12px 42px;border-radius:999px;border:1px solid #C6B491;background:transparent;color:#40291C;outline:none;transition:width .3s cubic-bezier(.4,0,.2,1),border-color .2s ease,background .2s ease" style-hover="width:300px;border-color:#A9482A" style-focus="width:300px;border-color:#A9482A;background:#FFFDF6">
+        <button type="submit" aria-label="Search products" style="background:none;border:0;color:#A9482A;cursor:pointer;padding:6px">Go</button>
+      </form>
       </div>
       <button onClick="{{ openCart }}" style="font:inherit;font-size:14px;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:9px;background:transparent;border:1px solid #C6B491;color:#40291C;padding:11px 18px;border-radius:999px;cursor:pointer" style-hover="border-color:#A9482A;color:#A9482A">
         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8Z"></path><path d="M9 7a3 3 0 0 1 6 0"></path></svg>
@@ -65,18 +70,15 @@
 
 
 
-<section id="top" style="max-width:1200px;margin:0 auto;padding:64px 24px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:48px;align-items:center">
+<sc-if value="{{ isHome }}">
+<section style="max-width:1200px;margin:0 auto;padding:64px 24px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:48px;align-items:center">
   <div>
-    <div style="position:relative;width:min(210px,48%);aspect-ratio:409/203;margin:0 0 24px">
-      <img src="assets/eleph-big.png" alt="Kalajay" style="position: absolute; left: 0px; top: 0; width: 65.04%">
-      <img src="assets/eleph-small.png" alt="" style="position:absolute;left:65.04%;top:34.98%;width:35.21%">
-      <img src="assets/lotus-dot.png" alt="" style="position:absolute;left:57.21%;top:-5.42%;width:20.29%">
-    </div><p style="font-size:12px;letter-spacing:0.3em;text-transform:uppercase;color:#8A6318;margin:0 0 22px">HAND-CRAFTED · ONE AT A TIME . WITH LOVE</p>
+<p style="font-size:12px;letter-spacing:0.3em;text-transform:uppercase;color:#8A6318;margin:0 0 22px">HAND-CRAFTED : ONE AT A TIME ❤️</p>
     
     <h1 style="font-family: 'Prata',serif; font-size: clamp(40px,6vw,72px); line-height: 1.04; margin: 0 0 24px; color: #40291C; text-wrap: pretty">Piece by Piece,<br><span style="color: rgb(169, 72, 42); font-size: 65px; font-family: 'Caveat', cursive">Handcrafted with Love</span></h1><p style="font-size:17px;line-height:1.7;max-width:46ch;color:#5B4331;margin:0 0 34px;text-wrap:pretty">Kalajay is a small, Mumbai-based business creating handcrafted pieces that bring a little beauty to your everyday. Each piece is made by hand with love and care, with subtle differences that make it uniquely yours. No two are quite the same!</p>
     <div style="display:flex;gap:14px;flex-wrap:wrap">
-      <a href="#shop" style="background:#A9482A;color:#FBF7E8;padding:16px 30px;border-radius:999px;font-size:13px;letter-spacing:0.18em;text-transform:uppercase" style-hover="background:#8E3A20;color:#FBF7E8">View the catalogue</a>
-      <a href="#custom" style="border:1px solid #C6B491;color:#40291C;padding:16px 30px;border-radius:999px;font-size:13px;letter-spacing:0.18em;text-transform:uppercase" style-hover="border-color:#A9482A;color:#A9482A">Custom orders</a>
+      <a href="/shop" style="background:#A9482A;color:#FBF7E8;padding:16px 30px;border-radius:999px;font-size:13px;letter-spacing:0.18em;text-transform:uppercase" style-hover="background:#8E3A20;color:#FBF7E8">View the catalogue</a>
+      <a href="/#custom" style="border:1px solid #C6B491;color:#40291C;padding:16px 30px;border-radius:999px;font-size:13px;letter-spacing:0.18em;text-transform:uppercase" style-hover="border-color:#A9482A;color:#A9482A">Custom orders</a>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
@@ -84,9 +86,10 @@
     <img src="v2/p3-2.jpg" alt="Pearl beaded jewellery box with mirror" style="width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:8px">
     <img src="v2/p16-3.jpg" alt="Lilac beaded tealight holders" style="width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:8px 8px 200px 200px">
   </div>
-</section><div style="overflow: hidden; border-top: 1px solid #E7DCC2; border-bottom: 1px solid #E7DCC2; margin-top: 72px; padding: 18px 0; background-color: #F5EFDB">
-  <div style="display:flex;gap:56px;width:max-content;animation:kj-drift 34s linear infinite;font-family:'Prata',serif;font-size:20px;color:#8A6318;white-space:nowrap">
-    <span>Handcrafted. Pretty. You.</span><span>·</span><span>Hand-strung beauty</span><span>·</span><span>Made to order</span><span>·</span><span>Free Delivery for order above INR 599&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;·</span><span>Handcrafted. Pretty. You.</span><span>·</span><span>Hand-strung pearls</span><span>·</span><span>Made to order</span><span>·</span><span>Mumbai studio</span><span>·</span>
+</section><div style="overflow: hidden; border-top: 1px solid #E7DCC2; border-bottom: 1px solid #E7DCC2; margin-top: 24px; padding: 18px 0; background-color: #F5EFDB">
+  <div class="kj-ticker" style="display:flex;width:max-content;animation:kj-drift 34s linear infinite;font-family:'Prata',serif;font-size:20px;color:#8A6318;white-space:nowrap">
+    <div style="display:flex;align-items:center;gap:56px;padding-right:56px;flex-shrink:0"><span>HAND-CRAFTED : ONE AT A TIME ❤️</span><span>·</span><span>Handcrafted. Pretty. You.</span><span>·</span><span>Hand-strung beauty</span><span>·</span><span>Made to order</span><span>·</span><span>Free Delivery for order above INR 599</span><span>·</span></div>
+    <div aria-hidden="true" style="display:flex;align-items:center;gap:56px;padding-right:56px;flex-shrink:0"><span>HAND-CRAFTED : ONE AT A TIME ❤️</span><span>·</span><span>Handcrafted. Pretty. You.</span><span>·</span><span>Hand-strung beauty</span><span>·</span><span>Made to order</span><span>·</span><span>Free Delivery for order above INR 599</span><span>·</span></div>
   </div>
 </div>
 
@@ -97,7 +100,7 @@
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px">
     <sc-for list="{{ collections }}" as="c" hint-placeholder-count="9">
-      <a href="#shop" onClick="{{ c.pick }}" style="display:block;background:#fff;border:1px solid #E7DCC2;border-radius:6px;overflow:hidden" style-hover="border-color:#A9482A">
+      <a href="{{ c.href }}" style="display:block;background:#fff;border:1px solid #E7DCC2;border-radius:6px;overflow:hidden" style-hover="border-color:#A9482A">
         <img src="{{ c.img }}" alt="{{ c.name }}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block">
         <div style="padding:18px 20px 22px">
           <p style="margin:0 0 6px;font-size:11px;letter-spacing:0.26em;text-transform:uppercase;color:#8A6318">{{ c.num }}</p>
@@ -109,12 +112,15 @@
   </div>
 </section>
 
-<section id="shop" style="max-width:1200px;margin:0 auto;padding:96px 24px 0">
-  <h2 style="font-family: 'Prata',serif; font-size: clamp(30px,4vw,44px); margin: 0 0 8px; color: #9E5430">The Catalogue</h2>
+</sc-if>
+<sc-if value="{{ isShop }}">
+<section id="shop" style="max-width:1200px;margin:0 auto;padding:44px 24px 0">
+  <p style="margin:0 0 20px;font-size:13px"><a href="/#top">Home</a> / Shop / {{ selectedCategory }}</p>
+  <h2 style="font-family: 'Prata',serif; font-size: clamp(30px,4vw,44px); margin: 0 0 8px; color: #9E5430">{{ shopHeading }}</h2>
   <p style="margin:0 0 32px;color:#5B4331;font-size:16px">{{ countLabel }}</p>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:36px">
+  <div role="navigation" aria-label="Product categories" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:12px;margin-bottom:28px">
     <sc-for list="{{ filters }}" as="f" hint-placeholder-count="10">
-      <button onClick="{{ f.pick }}" style="{{ f.style }}">{{ f.label }}</button>
+      <a href="{{ f.href }}" onClick="{{ f.pick }}" aria-current="{{ f.current }}" style="{{ f.style }}">{{ f.label }}</a>
     </sc-for>
   </div>
   <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
@@ -147,19 +153,21 @@
   <p style="margin:44px 0 0;font-size:15px;color:#5B4331">Bulk Prices on request — sizes, colours and quantities are all made to order. <a href="#contact">Send an enquiry</a> with the piece name and quantity required and we'll quote within a day.</p>
 </section>
 
-<section id="story" style="margin-top:104px;background:#F5EFDB;border-top:1px solid #E7DCC2;border-bottom:1px solid #E7DCC2">
+</sc-if>
+<sc-if value="{{ isStory }}">
+<section id="story" style="margin-top:0;background:#F5EFDB;border-top:1px solid #E7DCC2;border-bottom:1px solid #E7DCC2">
   <div style="max-width:1200px;margin:0 auto;padding:88px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:56px;align-items:center">
     <div>
       <p style="font-size:12px;letter-spacing:0.3em;text-transform:uppercase;color:#8A6318;margin:0 0 20px">Our story</p>
-      <h2 style="font-family:'Prata',serif;font-size:clamp(26px,3.4vw,38px);line-height:1.25;margin:0 0 24px;color:#40291C;text-wrap:pretty">A single bead or a strand of yarn or a paint brush. A little patience. Something beautiful.</h2>
+      <h1 style="font-family:'Prata',serif;font-size:clamp(26px,3.4vw,38px);line-height:1.25;margin:0 0 24px;color:#40291C;text-wrap:pretty">A single bead or a strand of yarn or a paint brush. A little patience. Something beautiful.</h1>
       <p style="font-size:17px;line-height:1.75;color:#5B4331;margin:0 0 18px;text-wrap:pretty">Kalajay began with a simple love for making things by hand. Today, we are a small business built almost entirely by women, creating pieces that bring beauty to everyday life. From jewellery boxes that hold your treasures to beaded purses, keyrings, and coasters, every piece brings together thoughtful design and patient handwork. Each is made to be as useful as it is pretty.</p>
       <p style="font-size:17px;line-height:1.75;color:#5B4331;margin:0 0 18px;text-wrap:pretty">Our name draws from <em>kala</em>, meaning art. That spirit runs through everything we create. Nothing is mass-produced; each piece reflects the skill and care of its maker, with subtle differences that make it special.</p>
       <p style="font-size:17px;line-height:1.75;color:#5B4331;margin:0 0 24px;text-wrap:pretty">From our first order to our first stall to every home we reach, we're growing one handcrafted piece at a time. Thank you for being part of our story.</p>
       <p style="font-size:12px;letter-spacing:0.3em;text-transform:uppercase;color:#8A6318;margin:0 0 32px">Handcrafted. Pretty. You.</p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:28px;border-top:1px solid #DFD2B2;padding-top:28px">
-        <div><p style="font-family:'Prata',serif;font-size:32px;margin:0 0 4px;color:#A9482A">9</p><p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#5B4331">Collections</p></div>
+        <div><p style="font-family:'Prata',serif;font-size:32px;margin:0 0 4px;color:#A9482A">{{ memberCount }}</p><p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#5B4331">Members</p></div>
+        <div><p style="font-family:'Prata',serif;font-size:32px;margin:0 0 4px;color:#A9482A">{{ cityCount }}</p><p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#5B4331">Cities</p></div>
         <div><p style="font-family:'Prata',serif;font-size:32px;margin:0 0 4px;color:#A9482A">100%</p><p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#5B4331">Hand-strung</p></div>
-        <div><p style="font-family:'Prata',serif;font-size:32px;margin:0 0 4px;color:#A9482A">1–2 wks</p><p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#5B4331">Made to order</p></div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
@@ -170,6 +178,24 @@
   </div>
 </section>
 
+<section aria-label="Story photo gallery" style="max-width:1200px;margin:0 auto;padding:64px 24px 0">
+  <p style="font-size:12px;letter-spacing:.25em;text-transform:uppercase;color:#8A6318">Made with care</p>
+  <h2 style="font-family:'Prata',serif;font-size:32px;color:#40291C">A glimpse of Kalajay</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
+    <figure style="margin:0"><img src="v2/p6-4.jpg" alt="Pearl beaded mini tote bag" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px"><figcaption style="padding-top:12px;color:#5B4331">Beads, brought together by hand.</figcaption></figure>
+    <figure style="margin:0"><img src="v2/p19-2.jpg" alt="Colourful crochet charms" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px"><figcaption style="padding-top:12px;color:#5B4331">Little details, patiently crafted.</figcaption></figure>
+    <figure style="margin:0"><img src="v2/p3-3.jpg" alt="Hands holding a pearl beaded jewellery box" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px"><figcaption style="padding-top:12px;color:#5B4331">Pieces made to hold something special.</figcaption></figure>
+  </div>
+</section>
+<section id="our-team" aria-labelledby="our-team-heading" style="max-width:1200px;margin:0 auto;padding:64px 24px 0">
+  <h2 id="our-team-heading" style="font-family:'Prata',serif;font-size:32px;color:#40291C">Our Team</h2>
+  <figure style="margin:0;max-width:960px">
+    <img src="assets/ratanpur-team.jpg" alt="Kalajay’s Ratanpur team together" width="1280" height="960" loading="lazy" style="display:block;width:100%;height:auto;border-radius:8px">
+    <figcaption style="padding-top:12px;color:#5B4331">Ratanpur Team</figcaption>
+  </figure>
+</section>
+</sc-if>
+<sc-if value="{{ isHome }}">
 <section id="custom" style="max-width:1200px;margin:0 auto;padding:88px 24px 0">
   <h2 style="font-family:'Prata',serif;font-size:clamp(30px,4vw,44px);margin:0 0 40px;color:#40291C">Ask for something of your own</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px">
@@ -188,6 +214,7 @@
   </div>
 </section>
 
+</sc-if>
 <section id="contact" style="margin-top:96px;background:#A9482A;color:#FBF7E8">
   <div style="max-width:1200px;margin:0 auto;padding:80px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:48px">
     <div>
@@ -258,6 +285,15 @@
       </div>
       <div style="border-top:1px solid #E7DCC2;padding:22px 24px;display:flex;flex-direction:column;gap:12px">
         <p style="margin:0;font-size:14px;line-height:1.6;color:#5B4331">{{ cartSummary }} · prices quoted on request</p>
+        <div style="display:grid;gap:8px">
+          <label>Your name<input value="{{ customerName }}" onChange="{{ setCustomerName }}" autocomplete="name" style="display:block;width:100%;padding:10px;border:1px solid #C6B491;border-radius:8px"></label>
+          <label>Phone number<input type="tel" value="{{ customerPhone }}" onChange="{{ setCustomerPhone }}" autocomplete="tel" style="display:block;width:100%;padding:10px;border:1px solid #C6B491;border-radius:8px"></label>
+          <label>Delivery address<input value="{{ customerAddress }}" onChange="{{ setCustomerAddress }}" autocomplete="street-address" style="display:block;width:100%;padding:10px;border:1px solid #C6B491;border-radius:8px"></label>
+          <label>Order notes (optional)<input value="{{ orderNote }}" onChange="{{ setOrderNote }}" style="display:block;width:100%;padding:10px;border:1px solid #C6B491;border-radius:8px"></label>
+          <button onClick="{{ saveOrder }}" style="padding:12px;border:0;border-radius:12px;background:#A9482A;color:#fff;cursor:pointer">{{ orderButtonLabel }}</button>
+          <p role="status" style="margin:0;font-size:14px">{{ orderMessage }}</p>
+        </div>
+
         <a href="{{ cartWaLink }}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#25D366;color:#0B3D22;padding:16px 22px;border-radius:999px;font-size:13px;letter-spacing:0.16em;text-transform:uppercase" style-hover="background:#1FB457;color:#08301A">
           <svg viewBox="0 0 32 32" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M16.04 3.2C9.01 3.2 3.3 8.91 3.3 15.94c0 2.25.59 4.44 1.71 6.38L3.2 28.8l6.65-1.74a12.7 12.7 0 0 0 6.19 1.58h.01c7.02 0 12.74-5.71 12.74-12.74 0-3.4-1.33-6.6-3.73-9.01a12.65 12.65 0 0 0-9.02-3.69Zm0 23.03h-.01a10.6 10.6 0 0 1-5.39-1.47l-.39-.23-4.01 1.05 1.07-3.9-.25-.4a10.5 10.5 0 0 1-1.62-5.63c0-5.84 4.76-10.59 10.6-10.59 2.83 0 5.49 1.1 7.49 3.11a10.5 10.5 0 0 1 3.1 7.49c0 5.84-4.75 10.57-10.59 10.57Zm5.81-7.92c-.32-.16-1.88-.93-2.17-1.03-.29-.11-.5-.16-.71.16-.21.32-.82 1.03-1 1.24-.19.21-.37.24-.68.08-.32-.16-1.34-.5-2.56-1.58-.95-.84-1.58-1.88-1.77-2.2-.19-.32-.02-.49.14-.65.14-.14.32-.37.48-.56.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.71-1.72-.98-2.35-.26-.62-.52-.54-.71-.55l-.61-.01c-.21 0-.56.08-.85.4-.29.32-1.11 1.09-1.11 2.65s1.14 3.08 1.3 3.29c.16.21 2.24 3.42 5.43 4.8.76.33 1.35.52 1.81.67.76.24 1.45.21 2 .13.61-.09 1.88-.77 2.14-1.51.26-.74.26-1.38.19-1.51-.08-.13-.29-.21-.61-.37Z"></path></svg>
           <span>Send list on WhatsApp</span>
@@ -280,109 +316,118 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#A9482A&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#A9482A&quot;,&quot;#8A6318&quot;,&quot;#8E3A20&quot;,&quot;#6E4A2E&quot;]},&quot;introAnimation&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
-const CATS = [
-  ["Organisers", "Pearl-beaded boxes & trays for jewellery and everyday essentials", "v2/p3-2.jpg"],
-  ["Purses", "Hand-beaded clutches and purses", "v2/p6-2.jpg"],
-  ["Slings", "Colourful beaded sling bags with long handle straps", "v2/p10-3.jpg"],
-  ["Airpod Cases", "Pearl beaded airpod cases for everyday use", "v2/p12-3.jpg"],
-  ["Mats", "Pearl-beaded mats and coasters", "v2/p14-5.jpg"],
-  ["Candle Holders", "Beaded tealight holders", "v2/p16-3.jpg"],
-  ["Key Rings", "Beaded keyrings and charms", "v2/p18-4.jpg"],
-  ["Crochet Magic", "Handmade crochet accessories", "v2/p19-2.jpg"],
-  ["Special Pieces", "One-of-a-kind crystal and beaded showpieces", "v2/p21-2.jpg"]
-];
-
-const PRODUCTS = [
-  ["Pearl Beaded Jewellery Box with Mirror", "p3-2", "Organisers"],
-  ["Pearl Beaded Ring/Earring Box", "p3-3", "Organisers"],
-  ["Pearl Beaded Round Watch/Accessory Box", "p3-4", "Organisers"],
-  ["Pearl Beaded Vanity Tray", "p3-5", "Organisers"],
-  ["Pearl Beaded Square Organiser", "p4-2", "Organisers"],
-  ["Pearl Beaded Round Organiser", "p4-3", "Organisers"],
-  ["Black Beaded Ashtray", "p4-4", "Organisers"],
-  ["Pearl Beaded Catch-All Tray", "p4-5", "Organisers"],
-  ["Beaded Desk Organiser Baskets", "p5-2", "Organisers"],
-  ["Crystal Beaded Tissue Dispenser", "p5-3a.png", "Organisers"],
-  ["Crystal Beaded Pen/Brush Holder ", "p5-3b.png", "Organisers"],
-  ["Matte Beaded Pen/Brush Holder", "p5-4.png", "Organisers"],
-  ["Pearl Beaded Baguette Bag", "p6-2", "Purses"],
-  ["Ivory Beaded Backpack", "p6-3", "Purses"],
-  ["Pearl Beaded Mini Tote Bag", "p6-4", "Purses"],
-  ["Pearl Beaded Envelope Clutch", "p6-5", "Purses"],
-  ["Pearl Beaded Mega Tote Bag", "p7-2", "Purses"],
-  ["Pearl Drop Bag", "p7-3", "Purses"],
-  ["Pearl Beaded Vintage Bag", "p7-4", "Purses"],
-  ["Pearl Beaded Mini Pouch with Flower Charm", "p7-5", "Purses"],
-  ["Pearl Beaded Clutch, Gold Dot Detail", "p8-2", "Purses"],
-  ["Pearl Beaded Hobo Bag", "p8-3", "Purses"],
-  ["Pearl Beaded Slice Bag", "p8-4", "Purses"],
-  ["Pearl Beaded Canteen Bag", "p8-5", "Purses"],
-  ["Pearl Beaded Cutout-Handle Bag", "p9-2", "Purses"],
-  ["Mint Green Beaded Tote Bag", "p9-3", "Purses"],
-  ["Orange Beaded Woven Handbag", "p9-4", "Purses"],
-  ["Yellow Beaded Woven Handbag", "p9-5", "Purses"],
-  ["Beaded Sling Bag Collection", "p10-2", "Slings"],
-  ["Sunset Ombre Beaded Sling Bag", "p10-3", "Slings"],
-  ["Pastel Beaded Sling Bag", "p10-4", "Slings"],
-  ["Pearl Beaded Textured Sling Bag", "p10-5", "Slings"],
-  ["Pearl Beaded Phone Sling Bag", "p11-2", "Slings"],
-  ["Pearl Beaded AirPods Case", "p12-2", "Airpod Cases"],
-  ["Yellow Beaded AirPods Case", "p12-3", "Airpod Cases"],
-  ["Pastel Beaded AirPods Case", "p12-4", "Airpod Cases"],
-  ["Crystal Beaded AirPods Case", "p12-5", "Airpod Cases"],
-  ["Beaded Nike Theme Mat", "p13-2", "Mats"],
-  ["Beaded Coaster Set, Grey & Blue", "p13-3", "Mats"],
-  ["Pink & Grey Beaded Round Mat", "p13-4", "Mats"],
-  ["Grey Beaded Table Runner", "p13-5", "Mats"],
-  ["Beaded Coaster Set, Blue & White", "p14-2", "Mats"],
-  ["Pearl Beaded Square Mat", "p14-3", "Mats"],
-  ["Pearl Beaded Accent Mat", "p14-4", "Mats"],
-  ["Pearl Beaded Round Coaster Set", "p14-5", "Mats"],
-  ["Pearl Beaded Mat With Colour Accents", "p15-2", "Mats"],
-  ["Pearl Beaded Tealight Holder Set", "p16-2", "Candle Holders"],
-  ["Lilac Beaded Tealight Holder Set", "p16-3", "Candle Holders"],
-  ["Pearl Beaded Alphabet Keyring", "p17-2", "Key Rings"],
-  ["Pastel Beaded Alphabet Keyring", "p17-3", "Key Rings"],
-  ["Pearl Beaded Music Note Keyring", "p17-4", "Key Rings"],
-  ["Pearl Beaded Heart Keyring", "p17-5", "Key Rings"],
-  ["Crystal Beaded Heart Charm Collection", "p18-3", "Key Rings"],
-  ["Rainbow Beaded Heart Charm Set", "p18-4", "Key Rings"],
-  ["Crochet Flower Bookmark/Bag Charm", "x19-2", "Crochet Magic"],
-  ["Crochet Chicken Bookmarks", "p19-3", "Crochet Magic"],
-  ["Crochet Heart Keyring", "p20-2", "Crochet Magic"],
-  ["Crochet Flower Bookmarks", "p20-3", "Crochet Magic"],
-  ["Crystal Bling Bottle", "p21-2", "Special Pieces"],
-  ["Mini Pearl Coin Bag", "p21-3", "Special Pieces"],
-  ["Custom Beaded Name Plaque", "p21-4", "Special Pieces"]
-];
-
-// Edit this list to mark pieces as out of stock — they drop to the end of their
-// collection automatically and render faded with a "Sold out" badge.
-const SOLD_OUT = [
-  "Pearl Beaded Envelope Clutch",
-  "Orange Beaded Woven Handbag",
-  "Lilac Beaded Tealight Holder Set",
-  "Crochet Chicken Bookmarks"
-];
-
-// Flat price for now. Add per-piece overrides here, e.g. "Pearl Beaded Mega Tote Bag": 1200
-const DEFAULT_PRICE = 500;
-const PRICES = {};
+const IS_SHOP = window.location.pathname.replace(/\/$/, "") === "/shop";
+const IS_STORY = window.location.pathname.replace(/\/$/, "") === "/story";
+const INITIAL_PARAMS = new URLSearchParams(window.location.search);
+const { collections: CATS, products: PRODUCTS, soldOut: SOLD_OUT, defaultPrice: DEFAULT_PRICE, prices: PRICES } = window.KALAJAY_DATA;
 
 class Component extends DCLogic {
-  state = { cat: "All", active: null, cart: {}, cartOpen: false, justAdded: null, q: "", intro: true };
+  state = { cityCount: window.KALAJAY_DATA.cityCount, memberCount: window.KALAJAY_DATA.memberCount, cat: CATS.some(c => c[0] === INITIAL_PARAMS.get("category")) ? INITIAL_PARAMS.get("category") : "All", active: null, cart: {}, cartOpen: false, justAdded: null, q: INITIAL_PARAMS.get("q") || "", intro: !IS_SHOP && !IS_STORY && window.location.hash !== "#top", customerName: "", customerPhone: "", customerAddress: "", orderNote: "", orderMessage: "", savingOrder: false };
 
   componentDidMount() {
-    if (this.props.introAnimation === false) return this.setState({ intro: false });
-    this._i = setTimeout(() => this.setState({ intro: false }), 3550);
+    document.title = IS_STORY ? "Our Story | Kalajay" : IS_SHOP ? "Shop | Kalajay" : "Kalajay | Handcrafted with care";
+    this._closeShop = e => { const menu = document.querySelector('.shop-menu'); if (menu && (e.key === 'Escape' || (e.type === 'click' && !menu.contains(e.target)))) menu.open = false; };
+    document.addEventListener('click', this._closeShop);
+    document.addEventListener('keydown', this._closeShop);
+
+    this._urlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      this.setState({ cat: CATS.some(c => c[0] === params.get('category')) ? params.get('category') : 'All', q: params.get('q') || '' });
+    };
+    window.addEventListener('popstate', this._urlChange);
+    try {
+      const stored = JSON.parse(sessionStorage.getItem('kalajay-cart') || '{}');
+      const cart = {};
+      PRODUCTS.forEach(p => { const item = stored[p[3]]; if (item && Number.isInteger(item.qty) && item.qty > 0) cart[p[3]] = { ...item, code:p[3], name:p[0], cat:p[2], price:PRICES[p[3]] }; });
+      this.setState({ cart });
+    } catch (_) {}
+    this._saveCart = () => { try { sessionStorage.setItem('kalajay-cart', JSON.stringify(this.state.cart)); } catch (_) {} };
+    window.addEventListener('pagehide', this._saveCart);
+
+    this._catalogueRefresh = () => fetch('/api/catalogue').then(r => r.json()).then(data => {
+      CATS.splice(0, CATS.length, ...data.collections);
+      PRODUCTS.splice(0, PRODUCTS.length, ...data.products);
+      SOLD_OUT.splice(0, SOLD_OUT.length, ...data.soldOut);
+      Object.keys(PRICES).forEach(k => delete PRICES[k]);
+      Object.assign(PRICES, data.prices);
+      const cart = {};
+      Object.values(this.state.cart).forEach(item => {
+        const product = data.products.find(p => p[3] === item.code);
+        if (product) cart[item.code] = { ...item, name: product[0], cat: product[2], price: data.prices[item.code] };
+      });
+      this.setState({ cart, memberCount: data.memberCount, cityCount: data.cityCount });
+    }).catch(() => {});
+    window.addEventListener('focus', this._catalogueRefresh);
+    this._catalogueTimer = setInterval(this._catalogueRefresh, 10000);
+
+    if (IS_SHOP || IS_STORY || window.location.hash === "#top" || this.props.introAnimation === false) return this.setState({ intro: false });
+    const video = document.querySelector('.kj-intro-video');
+    let finishing = false;
+    const finish = () => {
+      if (finishing) return;
+      finishing = true;
+      clearTimeout(this._i);
+      const veil = document.querySelector('.kj-veil');
+      const logo = document.querySelector('header img');
+      if (!video || !veil || !logo || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        this.setState({ intro: false });
+        return;
+      }
+      video.pause();
+      const from = video.getBoundingClientRect();
+      const to = logo.getBoundingClientRect();
+      // Fly the transparent emblem, avoiding a shrinking rectangle of video background.
+      const width = from.width * (314 / 480) / (410 / 969);
+      const left = from.left + from.width * (81 / 480) - width * (276 / 969);
+      const top = from.top + from.height * (41 / 240);
+      const emblem = document.createElement('div');
+      emblem.setAttribute('aria-hidden', 'true');
+      Object.assign(emblem.style, {
+        position: 'fixed', left: left + 'px', top: top + 'px', width: width + 'px',
+        height: (width * 215 / 969) + 'px', overflow: 'hidden', zIndex: '201',
+        pointerEvents: 'none', transformOrigin: '0 0'
+      });
+      const image = logo.cloneNode();
+      image.alt = '';
+      image.style.cssText = 'display:block;width:100%;height:auto;max-width:none;';
+      emblem.appendChild(image);
+      document.body.appendChild(emblem);
+      this._flyingEmblem = emblem;
+      video.style.visibility = 'hidden';
+      veil.style.pointerEvents = 'none';
+      const duration = 240;
+      veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: 'forwards' });
+      logo.animate([{ opacity: 0 }, { opacity: 0, offset: .68 }, { opacity: 1 }], { duration, fill: 'forwards' });
+      const flight = emblem.animate([
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: 'translate(' + (to.left-left) + 'px,' + (to.top-top) + 'px) scale(' + (to.width/width) + ')', opacity: 1, offset: .9 },
+        { transform: 'translate(' + (to.left-left) + 'px,' + (to.top-top) + 'px) scale(' + (to.width/width) + ')', opacity: 0 }
+      ], { duration, easing: 'cubic-bezier(.3,.8,.3,1)', fill: 'forwards' });
+      flight.onfinish = () => { emblem.remove(); this._flyingEmblem = null; this.setState({ intro: false }); };
+
+    };
+    if (video) {
+      video.muted = true;
+      video.playbackRate = 1.4; // Play the full 3.5-second clip in 2.5 seconds.
+      video.addEventListener('ended', finish, { once: true });
+      video.addEventListener('error', finish, { once: true });
+      video.addEventListener('playing', () => {
+        clearTimeout(this._i);
+        this._i = setTimeout(finish, 2500);
+      }, { once: true });
+      video.play().catch(finish);
+      this._i = setTimeout(finish, 8000);
+    } else {
+      this._i = setTimeout(finish, 2500);
+    }
   }
 
-  componentWillUnmount() { clearTimeout(this._i); clearTimeout(this._t); }
+  componentWillUnmount() { document.removeEventListener("click", this._closeShop); document.removeEventListener("keydown", this._closeShop); if (this._flyingEmblem) this._flyingEmblem.remove(); window.removeEventListener("popstate", this._urlChange); window.removeEventListener("pagehide", this._saveCart); clearInterval(this._catalogueTimer); window.removeEventListener("focus", this._catalogueRefresh); clearTimeout(this._i); clearTimeout(this._t); }
 
   addToCart(p) {
     this.setState(s => ({
-      cart: { ...s.cart, [p.name]: { ...p, qty: (s.cart[p.name] ? s.cart[p.name].qty : 0) + 1 } },
-      justAdded: p.name
+      cart: { ...s.cart, [p.code]: { ...p, qty: (s.cart[p.code] ? s.cart[p.code].qty : 0) + 1 } },
+      justAdded: p.code
     }));
     clearTimeout(this._t);
     this._t = setTimeout(() => this.setState({ justAdded: null }), 1400);
@@ -395,6 +440,26 @@ class Component extends DCLogic {
       if (q < 1) delete cart[name]; else cart[name] = { ...cart[name], qty: q };
       return { cart };
     });
+  }
+
+  async saveOrder() {
+    if (this.state.savingOrder) return;
+    this.setState({ savingOrder: true, orderMessage: "Saving your order…" });
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer: { name: this.state.customerName, phone: this.state.customerPhone, address: this.state.customerAddress },
+          note: this.state.orderNote,
+          items: Object.values(this.state.cart).map(i => ({ code: i.code, quantity: i.qty }))
+        })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Unable to save order.');
+      this.setState({ orderMessage: 'Order ' + result.orderId + ' saved. Total ₹' + result.total + '. Payment and delivery will be confirmed separately.', cart: {} });
+    } catch (error) {
+      this.setState({ orderMessage: error.message || 'Unable to save order. Please try again.' });
+    } finally { this.setState({ savingOrder: false }); }
   }
 
   waLink(text) {
@@ -411,6 +476,8 @@ class Component extends DCLogic {
       padding: "11px 20px",
       borderRadius: "999px",
       cursor: "pointer",
+      whiteSpace: "nowrap",
+      flexShrink: 0,
       background: on ? accent : "transparent",
       color: on ? "#FBF7E8" : "#5B4331",
       border: "1px solid " + (on ? accent : "#DDCEAE")
@@ -419,8 +486,8 @@ class Component extends DCLogic {
 
   card(p) {
     const accent = this.props.accentColor || "#A9482A";
-    const added = this.state.justAdded === p.name;
-    const inCart = !!this.state.cart[p.name];
+    const added = this.state.justAdded === p.code;
+    const inCart = !!this.state.cart[p.code];
     const out = p.soldOut;
     return {
       ...p,
@@ -463,11 +530,12 @@ class Component extends DCLogic {
     const cat = this.state.cat;
     const q = this.state.q.trim().toLowerCase();
     const items = PRODUCTS.map(p => ({
+      code: p[3],
       name: p[0],
-      img: "v2/" + p[1] + (p[1].indexOf(".") < 0 ? ".jpg" : ""),
+      img: p[1] ? "v2/" + p[1] + (p[1].indexOf(".") < 0 ? ".jpg" : "") : "assets/kalajay-brand.png",
       cat: p[2],
-      soldOut: SOLD_OUT.indexOf(p[0]) >= 0,
-      price: PRICES[p[0]] || DEFAULT_PRICE
+      soldOut: SOLD_OUT.indexOf(p[3]) >= 0,
+      price: PRICES[p[3]] ?? DEFAULT_PRICE
     }));
     let shown = cat === "All" ? items : items.filter(p => p.cat === cat);
     if (q) shown = shown.filter(p => (p.name + " " + p.cat).toLowerCase().includes(q));
@@ -476,18 +544,31 @@ class Component extends DCLogic {
     const cartItems = Object.values(this.state.cart);
     const count = cartItems.reduce((n, i) => n + i.qty, 0);
     return {
-      collections: CATS.map((c, i) => ({
+      cityCount: this.state.cityCount,
+      memberCount: this.state.memberCount,
+      collections: [["All", "Browse every handcrafted piece", "v2/p6-4.jpg"]].concat(CATS).map((c, i) => ({
         num: String(i + 1).padStart(2, "0"),
         name: c[0],
         blurb: c[1],
         img: c[2],
+        href: c[0] === "All" ? "/shop" : "/shop?category=" + encodeURIComponent(c[0]),
         pick: () => this.setState({ cat: c[0] })
       })),
       filters: ["All"].concat(CATS.map(c => c[0])).map(label => ({
         label: label,
         style: this.chip(label === cat),
-        pick: () => this.setState({ cat: label })
+        href: label === 'All' ? '/shop' : '/shop?category=' + encodeURIComponent(label),
+        current: label === cat ? 'page' : 'false',
+        pick: e => { e.preventDefault(); const url = new URL('/shop', window.location.origin); if (label !== 'All') url.searchParams.set('category', label); if (this.state.q) url.searchParams.set('q', this.state.q); window.history.pushState({}, '', url); this.setState({ cat: label }); }
       })),
+      isHome: !IS_SHOP && !IS_STORY,
+      isStory: IS_STORY,
+      isShop: IS_SHOP,
+      selectedCategory: IS_SHOP ? cat : '',
+      shopHeading: cat === 'All' ? 'All handcrafted pieces' : cat,
+      categoryOptions: ['All'].concat(CATS.map(c => c[0])).map(name => ({ name, href: name === 'All' ? '/shop' : '/shop?category=' + encodeURIComponent(name) })),
+      navigateCategory: e => { if (!e.target.value) return; window.location.href = e.target.value === 'All' ? '/shop' : '/shop?category=' + encodeURIComponent(e.target.value); },
+      searchCatalogue: e => { e.preventDefault(); const url = new URL('/shop', window.location.origin); if (this.state.q.trim()) url.searchParams.set('q',this.state.q.trim()); window.location.href = url.pathname + url.search; },
       query: this.state.q,
       setQuery: e => this.setState({ q: e.target.value }),
       noResults: shown.length === 0,
@@ -503,6 +584,17 @@ class Component extends DCLogic {
           count: inCat.length + (inCat.length === 1 ? " piece" : " pieces") + (gone ? " · " + gone + " sold out" : "")
         };
       }).filter(g => g.items.length),
+      customerName: this.state.customerName,
+      customerPhone: this.state.customerPhone,
+      customerAddress: this.state.customerAddress,
+      orderNote: this.state.orderNote,
+      orderMessage: this.state.orderMessage,
+      orderButtonLabel: this.state.savingOrder ? 'Saving…' : 'Save order',
+      setCustomerName: e => this.setState({ customerName: e.target.value }),
+      setCustomerPhone: e => this.setState({ customerPhone: e.target.value }),
+      setCustomerAddress: e => this.setState({ customerAddress: e.target.value }),
+      setOrderNote: e => this.setState({ orderNote: e.target.value }),
+      saveOrder: () => this.saveOrder(),
       cartCount: count,
       cartOpen: this.state.cartOpen,
       cartEmpty: cartItems.length === 0,
@@ -511,8 +603,8 @@ class Component extends DCLogic {
       clearCart: () => this.setState({ cart: {} }),
       cartItems: cartItems.map(i => ({
         ...i,
-        inc: () => this.bump(i.name, 1),
-        dec: () => this.bump(i.name, -1)
+        inc: () => this.bump(i.code, 1),
+        dec: () => this.bump(i.code, -1)
       })),
       cartSummary: count === 0 ? "No pieces added yet" : count + (count === 1 ? " piece" : " pieces") + " on your list",
       waLink: this.waLink("Hi Kalajay! I'd like to know more about your handcrafted pieces."),
@@ -524,7 +616,7 @@ class Component extends DCLogic {
       ),
       countLabel: q
         ? shown.length + (shown.length === 1 ? " piece matching “" : " pieces matching “") + this.state.q.trim() + "”"
-        : shown.length + (cat === "All" ? " pieces across nine collections" : " pieces in " + cat),
+        : shown.length + (cat === "All" ? " pieces across " + CATS.length + " collections" : " pieces in " + cat),
       active: !!a,
       activeImg: a ? a.img : "",
       activeName: a ? a.name : "",

@@ -1,0 +1,36 @@
+import fs from 'node:fs/promises';
+import {Workbook, SpreadsheetFile} from '@oai/artifact-tool';
+const [input, output, preview] = process.argv.slice(2);
+const data = JSON.parse(await fs.readFile(input, 'utf8'));
+const wb = Workbook.create();
+const sh = wb.worksheets.add('Catalogue');
+sh.showGridLines = false;
+const end = data.rows.length + 7;
+sh.getRange(`A1:G${end}`).format.font = {name:'Arial',size:11,color:'#40291C'};
+sh.getRange('A2').values = [['Kalajay catalogue updates']];
+sh.getRange('A2').format.font = {name:'Arial',size:16,bold:true,color:'#A4502B'};
+sh.getRange('A3').values = [['Fill yellow cells only. Blank = no change; new quantity 0 = sold out.']];
+sh.getRange('A4').values = [['Upload the saved .xlsx in ERP → Catalogue Excel. Download a fresh sheet before each update.']];
+sh.getRange('A5:B5').values = [['Database version',data.revision]];
+sh.getRange('A6').values = [['Source: shared Kalajay catalogue. Current quantity is recorded available stock.']];
+sh.getRange('A7:G7').values = [['Product code','Product name','Category','Current quantity','New quantity','Current price (INR)','New price (INR)']];
+sh.getRange(`A8:G${end}`).values = data.rows;
+sh.tables.add(`A7:G${end}`,true,'CatalogueUpdates');
+sh.getRange('A7:G7').format = {fill:'#A4502B',font:{name:'Arial',bold:true,color:'#FFFFFF'},rowHeight:30,wrapText:true};
+for (const [col,width] of [['A',21],['B',52],['C',23],['D',19],['E',18],['F',23],['G',22]]) sh.getRange(`${col}1:${col}${end}`).format.columnWidth = width;
+sh.getRange(`A8:G${end}`).format.rowHeight = 25;
+sh.getRange(`E8:E${end}`).format.fill = '#FFF0BD';
+sh.getRange(`G8:G${end}`).format.fill = '#FFF0BD';
+sh.getRange(`D8:E${end}`).setNumberFormat('#,##0');
+sh.getRange(`F8:G${end}`).setNumberFormat('"₹"#,##0.00');
+sh.dataValidations.add({range:`E8:E${end}`,rule:{type:'whole',operator:'between',formula1:0,formula2:1000000}});
+sh.dataValidations.add({range:`G8:G${end}`,rule:{type:'decimal',operator:'between',formula1:0,formula2:10000000}});
+sh.freezePanes.freezeRows(7);
+wb.recalculate();
+if (preview) {
+ console.log((await wb.inspect({kind:'table',range:'Catalogue!A7:G10',include:'values,formulas',tableMaxRows:4,tableMaxCols:7})).ndjson);
+ const pic = await wb.render({sheetName:'Catalogue',range:'A1:G14',scale:1.5});
+ await fs.writeFile(preview,new Uint8Array(await pic.arrayBuffer()));
+}
+const file = await SpreadsheetFile.exportXlsx(wb);
+await file.save(output);
