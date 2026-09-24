@@ -6,6 +6,7 @@ import sqlite3
 import uuid
 import shared_store as shared
 import team_store as team
+import auth_store as auth
 import catalogue_excel as excel
 import subprocess, tempfile
 from datetime import datetime, timezone
@@ -41,6 +42,7 @@ def initialize():
     DB.chmod(0o600)
     shared.migrate(connect, ROOT, ERP_ROOT)
     team.initialize(connect)
+    auth.initialize(connect, ROOT)
 
 def catalogue():
     return shared.catalog(connect)
@@ -49,7 +51,7 @@ def save_order(data):
     return shared.save_order(connect, data)
 
 class Handler(BaseHTTPRequestHandler):
-    def send(self, status, body, kind='application/json; charset=utf-8'):
+    def send(self, status, body, kind='application/json; charset=utf-8', headers=None):
         if isinstance(body, (dict, list)):
             body = json.dumps(body).encode()
         elif isinstance(body, str):
@@ -61,20 +63,38 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header('Content-Disposition', 'attachment; filename=Kalajay-Catalogue-Update.xlsx')
         self.send_header('Cache-Control', 'no-store')
         self.send_header('X-Content-Type-Options', 'nosniff')
+        for key,value in (headers or {}).items(): self.send_header(key,value)
         self.end_headers()
         self.wfile.write(body)
 
+    def erp_page(self, html):
+        user=auth.current(connect,self.headers.get('Cookie'))
+        extra='<script>window.ERP_USER='+json.dumps(user)+'</script><script src="/erp/auth.js" defer></script>'
+        return self.send(200,html.replace('</head>',extra+'</head>') if '</head>' in html else html.replace('<main>',extra+'<main>'), 'text/html; charset=utf-8')
+
     def do_GET(self):
         path = unquote(urlsplit(self.path).path)
+        if path in ('/erp/login','/erp/setup'):
+            return self.send(200,(ROOT/'auth.html').read_text(),'text/html; charset=utf-8')
+        protected=path=='/erp' or path.startswith('/erp/') or path.startswith('/api/erp') or path in ('/api/catalogue.xlsx','/api/auth/users')
+        user=auth.current(connect,self.headers.get('Cookie')) if protected else None
+        if protected and not user:
+            if path.startswith('/api/'): return self.send(401,{'error':'Please sign in to ERP.'})
+            return self.send(303,'','text/plain',{'Location':'/erp/login'})
+        if path in ('/erp/accounts','/api/auth/users'):
+            if user['role']!='admin':return self.send(403,{'error':'Admin access required.'})
+            if path=='/erp/accounts':return self.erp_page((ROOT/'auth.html').read_text())
+            with connect() as db:return self.send(200,[dict(row) for row in db.execute('SELECT username,role FROM auth_users ORDER BY username')])
+        if path=='/erp/auth.js':return self.send(200,(ROOT/'erp-auth.js').read_text(),'application/javascript')
         if path == '/erp/team':
-            return self.send(200, (ROOT/'team.html').read_text(), 'text/html; charset=utf-8')
+            return self.erp_page((ROOT/'team.html').read_text())
         if path == '/api/erp/cities':
             return self.send(200, team.cities(connect))
         if path == '/api/erp/team':
             return self.send(200, team.state(connect))
         if path in ('/erp', '/erp/', '/erp/index.html'):
             with connect() as db:
-                return self.send(200, db.execute("SELECT value FROM content WHERE key='erp_homepage'").fetchone()[0], 'text/html; charset=utf-8')
+                return self.erp_page(db.execute("SELECT value FROM content WHERE key='erp_homepage'").fetchone()[0])
         if path == '/api/catalogue.xlsx':
             try:
                 with tempfile.TemporaryDirectory() as temp:
@@ -107,11 +127,18 @@ class Handler(BaseHTTPRequestHandler):
         return self.send(200, file.read_bytes(), mimetypes.guess_type(file.name)[0] or 'application/octet-stream')
 
     def do_POST(self):
+        if self.path.startswith('/api/auth/'):
+            return self.auth_post()
         if self.path not in ('/api/erp/cities', '/api/erp/team', '/api/orders', '/api/erp', '/api/erp/confirm', '/api/catalogue/import-preview', '/api/catalogue/import'):
             return self.send(404, {'error': 'Not found'})
         origin = self.headers.get('Origin')
         if origin and origin != 'http://' + self.headers.get('Host', ''):
             return self.send(403, {'error': 'Cross-origin requests are not allowed.'})
+        if self.path != '/api/orders':
+            user=auth.current(connect,self.headers.get('Cookie'))
+            if not user:return self.send(401,{'error':'Please sign in to ERP.'})
+            if user['role']!='admin':return self.send(403,{'error':'Managers have view-only access.'})
+            if origin != 'http://' + self.headers.get('Host',''):return self.send(403,{'error':'Same-origin request required.'})
         if self.path in ('/api/catalogue/import-preview', '/api/catalogue/import'):
             try:
                 size = int(self.headers.get('Content-Length', '0'))
@@ -148,6 +175,31 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(400, {'error': str(error)})
         except sqlite3.Error:
             return self.send(503, {'error': 'Could not save your order. Please try again.'})
+
+    def auth_post(self):
+        if self.headers.get('Origin') != 'http://' + self.headers.get('Host',''):
+            return self.send(403,{'error':'Same-origin request required.'})
+        try:
+            if self.headers.get('Content-Type','').split(';')[0]!='application/json':return self.send(415,{'error':'JSON required.'})
+            size=int(self.headers.get('Content-Length','0'))
+            if not 0<size<=4096:raise ValueError('Invalid request size.')
+            data=json.loads(self.rfile.read(size))
+            path=self.path
+            if path=='/api/auth/login':
+                token=auth.login(connect,data,self.client_address[0])
+                return self.send(200,{'ok':True},headers={'Set-Cookie':'kj_session='+token+'; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200'})
+            if path=='/api/auth/setup':return self.send(201,auth.create(connect,data,ROOT))
+            user=auth.current(connect,self.headers.get('Cookie'))
+            if not user:return self.send(401,{'error':'Please sign in.'})
+            if path=='/api/auth/logout':
+                auth.logout(connect,self.headers.get('Cookie'))
+                return self.send(200,{'ok':True},headers={'Set-Cookie':'kj_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'})
+            if path=='/api/auth/users':
+                if user['role']!='admin':return self.send(403,{'error':'Admin access required.'})
+                return self.send(201,auth.create(connect,data))
+            return self.send(404,{'error':'Not found'})
+        except (ValueError,UnicodeError) as error:return self.send(400,{'error':str(error)})
+        except sqlite3.Error:return self.send(503,{'error':'Unable to save login details.'})
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
