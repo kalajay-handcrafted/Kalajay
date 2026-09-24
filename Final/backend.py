@@ -1,5 +1,6 @@
 """Kalajay local backend. Run: python3 backend.py --port 8000"""
 import argparse
+import os
 import json
 import mimetypes
 import sqlite3
@@ -15,8 +16,12 @@ from pathlib import Path
 from urllib.parse import urlsplit, unquote
 
 ROOT = Path(__file__).resolve().parent
-DB = ROOT / 'private' / 'kalajay.sqlite3'
-ERP_ROOT = ROOT.parent.parent / 'KalajayERP'
+DATA_DIR = Path(os.environ.get('KALAJAY_DATA_DIR', str(ROOT / 'private')))
+DB = DATA_DIR / 'kalajay.sqlite3'
+ERP_ROOT = Path(os.environ.get('KALAJAY_ERP_ROOT', str(ROOT / 'erp' if (ROOT / 'erp').exists() else ROOT.parent.parent / 'KalajayERP')))
+PRODUCTION = os.environ.get('KALAJAY_PRODUCTION') == '1'
+ALLOWED_HOSTS = set(filter(None, os.environ.get('KALAJAY_HOSTS','www.kalajay.in,kalajay.in,erp.kalajay.in').split(',')))
+if os.environ.get('RENDER_EXTERNAL_HOSTNAME'): ALLOWED_HOSTS.add(os.environ['RENDER_EXTERNAL_HOSTNAME'])
 
 def connect():
     db = sqlite3.connect(DB, timeout=15)
@@ -25,7 +30,7 @@ def connect():
     return db
 
 def initialize():
-    DB.parent.mkdir(exist_ok=True, mode=0o700)
+    DB.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     with connect() as db:
         db.executescript('''
         CREATE TABLE IF NOT EXISTS content (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -42,7 +47,7 @@ def initialize():
     DB.chmod(0o600)
     shared.migrate(connect, ROOT, ERP_ROOT)
     team.initialize(connect)
-    auth.initialize(connect, ROOT)
+    auth.initialize(connect, DATA_DIR)
 
 def catalogue():
     return shared.catalog(connect)
@@ -51,6 +56,20 @@ def save_order(data):
     return shared.save_order(connect, data)
 
 class Handler(BaseHTTPRequestHandler):
+    def setup(self):
+        super().setup()
+        self.connection.settimeout(30)
+
+    def valid_host(self):
+        host=self.headers.get('Host','').split(':')[0].lower()
+        return not PRODUCTION or host in ALLOWED_HOSTS
+
+    def expected_origin(self):
+        return ('https://' if PRODUCTION else 'http://') + self.headers.get('Host','')
+
+    def session_cookie(self, token, age):
+        return 'kj_session='+token+'; HttpOnly; SameSite=Strict; Path=/; Max-Age='+str(age)+('; Secure' if PRODUCTION else '')
+
     def send(self, status, body, kind='application/json; charset=utf-8', headers=None):
         if isinstance(body, (dict, list)):
             body = json.dumps(body).encode()
@@ -63,6 +82,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header('Content-Disposition', 'attachment; filename=Kalajay-Catalogue-Update.xlsx')
         self.send_header('Cache-Control', 'no-store')
         self.send_header('X-Content-Type-Options', 'nosniff')
+        self.send_header('Referrer-Policy','same-origin')
+        self.send_header('X-Frame-Options','SAMEORIGIN')
         for key,value in (headers or {}).items(): self.send_header(key,value)
         self.end_headers()
         self.wfile.write(body)
@@ -73,7 +94,11 @@ class Handler(BaseHTTPRequestHandler):
         return self.send(200,html.replace('</head>',extra+'</head>') if '</head>' in html else html.replace('<main>',extra+'<main>'), 'text/html; charset=utf-8')
 
     def do_GET(self):
+        if not self.valid_host(): return self.send(400, {'error':'Invalid host.'})
         path = unquote(urlsplit(self.path).path)
+        if path == '/healthz':return self.send(200, {'status':'ok'})
+        if path == '/' and self.headers.get('Host','').split(':')[0].lower() == 'erp.kalajay.in':
+            return self.send(302, '', 'text/plain', {'Location':'/erp/'})
         if path in ('/erp/login','/erp/setup'):
             return self.send(200,(ROOT/'auth.html').read_text(),'text/html; charset=utf-8')
         protected=path=='/erp' or path.startswith('/erp/') or path.startswith('/api/erp') or path in ('/api/catalogue.xlsx','/api/auth/users')
@@ -97,12 +122,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.erp_page(db.execute("SELECT value FROM content WHERE key='erp_homepage'").fetchone()[0])
         if path == '/api/catalogue.xlsx':
             try:
-                with tempfile.TemporaryDirectory() as temp:
-                    base = Path(temp)
-                    (base/'data.json').write_text(json.dumps(excel.export_data(connect)))
-                    subprocess.run(['/Users/som/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node', str(ROOT/'catalogue_excel.mjs'), str(base/'data.json'), str(base/'catalogue.xlsx')], check=True, timeout=60, capture_output=True)
-                    return self.send(200, (base/'catalogue.xlsx').read_bytes(), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            except (OSError, subprocess.SubprocessError):
+                return self.send(200, excel.export_workbook(connect), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            except Exception:
                 return self.send(503, {'error': 'Excel export failed. Please try again.'})
         if path == '/api/erp':
             return self.send(200, shared.state(connect))
@@ -127,18 +148,19 @@ class Handler(BaseHTTPRequestHandler):
         return self.send(200, file.read_bytes(), mimetypes.guess_type(file.name)[0] or 'application/octet-stream')
 
     def do_POST(self):
+        if not self.valid_host():return self.send(400, {"error":"Invalid host."})
         if self.path.startswith('/api/auth/'):
             return self.auth_post()
         if self.path not in ('/api/erp/cities', '/api/erp/team', '/api/orders', '/api/erp', '/api/erp/confirm', '/api/catalogue/import-preview', '/api/catalogue/import'):
             return self.send(404, {'error': 'Not found'})
         origin = self.headers.get('Origin')
-        if origin and origin != 'http://' + self.headers.get('Host', ''):
+        if origin and origin != self.expected_origin():
             return self.send(403, {'error': 'Cross-origin requests are not allowed.'})
         if self.path != '/api/orders':
             user=auth.current(connect,self.headers.get('Cookie'))
             if not user:return self.send(401,{'error':'Please sign in to ERP.'})
             if user['role']!='admin':return self.send(403,{'error':'Managers have view-only access.'})
-            if origin != 'http://' + self.headers.get('Host',''):return self.send(403,{'error':'Same-origin request required.'})
+            if origin != self.expected_origin():return self.send(403,{'error':'Same-origin request required.'})
         if self.path in ('/api/catalogue/import-preview', '/api/catalogue/import'):
             try:
                 size = int(self.headers.get('Content-Length', '0'))
@@ -177,7 +199,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(503, {'error': 'Could not save your order. Please try again.'})
 
     def auth_post(self):
-        if self.headers.get('Origin') != 'http://' + self.headers.get('Host',''):
+        if self.headers.get('Origin') != self.expected_origin():
             return self.send(403,{'error':'Same-origin request required.'})
         try:
             if self.headers.get('Content-Type','').split(';')[0]!='application/json':return self.send(415,{'error':'JSON required.'})
@@ -187,13 +209,13 @@ class Handler(BaseHTTPRequestHandler):
             path=self.path
             if path=='/api/auth/login':
                 token=auth.login(connect,data,self.client_address[0])
-                return self.send(200,{'ok':True},headers={'Set-Cookie':'kj_session='+token+'; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200'})
-            if path=='/api/auth/setup':return self.send(201,auth.create(connect,data,ROOT))
+                return self.send(200,{'ok':True},headers={'Set-Cookie':self.session_cookie(token,43200)})
+            if path=='/api/auth/setup':return self.send(201,auth.create(connect,data,DATA_DIR))
             user=auth.current(connect,self.headers.get('Cookie'))
             if not user:return self.send(401,{'error':'Please sign in.'})
             if path=='/api/auth/logout':
                 auth.logout(connect,self.headers.get('Cookie'))
-                return self.send(200,{'ok':True},headers={'Set-Cookie':'kj_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'})
+                return self.send(200,{'ok':True},headers={'Set-Cookie':self.session_cookie('',0)})
             if path=='/api/auth/users':
                 if user['role']!='admin':return self.send(403,{'error':'Admin access required.'})
                 return self.send(201,auth.create(connect,data))
@@ -203,8 +225,8 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--port', type=int, default=8000)
+    parser.add_argument('--port', type=int, default=int(os.environ.get('PORT','8000')))
     args = parser.parse_args()
     initialize()
     print(f'Kalajay running at http://127.0.0.1:{args.port}', flush=True)
-    ThreadingHTTPServer(('127.0.0.1', args.port), Handler).serve_forever()
+    ThreadingHTTPServer(('0.0.0.0' if PRODUCTION else '127.0.0.1', args.port), Handler).serve_forever()

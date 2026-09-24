@@ -25,7 +25,7 @@ def migrate(connect,root,erp_root):
   done=db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='shared_meta'").fetchone()
  if not done:
   # Online SQLite backup preserves the existing catalogue, website content, and customer orders.
-  with connect() as src, sqlite3.connect(root/'private'/'before-shared-migration.sqlite3') as dest: src.backup(dest)
+  with connect() as src, sqlite3.connect(__import__('pathlib').Path(src.execute('PRAGMA database_list').fetchone()[2]).parent/'before-shared-migration.sqlite3') as dest: src.backup(dest)
   with connect() as db:
    db.execute('BEGIN IMMEDIATE')
    legacy=[dict(r) for r in db.execute('SELECT * FROM products')]

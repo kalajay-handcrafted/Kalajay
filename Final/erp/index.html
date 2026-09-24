@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="/erp/">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  :root { --accent: #B4532A; --pad: 9px 12px; --ink: #2A241E; --mut: #7E7266; --line: #E5DACB; --paper: #FAF6F0; --panel: #FFFDFA; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: "IBM Plex Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  input, select, textarea, button { font: inherit; color: inherit; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -2px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: #8E3F1E; text-decoration: underline; }
+  table { border-collapse: collapse; }
+  ::-webkit-scrollbar { height: 10px; width: 10px; }
+  ::-webkit-scrollbar-thumb { background: #D8CCBB; border-radius: 8px; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+<div style="--accent:{{ accent }};--pad:{{ cellPad }};display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh;align-items:stretch">
+
+  <aside style="background:#231E19;color:#EDE4D8;display:flex;flex-direction:column;gap:2px;padding:20px 0 14px;position:sticky;top:0;height:100vh;overflow:auto">
+    <div style="padding:0 20px 18px;display:flex;flex-direction:column;gap:10px">
+      <div style="width:176px;height:112px;border-radius:8px;background:#F6EEDF;overflow:hidden;position:relative;flex:none">
+        <img src="assets/kalajay-logo.png" alt="Kalajay" style="position:absolute;width:475px;left:-150px;top:-207px">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <div style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#9C8E7E">Inventory &amp; Production ERP</div>
+        <div style="font-size:11px;color:#8C7D6C">{{ orgName }} · Mumbai</div>
+      </div>
+    </div>
+    <sc-for list="{{ navGroups }}" as="g" hint-placeholder-count="4">
+      <div style="padding:12px 20px 5px;font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:#8C7D6C">{{ g.label }}</div>
+      <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+        <button onClick="{{ it.go }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;border:0;cursor:pointer;background:{{ it.bg }};color:{{ it.fg }};padding:8px 20px;font-size:13.5px;border-left:3px solid {{ it.mark }}" style-hover="background:#322B24;color:#FFF">
+          <span>{{ it.label }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:1px 6px;border-radius:99px;background:{{ it.badgeBg }};color:{{ it.badgeFg }}">{{ it.badge }}</span>
+        </button>
+      </sc-for>
+    </sc-for>
+    <div style="margin-top:auto;padding:16px 20px 0;border-top:1px solid #372F28;display:flex;flex-direction:column;gap:7px">
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;color:#9C8E7E"><span>SKUs</span><span style="font-family:'IBM Plex Mono',monospace;color:#EDE4D8">{{ skuCount }}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;color:#9C8E7E"><span>Stock value</span><span style="font-family:'IBM Plex Mono',monospace;color:#EDE4D8">{{ totalValue }}</span></div>
+    </div>
+  </aside>
+
+  <main style="min-width:0;display:flex;flex-direction:column">
+    <header style="padding:22px 28px 16px;border-bottom:1px solid var(--line);background:var(--panel);display:flex;gap:20px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+        <h1 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:27px;letter-spacing:-0.015em">{{ screenTitle }}</h1>
+        <p style="margin:0;font-size:13px;color:var(--mut);max-width:70ch;text-wrap:pretty">{{ screenSub }}</p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="font-size:11px;color:var(--mut);text-align:right;line-height:1.55">FY 2026–27 · GSTIN 27FAAPS2113B1Z8<br>{{ today }}</div>
+      </div>
+    </header>
+
+    <div style="padding:22px 28px 40px;display:flex;flex-direction:column;gap:20px;min-width:0">
+
+      <sc-if value="{{ scrDash }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--mut)">{{ k.label }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:500;letter-spacing:-0.02em;color:{{ k.tone }}">{{ k.value }}</div>
+              <div style="font-size:11.5px;color:var(--mut)">{{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px">
+          <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px 18px;display:flex;flex-direction:column;gap:14px;min-width:0">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+              <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:17px">Production vs. sales</h2>
+              <div style="display:flex;gap:12px;font-size:11px;color:var(--mut)">
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;background:var(--accent);border-radius:2px"></span>Made</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;background:#2F6F5E;border-radius:2px"></span>Sold</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:10px;height:150px">
+              <sc-for list="{{ trend }}" as="m" hint-placeholder-count="8">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0">
+                  <div style="display:flex;align-items:flex-end;gap:3px;height:120px">
+                    <div title="{{ m.madeT }}" style="width:12px;background:var(--accent);border-radius:2px 2px 0 0;height:{{ m.madeH }}px"></div>
+                    <div title="{{ m.soldT }}" style="width:12px;background:#2F6F5E;border-radius:2px 2px 0 0;height:{{ m.soldH }}px"></div>
+                  </div>
+                  <div style="font-size:10.5px;color:var(--mut);font-family:'IBM Plex Mono',monospace">{{ m.label }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:17px">Low stock &amp; reorder alerts</h2>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid {{ a.line }};background:{{ a.bg }};border-radius:6px">
+                  <div style="width:6px;height:28px;border-radius:3px;background:{{ a.dot }}"></div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.name }}</div>
+                    <div style="font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',monospace">{{ a.code }} · reorder at {{ a.reorder }}</div>
+                  </div>
+                  <div style="text-align:right">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:{{ a.dot }}">{{ a.stock }}</div>
+                    <div style="font-size:10.5px;color:var(--mut)">{{ a.unit }} left</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+          <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:17px">Top sellers</h2>
+            <sc-for list="{{ topSellers }}" as="t" hint-placeholder-count="5">
+              <div style="display:flex;flex-direction:column;gap:5px">
+                <div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.name }}</span><span style="font-family:'IBM Plex Mono',monospace;color:var(--mut)">{{ t.sold }}</span></div>
+                <div style="height:5px;background:#F0E8DC;border-radius:99px;overflow:hidden"><div style="height:100%;background:var(--accent);width:{{ t.pct }}%"></div></div>
+              </div>
+            </sc-for>
+          </section>
+
+          <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0">
+            <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:17px">Slow movers</h2>
+            <p style="margin:0;font-size:11.5px;color:var(--mut)">Lowest sell-through against units made.</p>
+            <sc-for list="{{ slowMovers }}" as="s" hint-placeholder-count="5">
+              <div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1EAE0;font-size:12.5px">
+                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.name }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;color:#B8860B;flex:none">{{ s.rate }}%</span>
+              </div>
+            </sc-for>
+          </section>
+
+          <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0">
+            <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:17px">Recent activity</h2>
+            <sc-for list="{{ activity }}" as="t" hint-placeholder-count="6">
+              <div style="display:flex;gap:10px;align-items:baseline;font-size:12.5px;padding:6px 0;border-bottom:1px solid #F1EAE0">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--mut);flex:none">{{ t.date }}</span>
+                <span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:{{ t.tone }};flex:none">{{ t.type }}</span>
+                <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.name }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;flex:none">{{ t.qty }}</span>
+              </div>
+            </sc-for>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ scrGrid }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="Search product, code, category…" style="flex:1;min-width:220px;padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:13px">
+          <select value="{{ catFilter }}" onChange="{{ onCatFilter }}" style="padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:13px">
+            <sc-for list="{{ catOptions }}" as="c" hint-placeholder-count="5"><option value="{{ c }}">{{ c }}</option></sc-for>
+          </select>
+          <select value="{{ stockFilter }}" onChange="{{ onStockFilter }}" style="padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:13px">
+            <option value="all">All stock levels</option>
+            <option value="low">At / below reorder</option>
+            <option value="out">Out of stock</option>
+          </select>
+          <button data-admin-write="true" onClick="{{ goAdd }}" style="padding:9px 14px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#8E3F1E">+ New product</button>
+          <button onClick="{{ exportCsv }}" style="padding:9px 14px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:13px;cursor:pointer" style-hover="border-color:var(--accent);color:var(--accent)">Export CSV</button>
+        </div>
+        <p style="margin:0;font-size:11.5px;color:var(--mut);font-family:'IBM Plex Mono',monospace">Remaining stock = Opening + Stock-in + Made − Sold − Damaged · {{ rowCount }} rows · white cells are editable in place</p>
+        <div style="overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);max-height:70vh">
+          <table style="width:100%;font-size:12.5px;min-width:1900px">
+            <thead>
+              <tr style="background:#F4EDE3">
+                <sc-for list="{{ columns }}" as="c" hint-placeholder-count="20">
+                  <th onClick="{{ c.sort }}" title="Sort" style="position:sticky;top:0;background:#F4EDE3;z-index:2;text-align:{{ c.align }};padding:9px 12px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;font-weight:600">{{ c.label }}</th>
+                </sc-for>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12">
+                <tr style="border-bottom:1px solid #F2EBE1;background:{{ r.rowBg }}" style-hover="background:#FBF4EA">
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;color:var(--mut);text-align:right">{{ r.sno }}</td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;white-space:nowrap;color:#4A4038">{{ r.code }}</td>
+                  <td style="padding:4px 6px;min-width:250px"><input data-admin-write="true" value="{{ r.name }}" onChange="{{ r.onName }}" style="width:100%;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-weight:500" style-hover="border-color:var(--line)"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.cat }}" onChange="{{ r.onCat }}" style="width:150px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px" style-hover="border-color:var(--line)"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.unit }}" onChange="{{ r.onUnit }}" style="width:52px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;text-align:center" style-hover="border-color:var(--line)"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.hsn }}" onChange="{{ r.onHsn }}" style="width:62px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace" style-hover="border-color:var(--line)"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.gst }}" onChange="{{ r.onGst }}" style="width:48px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut)">{{ r.open }}</td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut)">{{ r.purch }}</td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ r.made }}</td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#2F6F5E">{{ r.sold }}</td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#A4442C">{{ r.dmg }}</td>
+                  <td style="padding:var(--pad);text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;padding:2px 7px;border-radius:99px;background:{{ r.stockBg }};color:{{ r.stockFg }}">{{ r.stock }}</span></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.reorder }}" onChange="{{ r.onReorder }}" style="width:56px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.cp }}" onChange="{{ r.onCp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.sp }}" onChange="{{ r.onSp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.mrp }}" onChange="{{ r.onMrp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:{{ r.marginFg }}">{{ r.margin }}</td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap">{{ r.value }}</td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut);white-space:nowrap">{{ r.upd }}</td>
+                  <td style="padding:var(--pad);text-align:center"><button data-admin-write="true" onClick="{{ r.onDelete }}" title="Delete row" style="border:0;background:none;color:#B9A896;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px" style-hover="color:#A4442C;background:#F8EDE7">✕</button></td>
+                </tr>
+              </sc-for>
+            </tbody>
+            <tfoot>
+              <tr style="background:#F4EDE3;font-weight:600">
+                <td colspan="7" style="padding:var(--pad);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#6B5F52">Totals — {{ rowCount }} products</td>
+                <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tOpen }}</td>
+                <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tPurch }}</td>
+                <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tMade }}</td>
+                <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tSold }}</td>
+                <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tDmg }}</td>
+                <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tStock }}</td>
+                <td colspan="4"></td>
+                <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tMargin }}</td>
+                <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap">{{ totalValue }}</td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ scrLow }}" hint-placeholder-val="{{ true }}">
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:auto">
+          <table style="width:100%;font-size:13px;min-width:820px">
+            <thead><tr style="background:#F4EDE3">
+              <th style="text-align:left;padding:10px 14px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Product</th>
+              <th style="text-align:right;padding:10px 14px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Stock</th>
+              <th style="text-align:right;padding:10px 14px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Reorder at</th>
+              <th style="text-align:right;padding:10px 14px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Deficit</th>
+              <th style="text-align:right;padding:10px 14px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Suggested make</th>
+              <th style="text-align:right;padding:10px 14px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Cost to replenish</th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ lowRows }}" as="r" hint-placeholder-count="6">
+                <tr style="border-bottom:1px solid #F2EBE1">
+                  <td style="padding:11px 14px"><div style="font-weight:500">{{ r.name }}</div><div style="font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',monospace">{{ r.code }} · {{ r.cat }}</div></td>
+                  <td style="padding:11px 14px;text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;padding:2px 7px;border-radius:99px;background:{{ r.stockBg }};color:{{ r.stockFg }}">{{ r.stock }}</span></td>
+                  <td style="padding:11px 14px;text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--mut)">{{ r.reorder }}</td>
+                  <td style="padding:11px 14px;text-align:right;font-family:'IBM Plex Mono',monospace;color:#A4442C">{{ r.deficit }}</td>
+                  <td style="padding:11px 14px;text-align:right;font-family:'IBM Plex Mono',monospace">{{ r.suggest }}</td>
+                  <td style="padding:11px 14px;text-align:right;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ r.cost }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ scrAdd }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;align-items:start">
+          <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:16px">
+            <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:18px">{{ addHeading }}</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+              <sc-for list="{{ addFields }}" as="f" hint-placeholder-count="14">
+                <label style="display:flex;flex-direction:column;gap:5px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mut)">
+                  {{ f.label }}
+                  <input data-admin-write="true" value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.hint }}" style="border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:13px;letter-spacing:0;text-transform:none;color:var(--ink);background:#fff">
+                </label>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button data-admin-write="true" onClick="{{ saveProduct }}" style="padding:10px 18px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#8E3F1E">Save product</button>
+              <button data-admin-write="true" onClick="{{ clearProduct }}" style="padding:10px 16px;border:1px solid var(--line);border-radius:6px;background:none;font-size:13px;cursor:pointer">Clear</button>
+              <span style="font-size:12px;color:#A4442C">{{ addError }}</span>
+            </div>
+          </section>
+          <section style="background:#F6EFE5;border:1px solid var(--line);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:12px">
+            <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:16px">Live preview</h2>
+            <div style="display:flex;flex-direction:column;gap:9px;font-size:13px">
+              <sc-for list="{{ addPreview }}" as="p" hint-placeholder-count="5">
+                <div style="display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed #DCD0BF;padding-bottom:7px">
+                  <span style="color:var(--mut)">{{ p.label }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-weight:500">{{ p.value }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <p style="margin:0;font-size:11.5px;color:var(--mut);text-wrap:pretty">Codes follow HC-XX-NNN. Saving an existing code updates that product instead of creating a duplicate.</p>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ scrEntry }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;align-items:start">
+          <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:14px">
+            <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:18px">{{ entryHeading }}</h2>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mut)">Product
+              <select data-admin-write="true" value="{{ entry.code }}" onChange="{{ onEntryCode }}" style="border:1px solid var(--line);border-radius:6px;padding:9px 10px;font-size:13px;letter-spacing:0;text-transform:none;color:var(--ink);background:#fff">
+                <option value="">— select product —</option>
+                <sc-for list="{{ productOptions }}" as="o" hint-placeholder-count="8"><option value="{{ o.code }}">{{ o.label }}</option></sc-for>
+              </select>
+            </label>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px">
+              <sc-for list="{{ entryFields }}" as="f" hint-placeholder-count="4">
+                <label style="display:flex;flex-direction:column;gap:5px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mut)">
+                  {{ f.label }}
+                  <input data-admin-write="true" value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.hint }}" style="border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:13px;letter-spacing:0;text-transform:none;color:var(--ink);background:#fff">
+                </label>
+              </sc-for>
+            </div>
+            <sc-if value="{{ isSale }}" hint-placeholder-val="{{ true }}">
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mut)">Entry type
+                <select data-admin-write="true" value="{{ entry.kind }}" onChange="{{ onEntryKind }}" style="border:1px solid var(--line);border-radius:6px;padding:9px 10px;font-size:13px;letter-spacing:0;text-transform:none;color:var(--ink);background:#fff">
+                  <option value="Sale">Sale — reduces stock, books revenue</option>
+                  <option value="Damage">Damage / return — writes off stock</option>
+                </select>
+              </label>
+            </sc-if>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <button data-admin-write="true" onClick="{{ postEntry }}" style="padding:10px 18px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#8E3F1E">{{ entryCta }}</button>
+              <span style="font-size:12px;color:#A4442C">{{ entryError }}</span>
+            </div>
+            <div style="background:#F6EFE5;border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:7px;font-size:12.5px">
+              <sc-for list="{{ entryPreview }}" as="p" hint-placeholder-count="3">
+                <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:var(--mut)">{{ p.label }}</span><span style="font-family:'IBM Plex Mono',monospace;font-weight:500;color:{{ p.tone }}">{{ p.value }}</span></div>
+              </sc-for>
+            </div>
+          </section>
+          <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:0;overflow:auto">
+            <div style="padding:16px 18px 10px"><h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:17px">{{ entryLogTitle }}</h2></div>
+            <table style="width:100%;font-size:12.5px;min-width:440px">
+              <thead><tr style="background:#F4EDE3">
+                <th style="text-align:left;padding:8px 14px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Date</th>
+                <th style="text-align:left;padding:8px 14px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Product</th>
+                <th style="text-align:left;padding:8px 14px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Ref</th>
+                <th style="text-align:right;padding:8px 14px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Qty</th>
+                <th style="text-align:right;padding:8px 14px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Value</th>
+              </tr></thead>
+              <tbody>
+                <sc-for list="{{ entryLog }}" as="t" hint-placeholder-count="8">
+                  <tr style="border-bottom:1px solid #F2EBE1">
+                    <td style="padding:9px 14px;font-family:'IBM Plex Mono',monospace;color:var(--mut);white-space:nowrap">{{ t.date }}</td>
+                    <td style="padding:9px 14px">{{ t.name }}</td>
+                    <td style="padding:9px 14px;color:var(--mut);font-size:11.5px">{{ t.ref }}</td>
+                    <td style="padding:9px 14px;text-align:right;font-family:'IBM Plex Mono',monospace;color:{{ t.tone }}">{{ t.qty }}</td>
+                    <td style="padding:9px 14px;text-align:right;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ t.amount }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </section>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ scrReports }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+          <sc-for list="{{ reportKpis }}" as="k" hint-placeholder-count="4">
+            <div style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:5px">
+              <div style="font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--mut)">{{ k.label }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:22px;color:{{ k.tone }}">{{ k.value }}</div>
+              <div style="font-size:11.5px;color:var(--mut)">{{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:auto">
+          <div style="padding:16px 18px 10px"><h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:17px">Margin &amp; stock value by category</h2></div>
+          <table style="width:100%;font-size:13px;min-width:860px">
+            <thead><tr style="background:#F4EDE3">
+              <th style="text-align:left;padding:9px 16px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Category</th>
+              <th style="text-align:right;padding:9px 16px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">SKUs</th>
+              <th style="text-align:right;padding:9px 16px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Units made</th>
+              <th style="text-align:right;padding:9px 16px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Units sold</th>
+              <th style="text-align:right;padding:9px 16px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Revenue</th>
+              <th style="text-align:right;padding:9px 16px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Gross profit</th>
+              <th style="padding:9px 16px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52;text-align:left;width:220px">Margin</th>
+              <th style="text-align:right;padding:9px 16px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Stock value</th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ catRows }}" as="c" hint-placeholder-count="8">
+                <tr style="border-bottom:1px solid #F2EBE1">
+                  <td style="padding:11px 16px;font-weight:500">{{ c.cat }}</td>
+                  <td style="padding:11px 16px;text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--mut)">{{ c.skus }}</td>
+                  <td style="padding:11px 16px;text-align:right;font-family:'IBM Plex Mono',monospace">{{ c.made }}</td>
+                  <td style="padding:11px 16px;text-align:right;font-family:'IBM Plex Mono',monospace;color:#2F6F5E">{{ c.sold }}</td>
+                  <td style="padding:11px 16px;text-align:right;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ c.rev }}</td>
+                  <td style="padding:11px 16px;text-align:right;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ c.profit }}</td>
+                  <td style="padding:11px 16px"><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:6px;background:#F0E8DC;border-radius:99px;overflow:hidden"><div style="height:100%;background:var(--accent);width:{{ c.pct }}%"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--mut);flex:none">{{ c.margin }}</span></div></td>
+                  <td style="padding:11px 16px;text-align:right;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ c.value }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </section>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+          <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+            <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:17px">Most profitable products</h2>
+            <sc-for list="{{ profitRows }}" as="p" hint-placeholder-count="6">
+              <div style="display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #F1EAE0;font-size:12.5px">
+                <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.name }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;flex:none;color:#2F6F5E">{{ p.profit }}</span>
+              </div>
+            </sc-for>
+          </section>
+          <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+            <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:17px">Damage &amp; wastage</h2>
+            <sc-for list="{{ damageRows }}" as="d" hint-placeholder-count="6">
+              <div style="display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #F1EAE0;font-size:12.5px">
+                <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ d.name }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;flex:none;color:#A4442C">{{ d.rate }}% · {{ d.dmg }}</span>
+              </div>
+            </sc-for>
+          </section>
+        </div>
+      </sc-if>
+
+    </div>
+    <section style="padding:24px 28px;border-top:1px solid var(--line)" id="team-members"><h2>Team Members</h2><p>Register new members in any role to update the website’s live member count.</p><a href="/erp/team">Manage team members →</a></section>
+    <section style="padding:24px 28px;border-top:1px solid var(--line)" id="catalogue-excel">
+      <h2>Catalogue Excel</h2>
+      <p>Download the current catalogue, fill the yellow New quantity / New price cells, then upload the saved .xlsx. Blank cells keep existing values. Quantity replaces available stock; zero marks a product sold out.</p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center"><a href="/api/catalogue.xlsx" download="Kalajay-Catalogue-Update.xlsx" style="padding:10px 16px;background:var(--accent);color:#fff;border-radius:6px">Download catalogue Excel</a><label>Upload edited Excel <input data-admin-write="true" type="file" accept=".xlsx" onChange="{{ previewExcel }}"></label></div>
+      <p role="status">{{ excelMessage }}</p>
+      <sc-for list="{{ excelChanges }}" as="c"><p><strong>{{ c.code }} · {{ c.name }}</strong><br>Quantity: {{ c.oldQuantity }} → {{ c.newQuantity }} · Price: ₹{{ c.oldPrice }} → ₹{{ c.newPrice }}</p></sc-for>
+      <sc-if value="{{ excelReady }}"><button data-admin-write="true" onClick="{{ applyExcel }}" style="padding:10px 16px;background:var(--accent);color:#fff;border:0;border-radius:6px">Apply updates to website &amp; ERP</button></sc-if>
+    </section>
+    <section style="padding:24px 28px;border-top:1px solid var(--line)">
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><h2>Website orders</h2><a href="/" target="_blank">Open website ↗</a><button onClick="{{ exportBackup }}">Export data backup</button><button data-admin-write="true" onClick="{{ importBrowserBackup }}">Import previous browser data</button><label>Import ERP JSON backup <input data-admin-write="true" type="file" accept=".json" onChange="{{ importBackup }}"></label></div>
+      <p>Orders remain pending until confirmed. Confirmation records the sale and updates shared stock.</p>
+      <sc-for list="{{ sharedOrders }}" as="o">
+        <article style="padding:16px;margin:12px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel)">
+          <strong>{{ o.id }} · {{ o.date }} · {{ o.status }} · {{ o.amount }}</strong>
+          <p>{{ o.customerLabel }}<br>{{ o.address }}</p><p>{{ o.summary }}</p><p>{{ o.note }}</p>
+          <sc-if value="{{ o.pending }}"><button data-admin-write="true" onClick="{{ o.confirm }}" style="padding:10px 16px;background:var(--accent);color:white;border:0;border-radius:6px;cursor:pointer">Confirm order &amp; record sale</button></sc-if>
+        </article>
+      </sc-for>
+    </section>
+  </main>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#231E19;color:#F3EADC;padding:11px 18px;border-radius:8px;font-size:13px;box-shadow:0 8px 24px rgba(40,30,20,0.22);animation:toastIn 0.18s ease-out;z-index:50">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;orgName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Kalajay&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#B4532A&quot;,&quot;options&quot;:[&quot;#B4532A&quot;,&quot;#2F6F5E&quot;,&quot;#3A4A7A&quot;,&quot;#7A4A6E&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Comfortable&quot;,&quot;options&quot;:[&quot;Comfortable&quot;,&quot;Compact&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  TREND = [
+    ["Feb", 0, 0], ["Mar", 0, 0], ["Apr", 0, 0], ["May", 0, 0],
+    ["Jun", 0, 0], ["Jul", 0, 0], ["Aug", 0, 0], ["Sep", 0, 0]
+  ];
+
+
+
+  state = {
+    excelChanges: [], excelMessage: "", excelReady: false,
+    orders: [], revision: 0, loaded: false,
+    products: [],
+    txns: [],
+    screen: "dash",
+    query: "",
+    catFilter: "All categories",
+    stockFilter: "all",
+    sortKey: "sno",
+    sortDir: 1,
+    draft: {},
+    entry: { code: "", qty: "", date: "", ref: "", rate: "", kind: "Sale" },
+    addError: "",
+    entryError: "",
+    toast: ""
+  };
+
+  componentDidMount() {
+    this.loadShared();
+    this._refresh = () => { if (!this._saving && !this._pending && !this._failed) this.loadShared(); };
+    window.addEventListener('focus', this._refresh);
+    this._poll = setInterval(this._refresh, 10000);
+  }
+  componentWillUnmount() {
+    clearInterval(this._poll);
+    window.removeEventListener('focus', this._refresh);
+  }
+  async loadShared() {
+    try {
+      const r = await fetch('/api/erp');
+      if (!r.ok) throw new Error('Unable to load shared database.');
+      const data = await r.json();
+      if (this._saving || this._pending || (this._revision && data.revision < this._revision)) return;
+      this._revision = data.revision;
+      this.setState({ ...data, loaded: true });
+    } catch (e) { this.setState({ toast: e.message }); }
+  }
+  async commit(products, txns, toast) {
+    if (this._confirming) return this.setState({ toast: 'Please wait for order confirmation to finish.' });
+    if (!this.state.loaded) return this.setState({ toast: 'Wait for the shared database to load.' });
+    const p = products || this.state.products, t = txns || this.state.txns;
+    this.setState({ products: p, txns: t, toast: 'Saving to shared database…' });
+    this._pending = { products: p, txns: t, toast };
+    if (this._saving) return;
+    this._saving = true;
+    try {
+      while (this._pending) {
+        const next = this._pending; this._pending = null;
+        const r = await fetch('/api/erp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ products: next.products, txns: next.txns, revision: this._revision }) });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'Save failed.');
+        this._revision = data.revision;
+        if (!this._pending) this.setState({ ...data, toast: next.toast || 'Saved to shared database' });
+      }
+      this._failed = false;
+    } catch (e) {
+      this._pending = null; this._failed = true;
+      this.setState({ toast: e.message + ' Your unsaved view is retained; export it before refreshing.' });
+    } finally { this._saving = false; }
+  }
+  async confirmOrder(id) {
+    if (this._saving || this._pending || this._failed) return this.setState({ toast: 'Finish saving inventory changes before confirming orders.' });
+    this._saving = true; this._confirming = true;
+    try {
+      const r = await fetch('/api/erp/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: id }) });
+      const data = await r.json(); if (!r.ok) throw new Error(data.error);
+      this.setState({ toast: 'Order confirmed and stock updated.' });
+    } catch (e) { this.setState({ toast: e.message }); }
+    finally { this._saving = false; this._confirming = false; await this.loadShared(); }
+  }
+  async previewExcel(e) {
+    const file = e.target.files[0];
+    if (!file || this._saving) return;
+    this._excelFile = file;
+    this.setState({ excelReady: false, excelChanges: [], excelMessage: 'Checking workbook…' });
+    try {
+      const r = await fetch('/api/catalogue/import-preview', { method: 'POST', headers: {'Content-Type':'application/octet-stream'}, body: file });
+      const data = await r.json(); if (!r.ok) throw new Error(data.error);
+      this.setState({ excelChanges: data.changes, excelReady: data.count > 0, excelMessage: data.count + ' products will be updated. Review the changes below.' });
+    } catch (error) { this.setState({ excelMessage: error.message }); }
+  }
+  async applyExcel() {
+    if (!this.state.excelReady || this._saving || this._pending) return;
+    this._saving = true; this.setState({ excelReady: false, excelMessage: 'Applying updates…' });
+    try {
+      const r = await fetch('/api/catalogue/import', { method: 'POST', headers: {'Content-Type':'application/octet-stream'}, body: this._excelFile });
+      const data = await r.json(); if (!r.ok) throw new Error(data.error);
+      this.setState({ excelMessage: data.count + ' products updated on the website and ERP.', excelChanges: [] });
+    } catch (error) { this.setState({ excelMessage: error.message }); }
+    finally { this._saving = false; await this.loadShared(); }
+  }
+
+  importBrowserBackup() {
+    const raw = localStorage.getItem('kalajay-erp-v2');
+    if (!raw) return this.setState({ toast: 'No previous ERP data in this browser origin. Import a JSON backup from the previous ERP instead.' });
+    return this.importBackup({ target: { files: [new Blob([raw], { type: 'application/json' })] } });
+  }
+  exportBackup() {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify({ products: this.state.products, txns: this.state.txns }, null, 2)], { type: 'application/json' }));
+    a.download = 'kalajay-erp-backup.json'; a.click(); URL.revokeObjectURL(a.href);
+  }
+  async importBackup(e) {
+    const file = e.target.files[0]; if (!file || this._saving) return;
+    this._saving = true;
+    try {
+      const data = JSON.parse(await file.text());
+      const r = await fetch('/api/erp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...data, revision: this._revision, importLegacy: true }) });
+      const saved = await r.json(); if (!r.ok) throw new Error(saved.error);
+      this._revision = saved.revision; this.setState({ ...saved, toast: 'Backup merged by product code.' });
+    } catch (err) { this.setState({ toast: err.message }); }
+    finally { this._saving = false; }
+  }
+
+  stock(p) { return p.open + p.purch + p.made - p.sold - p.dmg + (p.adjustment || 0); }
+  inr(n) { return "₹" + Math.round(n).toLocaleString("en-IN"); }
+  inrShort(n) {
+    if (n >= 10000000) return "₹" + (n / 10000000).toFixed(2) + " Cr";
+    if (n >= 100000) return "₹" + (n / 100000).toFixed(2) + " L";
+    return this.inr(n);
+  }
+  num(v) { const n = parseFloat(String(v).replace(/[^0-9.\-]/g, "")); return isNaN(n) ? 0 : n; }
+  todayISO() { return new Date().toISOString().slice(0, 10); }
+
+  setField(code, key, raw, numeric) {
+    const products = this.state.products.map(p =>
+      p.code === code ? Object.assign({}, p, { [key]: numeric ? this.num(raw) : raw, upd: this.todayISO() }) : p
+    );
+    this.commit(products, null);
+  }
+
+  postTxn() {
+    const e = this.state.entry;
+    const screen = this.state.screen;
+    const p = this.state.products.find(x => x.code === e.code);
+    const qty = this.num(e.qty);
+    if (!p) return this.setState({ entryError: "Select a product first." });
+    if (qty <= 0) return this.setState({ entryError: "Enter a quantity greater than zero." });
+    let type = screen === "prod" ? "Production" : screen === "purch" ? "Purchase" : e.kind;
+    if ((type === "Sale" || type === "Damage") && qty > this.stock(p)) {
+      return this.setState({ entryError: "Only " + this.stock(p) + " " + p.unit + " in stock." });
+    }
+    const key = type === "Production" ? "made" : type === "Purchase" ? "purch" : type === "Sale" ? "sold" : "dmg";
+    const date = e.date && /^\d{4}-\d{2}-\d{2}$/.test(e.date) ? e.date : this.todayISO();
+    const products = this.state.products.map(x =>
+      x.code === p.code ? Object.assign({}, x, { [key]: x[key] + qty, upd: date }) : x
+    );
+    const txn = { id: "t" + Date.now(), date, type, code: p.code, qty, ref: e.ref || "NA", rate: this.num(e.rate) || null };
+    this.setState({ entryError: "", entry: { code: "", qty: "", date: "", ref: "", rate: "", kind: e.kind } });
+    this.commit(products, [txn].concat(this.state.txns), type + " of " + qty + " " + p.unit + " recorded for " + p.name);
+  }
+
+  saveDraft() {
+    const d = this.state.draft;
+    if (!d.name || !String(d.name).trim()) return this.setState({ addError: "Product name is required." });
+    const code = (d.code && String(d.code).trim()) || ("KJ-NEW-" + (this.state.products.length + 1));
+    const existing = this.state.products.find(p => p.code === code);
+    const rec = {
+      sno: existing ? existing.sno : this.state.products.length + 1,
+      code, name: String(d.name).trim(),
+      cat: d.cat || "NA", unit: d.unit || "pcs",
+      hsn: d.hsn || "NA", gst: this.num(d.gst),
+      open: this.num(d.open), purch: 0, made: this.num(d.made), sold: this.num(d.sold), dmg: this.num(d.dmg),
+      reorder: this.num(d.reorder), cp: this.num(d.cp), sp: this.num(d.sp), mrp: this.num(d.mrp),
+      upd: this.todayISO()
+    };
+    const products = existing
+      ? this.state.products.map(p => (p.code === code ? Object.assign({}, p, rec, { purch: p.purch }) : p))
+      : this.state.products.concat([rec]);
+    this.setState({ draft: {}, addError: "", screen: "grid" });
+    this.commit(products, null, (existing ? "Updated " : "Added ") + rec.name);
+  }
+
+  exportCsv(rows) {
+    const head = ["S.No","Product Code","Product Name","Category","Unit","HSN","GST %","Opening","Stock In","Qty Made","Qty Sold","Damaged","Remaining Stock","Reorder Level","CP","SP","MRP","Margin %","Stock Value","Last Updated"];
+    const body = rows.map(p => [p.sno, p.code, p.name, p.cat, p.unit, p.hsn, p.gst, p.open, p.purch, p.made, p.sold, p.dmg, this.stock(p), p.reorder, p.cp, p.sp, p.mrp, p.cp ? Math.round(((p.sp - p.cp) / p.cp) * 100) : 0, this.stock(p) * p.cp, p.upd]);
+    const csv = [head].concat(body).map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(",")).join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = "inventory-" + this.todayISO() + ".csv";
+    a.click();
+    this.setState({ toast: "Exported " + rows.length + " rows to CSV" });
+    clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: "" }), 2600);
+  }
+
+  renderVals() {
+    const S = this.state;
+    const P = S.products;
+    const screen = S.screen;
+    const accent = this.props.accent || "#B4532A";
+    const compact = (this.props.density || "Comfortable") === "Compact";
+    const stock = p => this.stock(p);
+
+    const totalValue = P.reduce((s, p) => s + stock(p) * p.cp, 0);
+    const revenue = P.reduce((s, p) => s + p.sold * p.sp, 0);
+    const cogs = P.reduce((s, p) => s + p.sold * p.cp, 0);
+    const lows = P.filter(p => stock(p) <= p.reorder);
+    const outs = P.filter(p => stock(p) <= 0);
+    const totMade = P.reduce((s, p) => s + p.made, 0);
+    const totSold = P.reduce((s, p) => s + p.sold, 0);
+    const totDmg = P.reduce((s, p) => s + p.dmg, 0);
+
+    const titles = {
+      dash: ["Operations Dashboard", "Stock value, production flow and everything that needs attention today."],
+      grid: ["Master inventory", "Every SKU with its costing and live stock position. Click any white cell to edit it in place."],
+      low: ["Low stock & reorder list", "Items at or below their reorder level, with suggested replenishment quantity and cost."],
+      add: ["Add / edit product", "Create a new SKU or update an existing one by entering its code."],
+      prod: ["Record production", "Log units beaded or crocheted by the studio units. Adds to quantity made and remaining stock."],
+      sale: ["Record sale", "Log a dispatch against an invoice, or write off damaged and returned goods."],
+      purch: ["Purchase / stock-in", "Log finished pieces or crystal stock bought in from vendors against a purchase order."],
+      reports: ["Reports & margin analysis", "Category-level profitability, best and worst performers, wastage."]
+    };
+
+    const navGroups = [
+      { label: "Overview", items: [["dash", "Dashboard", lows.length ? String(lows.length) : ""]] },
+      { label: "Inventory", items: [["grid", "Master inventory", String(P.length)], ["low", "Low stock", lows.length ? String(lows.length) : ""], ["add", "Add / edit product", ""]] },
+      { label: "Transactions", items: [["prod", "Production entry", ""], ["sale", "Sale entry", ""], ["purch", "Purchase / stock-in", ""]] },
+      { label: "Insights", items: [["reports", "Reports", ""]] }
+    ].map(g => ({
+      label: g.label,
+      items: g.items.map(it => {
+        const on = screen === it[0];
+        return {
+          label: it[1], badge: it[2], go: () => this.setState({ screen: it[0], entryError: "", addError: "" }),
+          bg: on ? "#322B24" : "transparent", fg: on ? "#FFFFFF" : "#C9BCAC",
+          mark: on ? accent : "transparent",
+          badgeBg: it[2] && it[0] === "low" && lows.length ? "#5A2A18" : "transparent",
+          badgeFg: it[2] && it[0] === "low" && lows.length ? "#F0B9A2" : "#8C7D6C"
+        };
+      })
+    }));
+
+    // ---------- grid rows ----------
+    const cats = Array.from(new Set(P.map(p => p.cat))).sort();
+    let rows = P.slice();
+    const q = S.query.trim().toLowerCase();
+    if (q) rows = rows.filter(p => (p.name + " " + p.code + " " + p.cat).toLowerCase().indexOf(q) >= 0);
+    if (S.catFilter !== "All categories") rows = rows.filter(p => p.cat === S.catFilter);
+    if (S.stockFilter === "low") rows = rows.filter(p => stock(p) <= p.reorder);
+    if (S.stockFilter === "out") rows = rows.filter(p => stock(p) <= 0);
+    const sk = S.sortKey;
+    rows.sort((a, b) => {
+      const va = sk === "stock" ? stock(a) : sk === "value" ? stock(a) * a.cp : sk === "margin" ? (a.cp ? (a.sp - a.cp) / a.cp : 0) : a[sk];
+      const vb = sk === "stock" ? stock(b) : sk === "value" ? stock(b) * b.cp : sk === "margin" ? (b.cp ? (b.sp - b.cp) / b.cp : 0) : b[sk];
+      if (typeof va === "string") return va.localeCompare(vb) * S.sortDir;
+      return (va - vb) * S.sortDir;
+    });
+
+    const colDefs = [
+      ["S.No", "sno", "right"], ["PRODUCT Code", "code", "left"], ["Product name", "name", "left"], ["Category", "cat", "left"],
+      ["Unit", "unit", "center"], ["HSN", "hsn", "left"], ["GST %", "gst", "right"],
+      ["Opening", "open", "right"], ["Stock in", "purch", "right"], ["Qty made", "made", "right"], ["Qty sold", "sold", "right"],
+      ["Damaged", "dmg", "right"], ["Stock", "stock", "right"], ["Reorder", "reorder", "right"], ["CP ₹", "cp", "right"],
+      ["SP ₹", "sp", "right"], ["MRP ₹", "mrp", "right"], ["Margin %", "margin", "right"], ["Stock value", "value", "right"],
+      ["Updated", "upd", "right"], ["", "", "center"]
+    ];
+    const columns = colDefs.map(c => ({
+      label: c[0] + (c[1] && sk === c[1] ? (S.sortDir > 0 ? " ↑" : " ↓") : ""),
+      align: c[2],
+      sort: c[1] ? () => this.setState({ sortKey: c[1], sortDir: sk === c[1] ? -S.sortDir : 1 }) : () => {}
+    }));
+
+    const txt = (code, key) => e => this.setField(code, key, e.target.value, false);
+    const nm = (code, key) => e => this.setField(code, key, e.target.value, true);
+
+    const gridRows = rows.map(p => {
+      const st = stock(p);
+      const low = st <= p.reorder;
+      const m = p.cp ? ((p.sp - p.cp) / p.cp) * 100 : 0;
+      return {
+        sno: p.sno, code: p.code, name: p.name, cat: p.cat, unit: p.unit, hsn: p.hsn, gst: p.gst,
+        open: p.open, purch: p.purch, made: p.made, sold: p.sold, dmg: p.dmg, reorder: p.reorder,
+        cp: p.cp, sp: p.sp, mrp: p.mrp, upd: p.upd, stock: st,
+        margin: Math.round(m) + "%", marginFg: m >= 50 ? "#2F6F5E" : m >= 30 ? "#6B5F52" : "#A4442C",
+        value: this.inr(st * p.cp),
+        stockBg: st <= 0 ? "#F6E2DA" : low ? "#FAEFD9" : "#E7F1EC",
+        stockFg: st <= 0 ? "#9B2F16" : low ? "#8A6206" : "#25604F",
+        rowBg: st <= 0 ? "#FDF7F4" : "transparent",
+        onName: txt(p.code, "name"), onCat: txt(p.code, "cat"), onUnit: txt(p.code, "unit"),
+        onHsn: txt(p.code, "hsn"), onGst: nm(p.code, "gst"),
+        onReorder: nm(p.code, "reorder"), onCp: nm(p.code, "cp"), onSp: nm(p.code, "sp"), onMrp: nm(p.code, "mrp"),
+        onDelete: () => this.commit(P.filter(x => x.code !== p.code).map((x, i) => Object.assign({}, x, { sno: i + 1 })), null, p.name + " removed")
+      };
+    });
+
+    // ---------- dashboard ----------
+    this.TREND = Array.from({ length: 8 }, (_, i) => {
+      const date = new Date(); date.setMonth(date.getMonth() - (7 - i), 1);
+      const prefix = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
+      const txns = S.txns.filter(t => t.date.startsWith(prefix));
+      return [date.toLocaleString('en', { month: 'short' }), txns.filter(t => t.type === 'Production').reduce((n,t) => n+t.qty,0), txns.filter(t => t.type === 'Sale').reduce((n,t) => n+t.qty,0)];
+    });
+    const maxTrend = Math.max(1, Math.max.apply(null, this.TREND.map(t => Math.max(t[1], t[2]))));
+    const trend = this.TREND.map(t => ({
+      label: t[0], madeH: Math.round((t[1] / maxTrend) * 120), soldH: Math.round((t[2] / maxTrend) * 120),
+      madeT: t[0] + " made " + t[1], soldT: t[0] + " sold " + t[2]
+    }));
+
+    const alerts = lows.slice().sort((a, b) => (stock(a) - a.reorder) - (stock(b) - b.reorder)).slice(0, 6).map(p => {
+      const st = stock(p);
+      return {
+        name: p.name, code: p.code, reorder: p.reorder, stock: st, unit: p.unit,
+        dot: st <= 0 ? "#9B2F16" : "#B8860B",
+        bg: st <= 0 ? "#FDF4F0" : "#FDF8EC",
+        line: st <= 0 ? "#EDD5CA" : "#EDE0C4"
+      };
+    });
+
+    const maxSold = Math.max.apply(null, P.map(p => p.sold).concat([1]));
+    const topSellers = P.slice().sort((a, b) => b.sold - a.sold).slice(0, 6).map(p => ({
+      name: p.name, sold: p.sold + " " + p.unit, pct: Math.round((p.sold / maxSold) * 100)
+    }));
+
+    const slowMovers = P.slice().filter(p => p.made + p.purch + p.open > 0)
+      .sort((a, b) => (a.sold / (a.open + a.purch + a.made)) - (b.sold / (b.open + b.purch + b.made)))
+      .slice(0, 6).map(p => ({ name: p.name, rate: Math.round((p.sold / (p.open + p.purch + p.made)) * 100) }));
+
+    const nameOf = c => { const p = P.find(x => x.code === c); return p ? p.name : c; };
+    const toneOf = t => t === "Sale" ? "#2F6F5E" : t === "Damage" ? "#A4442C" : t === "Purchase" ? "#3A4A7A" : accent;
+    const activity = S.txns.slice(0, 7).map(t => ({
+      date: t.date.slice(5), type: t.type, name: nameOf(t.code), qty: (t.type === "Sale" || t.type === "Damage" ? "−" : "+") + t.qty, tone: toneOf(t.type)
+    }));
+
+    const kpis = [
+      { label: "Stock value at cost", value: this.inrShort(totalValue), sub: P.length + " SKUs in " + cats.length + " categories", tone: "#2A241E" },
+      { label: "Revenue booked", value: this.inrShort(revenue), sub: "Gross profit " + this.inrShort(revenue - cogs), tone: "#2F6F5E" },
+      { label: "Low stock alerts", value: String(lows.length), sub: outs.length + " fully out of stock", tone: lows.length ? "#A4442C" : "#2F6F5E" },
+      { label: "Units made / sold", value: totMade.toLocaleString("en-IN") + " / " + totSold.toLocaleString("en-IN"), sub: "Sell-through " + Math.round((totSold / Math.max(totMade, 1)) * 100) + "%", tone: "#2A241E" },
+      { label: "Damage rate", value: (totDmg / Math.max(totMade + totSold, 1) * 100).toFixed(1) + "%", sub: totDmg + " units written off", tone: "#B8860B" }
+    ];
+
+    // ---------- low stock screen ----------
+    const lowRows = lows.slice().sort((a, b) => (stock(a) - a.reorder) - (stock(b) - b.reorder)).map(p => {
+      const st = stock(p);
+      const suggest = Math.max(p.reorder * 2 - st, p.reorder);
+      return {
+        name: p.name, code: p.code, cat: p.cat, stock: st, reorder: p.reorder,
+        deficit: Math.max(p.reorder - st, 0), suggest, cost: this.inr(suggest * p.cp),
+        stockBg: st <= 0 ? "#F6E2DA" : "#FAEFD9", stockFg: st <= 0 ? "#9B2F16" : "#8A6206"
+      };
+    });
+
+    // ---------- add / edit ----------
+    const d = S.draft;
+    const dset = k => e => this.setState({ draft: Object.assign({}, this.state.draft, { [k]: e.target.value }) });
+    const addFields = [
+      ["Product code", "code", "KJ-ORG-111"], ["Product name", "name", "Product name"],
+      ["Category", "cat", "NA"], ["Unit", "unit", "pcs"],
+      ["HSN", "hsn", "NA"], ["GST %", "gst", "0"], ["Opening stock", "open", "0"],
+      ["Qty made", "made", "0"], ["Qty sold", "sold", "0"], ["Damaged", "dmg", "0"],
+      ["Reorder level", "reorder", "0"], ["CP ₹", "cp", "0"], ["SP ₹", "sp", "0"], ["MRP ₹", "mrp", "0"]
+    ].map(f => ({ label: f[0], hint: f[2], value: d[f[1]] === undefined ? "" : d[f[1]], onChange: dset(f[1]) }));
+    const dcp = this.num(d.cp), dsp = this.num(d.sp);
+    const dstock = this.num(d.open) + this.num(d.made) - this.num(d.sold) - this.num(d.dmg);
+    const addPreview = [
+      { label: "Remaining stock", value: String(dstock) },
+      { label: "Stock value", value: this.inr(dstock * dcp) },
+      { label: "Margin per unit", value: this.inr(dsp - dcp) },
+      { label: "Margin %", value: (dcp ? Math.round(((dsp - dcp) / dcp) * 100) : 0) + "%" },
+      { label: "Below reorder?", value: dstock <= this.num(d.reorder) ? "Yes" : "No" }
+    ];
+    const existingDraft = P.find(p => p.code === (d.code || "").trim());
+
+    // ---------- entry screens ----------
+    const isSale = screen === "sale";
+    const eset = k => e => this.setState({ entry: Object.assign({}, this.state.entry, { [k]: e.target.value }), entryError: "" });
+    const entryFieldDefs = screen === "prod"
+      ? [["Quantity made", "qty", "0"], ["Date", "date", this.todayISO()], ["Batch / job no.", "ref", "NA"]]
+      : screen === "purch"
+      ? [["Quantity received", "qty", "0"], ["Date", "date", this.todayISO()], ["PO / invoice no.", "ref", "NA"], ["Rate per unit ₹", "rate", "0"]]
+      : [["Quantity", "qty", "0"], ["Date", "date", this.todayISO()], ["Invoice / customer", "ref", "NA"], ["Rate per unit ₹", "rate", "0"]];
+    const entryFields = entryFieldDefs.map(f => ({ label: f[0], hint: f[2], value: S.entry[f[1]], onChange: eset(f[1]) }));
+
+    const sel = P.find(p => p.code === S.entry.code);
+    const eqty = this.num(S.entry.qty);
+    const erate = this.num(S.entry.rate) || (sel ? (screen === "purch" ? sel.cp : sel.sp) : 0);
+    const isOut = isSale;
+    const entryPreview = sel ? [
+      { label: "Current stock", value: stock(sel) + " " + sel.unit, tone: "#2A241E" },
+      { label: "After this entry", value: (stock(sel) + (isOut ? -eqty : eqty)) + " " + sel.unit, tone: (stock(sel) + (isOut ? -eqty : eqty)) <= sel.reorder ? "#A4442C" : "#2F6F5E" },
+      { label: screen === "prod" ? "Production cost" : screen === "purch" ? "Purchase value" : S.entry.kind === "Damage" ? "Write-off at cost" : "Invoice value", value: this.inr(eqty * (screen === "prod" || S.entry.kind === "Damage" ? sel.cp : erate)), tone: "#2A241E" }
+    ] : [{ label: "Select a product", value: "—", tone: "#7E7266" }];
+
+    const logType = screen === "prod" ? ["Production"] : screen === "purch" ? ["Purchase"] : ["Sale", "Damage"];
+    const entryLog = S.txns.filter(t => logType.indexOf(t.type) >= 0).slice(0, 14).map(t => {
+      const p = P.find(x => x.code === t.code);
+      const rate = t.rate || (p ? (t.type === "Sale" ? p.sp : p.cp) : 0);
+      return { date: t.date, name: p ? p.name : t.code, ref: t.ref, qty: (t.type === "Sale" || t.type === "Damage" ? "−" : "+") + t.qty, amount: this.inr(t.qty * rate), tone: toneOf(t.type) };
+    });
+
+    // ---------- reports ----------
+    const catRows = cats.map(c => {
+      const list = P.filter(p => p.cat === c);
+      const rev = list.reduce((s, p) => s + p.sold * p.sp, 0);
+      const cost = list.reduce((s, p) => s + p.sold * p.cp, 0);
+      const mg = rev ? ((rev - cost) / rev) * 100 : 0;
+      return {
+        cat: c, skus: list.length, made: list.reduce((s, p) => s + p.made, 0), sold: list.reduce((s, p) => s + p.sold, 0),
+        rev: this.inrShort(rev), profit: this.inrShort(rev - cost), margin: Math.round(mg) + "%", pct: Math.round(mg),
+        value: this.inrShort(list.reduce((s, p) => s + stock(p) * p.cp, 0)), _mg: mg
+      };
+    }).sort((a, b) => b._mg - a._mg);
+
+    const profitRows = P.slice().sort((a, b) => (b.sold * (b.sp - b.cp)) - (a.sold * (a.sp - a.cp))).slice(0, 8)
+      .map(p => ({ name: p.name, profit: this.inrShort(p.sold * (p.sp - p.cp)) }));
+    const damageRows = P.slice().filter(p => p.dmg > 0).sort((a, b) => (b.dmg / Math.max(b.made + b.purch + b.open, 1)) - (a.dmg / Math.max(a.made + a.purch + a.open, 1))).slice(0, 8)
+      .map(p => ({ name: p.name, dmg: p.dmg + " " + p.unit, rate: (p.dmg / Math.max(p.made + p.purch + p.open, 1) * 100).toFixed(1) }));
+    const reportKpis = [
+      { label: "Revenue", value: this.inrShort(revenue), sub: totSold.toLocaleString("en-IN") + " units sold", tone: "#2A241E" },
+      { label: "Gross profit", value: this.inrShort(revenue - cogs), sub: "Blended margin " + Math.round(((revenue - cogs) / Math.max(revenue, 1)) * 100) + "%", tone: "#2F6F5E" },
+      { label: "Stock value", value: this.inrShort(totalValue), sub: "At cost price", tone: "#2A241E" },
+      { label: "MRP headroom", value: Math.round((P.reduce((s, p) => s + (p.mrp - p.sp), 0) / Math.max(P.reduce((s, p) => s + p.sp, 0), 1)) * 100) + "%", sub: "Average SP to MRP gap", tone: "#B8860B" }
+    ];
+
+    const tMarginPct = revenue ? Math.round(((revenue - cogs) / revenue) * 100) + "%" : "0%";
+
+    return {
+      accent, cellPad: compact ? "5px 10px" : "9px 12px",
+      orgName: this.props.orgName || "Kalajay",
+      today: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+      screenTitle: titles[screen][0], screenSub: titles[screen][1],
+      scrDash: screen === "dash", scrGrid: screen === "grid", scrLow: screen === "low", scrAdd: screen === "add",
+      scrEntry: screen === "prod" || screen === "sale" || screen === "purch",
+      scrReports: screen === "reports",
+      navGroups, skuCount: String(P.length), totalValue: this.inrShort(totalValue),
+      kpis, trend, alerts, topSellers, slowMovers, activity,
+      columns, rows: gridRows, rowCount: String(rows.length),
+      query: S.query, onQuery: e => this.setState({ query: e.target.value }),
+      catFilter: S.catFilter, onCatFilter: e => this.setState({ catFilter: e.target.value }),
+      catOptions: ["All categories"].concat(cats),
+      stockFilter: S.stockFilter, onStockFilter: e => this.setState({ stockFilter: e.target.value }),
+      goAdd: () => this.setState({ screen: "add" }),
+      exportCsv: () => this.exportCsv(rows),
+      tOpen: rows.reduce((s, p) => s + p.open, 0).toLocaleString("en-IN"),
+      tPurch: rows.reduce((s, p) => s + p.purch, 0).toLocaleString("en-IN"),
+      tMade: rows.reduce((s, p) => s + p.made, 0).toLocaleString("en-IN"),
+      tSold: rows.reduce((s, p) => s + p.sold, 0).toLocaleString("en-IN"),
+      tDmg: rows.reduce((s, p) => s + p.dmg, 0).toLocaleString("en-IN"),
+      tStock: rows.reduce((s, p) => s + stock(p), 0).toLocaleString("en-IN"),
+      tMargin: tMarginPct,
+      lowRows,
+      addFields, addPreview, addError: S.addError,
+      addHeading: existingDraft ? "Editing " + existingDraft.name : "New product",
+      saveProduct: () => this.saveDraft(), clearProduct: () => this.setState({ draft: {}, addError: "" }),
+      entry: S.entry, entryFields, entryPreview, entryError: S.entryError, isSale,
+      onEntryCode: eset("code"), onEntryKind: eset("kind"),
+      productOptions: P.map(p => ({ code: p.code, label: p.code + " — " + p.name + "  (" + stock(p) + " " + p.unit + ")" })),
+      entryHeading: screen === "prod" ? "New production entry" : screen === "purch" ? "New stock-in entry" : "New sale entry",
+      entryCta: screen === "prod" ? "Post production" : screen === "purch" ? "Post stock-in" : S.entry.kind === "Damage" ? "Write off stock" : "Post sale",
+      entryLogTitle: screen === "prod" ? "Recent production" : screen === "purch" ? "Recent purchases" : "Recent sales & write-offs",
+      entryLog,
+      reportKpis, catRows, profitRows, damageRows,
+      postEntry: () => this.postTxn(),
+      excelChanges: S.excelChanges,
+      excelMessage: S.excelMessage,
+      excelReady: S.excelReady,
+      previewExcel: e => this.previewExcel(e),
+      applyExcel: () => this.applyExcel(),
+      sharedOrders: S.orders.map(o => ({ ...o, customerLabel: o.customer.name + ' · ' + o.customer.phone, address: o.customer.address, summary: o.items.map(i => i.product_code + ' · ' + i.name_snapshot + ' × ' + i.quantity).join('; '), amount: this.inr(o.total), pending: o.status === 'new', confirm: () => this.confirmOrder(o.id) })),
+      importBrowserBackup: () => this.importBrowserBackup(),
+      exportBackup: () => this.exportBackup(),
+      importBackup: e => this.importBackup(e),
+      toast: S.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

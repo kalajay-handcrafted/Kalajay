@@ -5,7 +5,7 @@ def initialize(connect,root):
  with connect() as db:
   db.executescript('CREATE TABLE IF NOT EXISTS auth_users(username TEXT PRIMARY KEY, salt TEXT NOT NULL, password_hash TEXT NOT NULL, role TEXT NOT NULL CHECK(role IN (\'admin\',\'manager\'))); CREATE TABLE IF NOT EXISTS auth_sessions(token_hash TEXT PRIMARY KEY,username TEXT REFERENCES auth_users(username),expires REAL NOT NULL); CREATE TABLE IF NOT EXISTS auth_attempts(client TEXT PRIMARY KEY, failures INTEGER NOT NULL, until REAL NOT NULL);')
   if not db.execute('SELECT 1 FROM auth_users').fetchone():
-   p=root/'private/auth-setup-token'
+   p=root/'auth-setup-token'
    if not p.exists():p.write_text(secrets.token_urlsafe(32));p.chmod(0o600)
 def password_hash(password,salt):return hashlib.scrypt(password.encode(),salt=bytes.fromhex(salt),n=16384,r=8,p=1).hex()
 def credentials(data):
@@ -22,7 +22,7 @@ def create(connect,data,root=None):
  with connect() as db:
   db.execute('BEGIN IMMEDIATE')
   if root:
-   p=root/'private/auth-setup-token'
+   p=root/'auth-setup-token'
    if db.execute('SELECT 1 FROM auth_users').fetchone() or not p.exists() or not hmac.compare_digest(str(data.get('token','')),p.read_text()):raise ValueError('Setup link is invalid or already used.')
    role='admin'
   try:db.execute('INSERT INTO auth_users VALUES (?,?,?,?)',(user,salt,digest,role))

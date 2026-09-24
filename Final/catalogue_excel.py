@@ -76,3 +76,29 @@ def import_sheet(connect,raw,apply=False):
      db.execute('INSERT INTO inventory_transactions VALUES (?,?,?)',(t['id'],u['code'],json.dumps(t)))
   if apply and changes:db.execute("UPDATE shared_meta SET value=value+1 WHERE key='revision'")
   return dict(count=len(changes),changes=changes,applied=apply)
+
+
+def export_workbook(connect):
+ from openpyxl import Workbook
+ from openpyxl.styles import Font, PatternFill, Alignment
+ from openpyxl.worksheet.datavalidation import DataValidation
+ from openpyxl.worksheet.table import Table, TableStyleInfo
+ data=export_data(connect);wb=Workbook();ws=wb.active;ws.title='Catalogue'
+ ws['A2']='Kalajay catalogue updates'
+ ws['A2'].font=Font(size=16,bold=True,color='A4502B')
+ ws['A3']='Fill yellow cells only. Blank = no change; new quantity 0 = sold out.'
+ ws['A4']='Upload the edited workbook in ERP → Catalogue Excel. Download a fresh sheet before editing.'
+ ws['A5']='Database version';ws['B5']=data['revision']
+ ws['A6']='Source: shared Kalajay catalogue'
+ for col,value in enumerate(HEADERS,1):ws.cell(7,col,value)
+ for row in data['rows']:ws.append(row) if ws.max_row>=7 else None
+ end=ws.max_row;ws.freeze_panes='A8'
+ if end>=8:
+  tab=Table(displayName='CatalogueUpdates',ref=f'A7:G{end}');tab.tableStyleInfo=TableStyleInfo(name='TableStyleMedium4',showRowStripes=True);ws.add_table(tab)
+  for col,kind in [('E','whole'),('G','decimal')]:
+   validation=DataValidation(type=kind,operator='greaterThanOrEqual',formula1=0,allow_blank=True);validation.showErrorMessage=True;validation.error='Enter a non-negative value.';ws.add_data_validation(validation);validation.add(f'{col}8:{col}{end}')
+  for row in ws.iter_rows(min_row=8):
+   for i in (4,6):row[i].fill=PatternFill('solid',fgColor='FFF2CC')
+   for i in (5,6):row[i].number_format='0.00'
+ for col,width in [('A',20),('B',48),('C',24),('D',20),('E',20),('F',24),('G',24)]:ws.column_dimensions[col].width=width
+ out=io.BytesIO();wb.save(out);return out.getvalue()
