@@ -25,6 +25,16 @@
   @keyframes kj-logo-reveal { from { opacity: 0; transform: translateY(18px) scale(.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
   @keyframes kj-veil { to { opacity: 0; visibility: hidden; } }
   @media (prefers-reduced-motion: reduce) { .kj-veil, .kj-veil * { animation-duration: .01ms !important; animation-delay: 0ms !important; } }
+  @media (max-width: 760px) {
+    .kj-header-inner { padding: 10px 14px !important; gap: 10px !important; align-items: flex-start !important; }
+    .kj-logo { width: 92px !important; }
+    .kj-nav { gap: 10px !important; font-size: 11px !important; letter-spacing: .07em !important; }
+    .kj-shop-tools { gap: 8px !important; flex-wrap: wrap !important; justify-content: flex-end !important; }
+    .kj-search input { width: 104px !important; padding-right: 10px !important; }
+    .kj-search input:focus { width: 170px !important; }
+    .kj-cart-button { width: 42px !important; height: 42px !important; padding: 0 !important; justify-content: center !important; border-radius: 50% !important; position: relative !important; }
+    .kj-cart-button span { position: absolute; right: -5px; top: -6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: #A9482A; color: #FBF7E8; display: grid; place-items: center; font-size: 10px; letter-spacing: 0; }
+  }
 </style>
 </helmet>
 <div id="top" style="display:flow-root;padding-bottom:60px">
@@ -38,30 +48,31 @@
 <div style="background:#A9482A;color:#FBF7E8;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;text-align:center;padding:10px 16px">HANDMADE TO ORDER&nbsp; ·&nbsp; SHIPS ACROSS INDIA&nbsp;&nbsp;·&nbsp; HANDCRAFTED WITH LOVE</div>
 
 <header style="position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px); border-bottom: 1px solid #E7DCC2; background-color: #FBF7E8F0">
-  <div style="max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 24px; justify-content: space-between">
+  <div class="kj-header-inner" style="max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 24px; justify-content: space-between">
     <a href="/" style="display:flex;align-items:center;gap:12px;min-width:0">
-      <img src="assets/kalajay-brand.png" alt="Kalajay — handcrafted, pretty, you" style="width: 120px; height: auto; object-fit: contain; object-position: left center; display: block; flex: none">
+      <img class="kj-logo" src="assets/kalajay-brand.png" alt="Kalajay — handcrafted, pretty, you" style="width: 120px; height: auto; object-fit: contain; object-position: left center; display: block; flex: none">
     </a>
-    <nav aria-label="Main navigation" style="display:flex;align-items:center;gap:20px;font-size:14px;letter-spacing:0.1em;text-transform:uppercase;flex-wrap:wrap;justify-content:flex-end;margin-left:auto">
+    <nav class="kj-nav" aria-label="Main navigation" style="display:flex;align-items:center;gap:20px;font-size:14px;letter-spacing:0.1em;text-transform:uppercase;flex-wrap:wrap;justify-content:flex-end;margin-left:auto">
       <a href="/#top" style="color:#40291C">Home</a>
-      <a href="/#collections" style="color:#40291C">Collections</a>
+      <a href="/hampers" style="color:#40291C">Gift Hampers</a>
 
       <a href="/story" style="color:#40291C">Our Story</a>
-      <div style="display:flex;align-items:center;gap:18px;flex-wrap:nowrap">
+      <a href="/returns" style="color:#40291C">Returns</a>
+      <div class="kj-shop-tools" style="display:flex;align-items:center;gap:18px;flex-wrap:nowrap">
       <details class="shop-menu" style="position:relative">
         <summary style="color:#40291C;cursor:pointer;list-style:none;display:flex;align-items:center;gap:7px;padding:8px 0">Shop <span aria-hidden="true" style="font-size:10px">▾</span></summary>
         <div style="position:absolute;top:100%;left:0;width:220px;max-height:70vh;overflow-y:auto;background:#FBF7E8;border:1px solid #E7DCC2;border-radius:10px;box-shadow:0 10px 28px #40291C20;padding:8px;z-index:30;text-transform:none;letter-spacing:0">
           <sc-for list="{{ categoryOptions }}" as="o"><a href="{{ o.href }}" style="display:block;padding:10px 12px;border-radius:6px;color:#40291C;font-size:14px" style-hover="background:#F0E6CC;color:#A9482A">{{ o.name }}</a></sc-for>
         </div>
       </details>
-      <form onSubmit="{{ searchCatalogue }}" role="search" style="position:relative;display:flex;align-items:center;flex:none">
+      <form class="kj-search" onSubmit="{{ searchCatalogue }}" role="search" style="position:relative;display:flex;align-items:center;flex:none">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#8A6318" stroke-width="1.7" stroke-linecap="round" style="position:absolute;left:17px;pointer-events:none"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg>
         <input type="search" value="{{ query }}" onChange="{{ setQuery }}" placeholder="Search" aria-label="Search the catalogue" style="font:inherit;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;width:150px;padding:12px 18px 12px 42px;border-radius:999px;border:1px solid #C6B491;background:transparent;color:#40291C;outline:none;transition:width .3s cubic-bezier(.4,0,.2,1),border-color .2s ease,background .2s ease" style-hover="width:300px;border-color:#A9482A" style-focus="width:300px;border-color:#A9482A;background:#FFFDF6">
         <button type="submit" aria-label="Search products" style="background:none;border:0;color:#A9482A;cursor:pointer;padding:6px">Go</button>
       </form>
       </div>
-      <button onClick="{{ openCart }}" style="font:inherit;font-size:14px;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:9px;background:transparent;border:1px solid #C6B491;color:#40291C;padding:11px 18px;border-radius:999px;cursor:pointer" style-hover="border-color:#A9482A;color:#A9482A">
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8Z"></path><path d="M9 7a3 3 0 0 1 6 0"></path></svg>
+      <button class="kj-cart-button" onClick="{{ openCart }}" aria-label="Open cart" style="font:inherit;font-size:14px;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:9px;background:transparent;border:1px solid #C6B491;color:#40291C;padding:11px 18px;border-radius:999px;cursor:pointer" style-hover="border-color:#A9482A;color:#A9482A">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"></circle><circle cx="18" cy="20" r="1.4"></circle><path d="M3.5 4h2.1l2.2 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L21 8H7"></path></svg>
         <span>{{ cartCount }}</span>
       </button>
     </nav>
@@ -113,6 +124,16 @@
   <p style="margin:0 0 20px;font-size:13px"><a href="/#top">Home</a> / Shop / {{ selectedCategory }}</p>
   <h2 style="font-family: 'Prata',serif; font-size: clamp(30px,4vw,44px); margin: 0 0 8px; color: #9E5430">{{ shopHeading }}</h2>
   <p style="margin:0 0 32px;color:#5B4331;font-size:16px">{{ countLabel }}</p>
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0 0 24px">
+    <label style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#8A6318">Sort
+      <select value="{{ sortMode }}" onChange="{{ setSortMode }}" style="margin-left:8px;padding:9px 12px;border:1px solid #C6B491;border-radius:999px;background:#FBF7E8;color:#40291C;font:inherit;font-size:13px;letter-spacing:0;text-transform:none">
+        <option value="az">Alphabetical</option>
+        <option value="price-low">Price: low to high</option>
+        <option value="price-high">Price: high to low</option>
+        <option value="popular">Most frequently bought</option>
+      </select>
+    </label>
+  </div>
   <div role="navigation" aria-label="Product categories" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:12px;margin-bottom:28px">
     <sc-for list="{{ filters }}" as="f" hint-placeholder-count="10">
       <a href="{{ f.href }}" onClick="{{ f.pick }}" aria-current="{{ f.current }}" style="{{ f.style }}">{{ f.label }}</a>
@@ -148,6 +169,61 @@
   <p style="margin:44px 0 0;font-size:15px;color:#5B4331">Bulk Prices on request — sizes, colours and quantities are all made to order. <a href="#contact">Send an enquiry</a> with the piece name and quantity required and we'll quote within a day.</p>
 </section>
 
+</sc-if>
+<sc-if value="{{ isHampers }}">
+<section id="hampers" style="max-width:1100px;margin:0 auto;padding:64px 24px 0">
+  <p style="margin:0 0 16px;font-size:13px"><a href="/#top">Home</a> / Gift Hampers</p>
+  <h1 style="font-family:'Prata',serif;font-size:clamp(30px,4vw,44px);margin:0 0 18px;color:#40291C">Custom Gift Hampers</h1>
+  <p style="font-size:17px;line-height:1.7;color:#5B4331;max-width:68ch;margin:0 0 32px">Choose handcrafted pieces, colours, quantities, packaging style, and note cards. We prepare wedding favours, festive hampers, corporate gifting sets, and personalised beadwork bundles.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px">
+    <div style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p18-4.jpg" alt="Beaded charms for hampers" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Wedding Favours</h2><p style="margin:0;color:#5B4331;line-height:1.6">Charm sets, coin bags, coasters, and keepsakes matched to your event palette.</p></div></div>
+    <div style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p6-4.jpg" alt="Beaded mini tote gift" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Corporate Gifts</h2><p style="margin:0;color:#5B4331;line-height:1.6">Desk organisers, pen stands, pouches, and branded notes for teams and clients.</p></div></div>
+    <div style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p19-2.jpg" alt="Crochet pieces for festive hampers" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Festive Sets</h2><p style="margin:0;color:#5B4331;line-height:1.6">Mix beadwork, crochet, candles, and personalised pieces into one ready-to-gift hamper.</p></div></div>
+  </div>
+  <a href="#contact" style="display:inline-flex;margin-top:28px;background:#A9482A;color:#FBF7E8;padding:14px 24px;border-radius:999px;font-size:13px;letter-spacing:.16em;text-transform:uppercase">Enquire for hampers</a>
+</section>
+</sc-if>
+<sc-if value="{{ isReturns }}">
+<section id="returns" style="max-width:980px;margin:0 auto;padding:64px 24px 0">
+  <p style="margin:0 0 16px;font-size:13px"><a href="/#top">Home</a> / Return &amp; Exchange</p>
+  <h1 style="font-family:'Prata',serif;font-size:clamp(30px,4vw,44px);margin:0 0 18px;color:#40291C">Return &amp; Exchange</h1>
+  <div style="display:grid;gap:18px;font-size:16px;line-height:1.75;color:#5B4331">
+    <p style="margin:0">Every Kalajay piece is handmade to order, so small variations are part of the charm. If an item reaches you damaged, incorrect, or materially different from what was confirmed, contact us within 48 hours of delivery.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+      <div style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px;color:#A9482A">Eligible</h2><p style="margin:0">Damaged in transit, wrong product, missing item, or confirmed manufacturing issue.</p></div>
+      <div style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px;color:#A9482A">Not eligible</h2><p style="margin:0">Customised items after approval, used items, preference changes, or natural handmade variation.</p></div>
+      <div style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px;color:#A9482A">Resolution</h2><p style="margin:0">We will repair, replace, exchange, or refund after reviewing photos and order details.</p></div>
+    </div>
+    <form action="https://wa.me/919740540847" target="_blank" style="background:#F5EFDB;border:1px solid #E7DCC2;border-radius:8px;padding:20px;display:grid;gap:12px">
+      <h2 style="font-family:'Prata',serif;font-size:24px;margin:0;color:#40291C">Start a request</h2>
+      <p style="margin:0">Send your order ID, product name, issue, and photos on WhatsApp. Keep the packaging until the request is resolved.</p>
+      <button type="submit" style="justify-self:start;border:0;border-radius:999px;background:#25D366;color:#0B3D22;padding:13px 20px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer">Open WhatsApp</button>
+    </form>
+  </div>
+</section>
+</sc-if>
+<sc-if value="{{ isHome }}">
+<section id="cities-map" style="max-width:1100px;margin:0 auto;padding:88px 24px 0">
+  <p style="font-size:12px;letter-spacing:.25em;text-transform:uppercase;color:#8A6318;margin:0 0 16px">Cities involved</p>
+  <h2 style="font-family:'Prata',serif;font-size:clamp(28px,4vw,40px);margin:0 0 26px;color:#40291C">From Bihar’s artisan communities to Mumbai homes</h2>
+  <div style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;padding:24px;display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center">
+    <svg viewBox="0 0 640 520" role="img" aria-label="Map showing Bihar and Mumbai connected by flight" style="width:100%;height:auto">
+      <path d="M317 42 286 65 279 104 251 132 269 170 246 207 257 249 230 287 248 330 232 367 263 403 306 420 338 468 383 450 397 404 434 380 421 337 454 303 437 256 462 218 430 184 438 139 397 116 374 77Z" fill="#F5EFDB" stroke="#C6B491" stroke-width="3"></path>
+      <circle cx="384" cy="178" r="15" fill="#A9482A"></circle>
+      <text x="405" y="171" font-family="Jost, sans-serif" font-size="22" fill="#40291C">Bihar</text>
+      <text x="405" y="196" font-family="Jost, sans-serif" font-size="14" fill="#5B4331">Ratanpur · Chandwara</text>
+      <circle cx="285" cy="384" r="15" fill="#2F6F5E"></circle>
+      <text x="120" y="376" font-family="Jost, sans-serif" font-size="22" fill="#40291C">Mumbai</text>
+      <text x="120" y="401" font-family="Jost, sans-serif" font-size="14" fill="#5B4331">Design · dispatch · customers</text>
+      <path d="M374 190 C326 235 296 302 288 369" fill="none" stroke="#A9482A" stroke-width="3" stroke-dasharray="8 8"></path>
+      <text x="315" y="282" font-family="Jost, sans-serif" font-size="28" fill="#A9482A" transform="rotate(38 315 282)">✈</text>
+    </svg>
+    <div style="display:grid;gap:14px;color:#5B4331;font-size:16px;line-height:1.7">
+      <p style="margin:0"><strong style="color:#40291C">Bihar:</strong> Ratanpur and Chandwara teams bring patient handwork and craft skill to Kalajay pieces.</p>
+      <p style="margin:0"><strong style="color:#40291C">Mumbai:</strong> product planning, customer conversations, packing, dispatch, and gifting coordination come together here.</p>
+    </div>
+  </div>
+</section>
 </sc-if>
 <sc-if value="{{ isStory }}">
 <section id="story" style="margin-top:0;background:#F5EFDB;border-top:1px solid #E7DCC2;border-bottom:1px solid #E7DCC2">
@@ -244,8 +320,8 @@
 
 <div style="position:fixed;bottom:0;left:0;right:0;z-index:40;overflow:hidden;border-top:1px solid #E7DCC2;padding:14px 0;background-color:#F5EFDB">
   <div class="kj-ticker" style="display:flex;width:max-content;animation:kj-drift 34s linear infinite;font-family:'Prata',serif;font-size:20px;color:#8A6318;white-space:nowrap">
-    <div style="display:flex;align-items:center;gap:56px;padding-right:56px;flex-shrink:0"><span>HAND-CRAFTED : ONE AT A TIME ❤️</span><span>·</span><span>Handcrafted. Pretty. You.</span><span>·</span><span>Hand-strung beauty</span><span>·</span><span>Made to order</span><span>·</span><span>Prices mentioned are per piece</span><span>·</span><span>Free Delivery for order above INR 599</span><span>·</span></div>
-    <div aria-hidden="true" style="display:flex;align-items:center;gap:56px;padding-right:56px;flex-shrink:0"><span>HAND-CRAFTED : ONE AT A TIME ❤️</span><span>·</span><span>Handcrafted. Pretty. You.</span><span>·</span><span>Hand-strung beauty</span><span>·</span><span>Made to order</span><span>·</span><span>Prices mentioned are per piece</span><span>·</span><span>Free Delivery for order above INR 599</span><span>·</span></div>
+    <div style="display:flex;align-items:center;gap:56px;padding-right:56px;flex-shrink:0"><span>HAND-CRAFTED : ONE AT A TIME ❤️</span><span>·</span><span>Handcrafted. Pretty. You.</span><span>·</span><span>Hand-strung beauty</span><span>·</span><span>Made to order</span><span>·</span><span>Single piece price, unless specifically mentioned</span><span>·</span><span>Free Delivery for order above INR 599</span><span>·</span></div>
+    <div aria-hidden="true" style="display:flex;align-items:center;gap:56px;padding-right:56px;flex-shrink:0"><span>HAND-CRAFTED : ONE AT A TIME ❤️</span><span>·</span><span>Handcrafted. Pretty. You.</span><span>·</span><span>Hand-strung beauty</span><span>·</span><span>Made to order</span><span>·</span><span>Single piece price, unless specifically mentioned</span><span>·</span><span>Free Delivery for order above INR 599</span><span>·</span></div>
   </div>
 </div>
 <footer style="color: #E6D7BF; background-color: #40291C">
@@ -279,6 +355,7 @@
             <div style="flex:1;min-width:0">
               <p style="margin:0 0 4px;font-size:15px;line-height:1.4;color:#40291C">{{ i.name }}</p>
               <p style="margin:0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A6318">{{ i.cat }}</p>
+              <p style="margin:4px 0 0;font-size:13px;color:#5B4331">{{ i.priceLine }}</p>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex:none">
               <button onClick="{{ i.dec }}" style="font:inherit;font-size:16px;width:30px;height:30px;border-radius:50%;border:1px solid #DDCEAE;background:transparent;color:#5B4331;cursor:pointer" style-hover="border-color:#A9482A;color:#A9482A">−</button>
@@ -289,7 +366,12 @@
         </sc-for>
       </div>
       <div style="border-top:1px solid #E7DCC2;padding:22px 24px;display:flex;flex-direction:column;gap:12px">
-        <p style="margin:0;font-size:14px;line-height:1.6;color:#5B4331">{{ cartSummary }} · prices quoted on request</p>
+        <p style="margin:0;font-size:14px;line-height:1.6;color:#5B4331">{{ cartSummary }}</p>
+        <div style="display:grid;gap:5px;font-size:14px;color:#40291C">
+          <div style="display:flex;justify-content:space-between;gap:16px"><span>Products</span><strong>{{ cartSubtotalLabel }}</strong></div>
+          <div style="display:flex;justify-content:space-between;gap:16px"><span>Delivery</span><strong>{{ deliveryLabel }}</strong></div>
+          <div style="display:flex;justify-content:space-between;gap:16px;border-top:1px solid #E7DCC2;padding-top:8px"><span>Total</span><strong>{{ cartTotalLabel }}</strong></div>
+        </div>
         <div style="display:grid;gap:8px">
           <label>Your name<input value="{{ customerName }}" onChange="{{ setCustomerName }}" autocomplete="name" style="display:block;width:100%;padding:10px;border:1px solid #C6B491;border-radius:8px"></label>
           <label>Phone number<input type="tel" value="{{ customerPhone }}" onChange="{{ setCustomerPhone }}" autocomplete="tel" style="display:block;width:100%;padding:10px;border:1px solid #C6B491;border-radius:8px"></label>
@@ -323,14 +405,17 @@
 <script type="text/x-dc" data-dc-script data-props="{&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#A9482A&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#A9482A&quot;,&quot;#8A6318&quot;,&quot;#8E3A20&quot;,&quot;#6E4A2E&quot;]},&quot;introAnimation&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
 const IS_SHOP = window.location.pathname.replace(/\/$/, "") === "/shop";
 const IS_STORY = window.location.pathname.replace(/\/$/, "") === "/story";
+const IS_RETURNS = window.location.pathname.replace(/\/$/, "") === "/returns";
+const IS_HAMPERS = window.location.pathname.replace(/\/$/, "") === "/hampers";
 const INITIAL_PARAMS = new URLSearchParams(window.location.search);
 const { collections: CATS, products: PRODUCTS, soldOut: SOLD_OUT, defaultPrice: DEFAULT_PRICE, prices: PRICES } = window.KALAJAY_DATA;
+const SOLD_COUNTS = window.KALAJAY_DATA.soldCounts || {};
 
 class Component extends DCLogic {
-  state = { cityCount: window.KALAJAY_DATA.cityCount, memberCount: window.KALAJAY_DATA.memberCount, cat: CATS.some(c => c[0] === INITIAL_PARAMS.get("category")) ? INITIAL_PARAMS.get("category") : "All", active: null, cart: {}, cartOpen: false, justAdded: null, q: INITIAL_PARAMS.get("q") || "", intro: !IS_SHOP && !IS_STORY && window.location.hash !== "#top", customerName: "", customerPhone: "", customerAddress: "", orderNote: "", orderMessage: "", savingOrder: false };
+  state = { cityCount: window.KALAJAY_DATA.cityCount, memberCount: window.KALAJAY_DATA.memberCount, cat: CATS.some(c => c[0] === INITIAL_PARAMS.get("category")) ? INITIAL_PARAMS.get("category") : "All", active: null, cart: {}, cartOpen: false, justAdded: null, q: INITIAL_PARAMS.get("q") || "", sortMode: INITIAL_PARAMS.get("sort") || "az", intro: !IS_SHOP && !IS_STORY && !IS_RETURNS && !IS_HAMPERS && window.location.hash !== "#top", customerName: "", customerPhone: "", customerAddress: "", orderNote: "", orderMessage: "", savingOrder: false };
 
   componentDidMount() {
-    document.title = IS_STORY ? "Our Story | Kalajay" : IS_SHOP ? "Shop | Kalajay" : "Kalajay | Handcrafted with care";
+    document.title = IS_STORY ? "Our Story | Kalajay" : IS_RETURNS ? "Return & Exchange | Kalajay" : IS_HAMPERS ? "Gift Hampers | Kalajay" : IS_SHOP ? "Shop | Kalajay" : "Kalajay | Handcrafted with care";
     this._closeShop = e => { const menu = document.querySelector('.shop-menu'); if (menu && (e.key === 'Escape' || (e.type === 'click' && !menu.contains(e.target)))) menu.open = false; };
     document.addEventListener('click', this._closeShop);
     document.addEventListener('keydown', this._closeShop);
@@ -355,6 +440,8 @@ class Component extends DCLogic {
       SOLD_OUT.splice(0, SOLD_OUT.length, ...data.soldOut);
       Object.keys(PRICES).forEach(k => delete PRICES[k]);
       Object.assign(PRICES, data.prices);
+      Object.keys(SOLD_COUNTS).forEach(k => delete SOLD_COUNTS[k]);
+      Object.assign(SOLD_COUNTS, data.soldCounts || {});
       const cart = {};
       Object.values(this.state.cart).forEach(item => {
         const product = data.products.find(p => p[3] === item.code);
@@ -365,7 +452,7 @@ class Component extends DCLogic {
     window.addEventListener('focus', this._catalogueRefresh);
     this._catalogueTimer = setInterval(this._catalogueRefresh, 10000);
 
-    if (IS_SHOP || IS_STORY || window.location.hash === "#top" || this.props.introAnimation === false) return this.setState({ intro: false });
+    if (IS_SHOP || IS_STORY || IS_RETURNS || IS_HAMPERS || window.location.hash === "#top" || this.props.introAnimation === false) return this.setState({ intro: false });
     const video = document.querySelector('.kj-intro-video');
     let finishing = false;
     const finish = () => {
@@ -470,6 +557,7 @@ class Component extends DCLogic {
   waLink(text) {
     return "https://wa.me/9740540847" + (text ? "?text=" + encodeURIComponent(text) : "");
   }
+  inr(n) { return "₹" + Math.round(n).toLocaleString("en-IN"); }
 
   chip(on) {
     const accent = this.props.accentColor || "#A9482A";
@@ -537,17 +625,26 @@ class Component extends DCLogic {
     const items = PRODUCTS.map(p => ({
       code: p[3],
       name: p[0],
-      img: p[1] ? "v2/" + p[1] + (p[1].indexOf(".") < 0 ? ".jpg" : "") : "assets/kalajay-brand.png",
+      img: p[1] ? (p[1].indexOf("/") === 0 || p[1].indexOf("http") === 0 || p[1].indexOf("assets/") === 0 ? p[1] : "v2/" + p[1] + (p[1].indexOf(".") < 0 ? ".jpg" : "")) : "assets/kalajay-brand.png",
       cat: p[2],
       soldOut: SOLD_OUT.indexOf(p[3]) >= 0,
       price: PRICES[p[3]] ?? DEFAULT_PRICE
     }));
     let shown = cat === "All" ? items : items.filter(p => p.cat === cat);
     if (q) shown = shown.filter(p => (p.name + " " + p.cat).toLowerCase().includes(q));
+    shown = shown.slice().sort((a, b) => {
+      if (this.state.sortMode === "price-low") return a.price - b.price || a.name.localeCompare(b.name);
+      if (this.state.sortMode === "price-high") return b.price - a.price || a.name.localeCompare(b.name);
+      if (this.state.sortMode === "popular") return (SOLD_COUNTS[b.code] || 0) - (SOLD_COUNTS[a.code] || 0) || a.name.localeCompare(b.name);
+      return a.name.localeCompare(b.name);
+    });
     const a = this.state.active;
     const accent = this.props.accentColor || "#A9482A";
     const cartItems = Object.values(this.state.cart);
     const count = cartItems.reduce((n, i) => n + i.qty, 0);
+    const subtotal = cartItems.reduce((n, i) => n + i.qty * i.price, 0);
+    const delivery = subtotal > 0 && subtotal < 599 ? 75 : 0;
+    const total = subtotal + delivery;
     return {
       cityCount: this.state.cityCount,
       memberCount: this.state.memberCount,
@@ -566,8 +663,10 @@ class Component extends DCLogic {
         current: label === cat ? 'page' : 'false',
         pick: e => { e.preventDefault(); const url = new URL('/shop', window.location.origin); if (label !== 'All') url.searchParams.set('category', label); if (this.state.q) url.searchParams.set('q', this.state.q); window.history.pushState({}, '', url); this.setState({ cat: label }); }
       })),
-      isHome: !IS_SHOP && !IS_STORY,
+      isHome: !IS_SHOP && !IS_STORY && !IS_RETURNS && !IS_HAMPERS,
+      isHampers: IS_HAMPERS,
       isStory: IS_STORY,
+      isReturns: IS_RETURNS,
       isShop: IS_SHOP,
       selectedCategory: IS_SHOP ? cat : '',
       shopHeading: cat === 'All' ? 'All handcrafted pieces' : cat,
@@ -576,6 +675,8 @@ class Component extends DCLogic {
       searchCatalogue: e => { e.preventDefault(); const url = new URL('/shop', window.location.origin); if (this.state.q.trim()) url.searchParams.set('q',this.state.q.trim()); window.location.href = url.pathname + url.search; },
       query: this.state.q,
       setQuery: e => this.setState({ q: e.target.value }),
+      sortMode: this.state.sortMode,
+      setSortMode: e => this.setState({ sortMode: e.target.value }),
       noResults: shown.length === 0,
       intro: this.state.intro,
       groups: CATS.map((c, i) => {
@@ -608,20 +709,26 @@ class Component extends DCLogic {
       clearCart: () => this.setState({ cart: {} }),
       cartItems: cartItems.map(i => ({
         ...i,
+        priceLine: this.inr(i.price) + " × " + i.qty + " = " + this.inr(i.price * i.qty),
         inc: () => this.bump(i.code, 1),
         dec: () => this.bump(i.code, -1)
       })),
       cartSummary: count === 0 ? "No pieces added yet" : count + (count === 1 ? " piece" : " pieces") + " on your list",
+      cartSubtotalLabel: this.inr(subtotal),
+      deliveryLabel: delivery ? this.inr(delivery) : (subtotal ? "Free" : this.inr(0)),
+      cartTotalLabel: this.inr(total),
       waLink: this.waLink("Hi Kalajay! I'd like to know more about your handcrafted pieces."),
       cartWaLink: this.waLink(
         cartItems.length
           ? "Hi Kalajay! I'd like a quote for:\n" +
-            cartItems.map(i => "• " + i.name + " × " + i.qty).join("\n")
+            cartItems.map(i => "• " + i.name + " × " + i.qty + " — " + this.inr(i.price * i.qty)).join("\n") +
+            "\nDelivery: " + (delivery ? this.inr(delivery) : "Free") +
+            "\nThe cart value is " + this.inr(total) + "."
           : "Hi Kalajay! I'd like a quote on a few pieces."
       ),
       countLabel: q
         ? shown.length + (shown.length === 1 ? " piece matching “" : " pieces matching “") + this.state.q.trim() + "”"
-        : shown.length + (cat === "All" ? " pieces across " + CATS.length + " collections" : " pieces in " + cat),
+        : shown.length + (cat === "All" ? " pieces" : " pieces in " + cat),
       active: !!a,
       activeImg: a ? a.img : "",
       activeName: a ? a.name : "",

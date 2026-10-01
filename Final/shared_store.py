@@ -13,8 +13,14 @@ ALIASES={
  'Lilac Beaded Tealight Holder Set':'Lilac Beaded Tealight Holder Set of 2',
  'Crochet Flower Bookmark/Bag Charm':'Crochet Flower Bookmark / Bag Charm',
  'Crochet Chicken Bookmarks':'Crochet Chicken Bookmark',
- 'Crochet Flower Bookmarks':'Crochet Flower Bookmark Set of 3',
+ 'Crochet Flower Bookmarks':'Crochet Flower Broad Bookmark',
+ 'Crochet Flower Bookmark Set of 3':'Crochet Flower Broad Bookmark',
  'Crystal Beaded Heart Charm Collection':'Crystal Beaded Heart Charm',
+}
+CATALOGUE_FIXES={
+ 'KJ-PRS-202':{'name':'Ivory Beaded Backpack','price':2799},
+ 'KJ-CRO-805':{'name':'Crochet Flower Broad Bookmark'},
+ 'KJ-SPL-901':{'name':'Crystal Bling Bottle','price':1699},
 }
 def norm(s):return ' '.join(s.strip().lower().split())
 def record(code,name,cat,unit='pcs'):
@@ -69,18 +75,29 @@ def migrate(connect,root,erp_root):
      db.execute('INSERT INTO order_items VALUES (?,?,?,?,?)',(order['id'],row[0],item['quantity'],item['unitPrice'],item['name']))
  with connect() as db:
   db.execute('INSERT OR REPLACE INTO content VALUES (?,?)',('erp_homepage',(erp_root/'index.html').read_text()))
+  for code,fix in CATALOGUE_FIXES.items():
+   row=db.execute('SELECT * FROM products WHERE product_code=?',(code,)).fetchone()
+   if not row:continue
+   name=fix.get('name',row['name']);price=fix.get('price',row['price'])
+   db.execute('UPDATE products SET name=?,price=? WHERE product_code=?',(name,price,code))
+   inv_row=db.execute('SELECT record FROM inventory WHERE product_code=?',(code,)).fetchone()
+   if inv_row:
+    inv=json.loads(inv_row[0]);inv.update(name=name,sp=price)
+    db.execute('UPDATE inventory SET record=? WHERE product_code=?',(json.dumps(inv),code))
+   db.execute('INSERT OR IGNORE INTO product_aliases VALUES (?,?)',(row['name'],code))
 
 def catalog(connect):
  with connect() as db:
-  rows=db.execute('SELECT * FROM products WHERE active=1 AND published=1 ORDER BY position').fetchall()
+  rows=db.execute('SELECT * FROM products WHERE active=1 AND published=1 ORDER BY category, name COLLATE NOCASE').fetchall()
   cats=json.loads(db.execute("SELECT value FROM content WHERE key='collections'").fetchone()[0])
   for r in rows:
    if r['category'] not in [c[0] for c in cats]:cats.append([r['category'],'Handcrafted pieces','assets/kalajay-brand.png'])
-  return {'cityCount':db.execute("SELECT value FROM shared_meta WHERE key='city_count'").fetchone()[0], 'memberCount':team.count(db), 'collections':cats,'products':[[r['name'],r['image'],r['category'],r['product_code']] for r in rows], 'prices':{r['product_code']:r['price'] for r in rows},'soldOut':[r['product_code'] for r in rows if r['sold_out']], 'defaultPrice':500}
+  sold=dict(db.execute('SELECT product_code,COALESCE(SUM(quantity),0) FROM order_items GROUP BY product_code').fetchall())
+  return {'cityCount':db.execute("SELECT value FROM shared_meta WHERE key='city_count'").fetchone()[0], 'memberCount':team.count(db), 'collections':cats,'products':[[r['name'],r['image'],r['category'],r['product_code']] for r in rows], 'prices':{r['product_code']:r['price'] for r in rows},'soldOut':[r['product_code'] for r in rows if r['sold_out']], 'soldCounts':sold, 'defaultPrice':500}
 
 def state(connect):
  with connect() as db:
-  products=[json.loads(r[0]) for r in db.execute('SELECT i.record FROM inventory i JOIN products p USING(product_code) WHERE p.active=1 ORDER BY p.position')]
+  products=[json.loads(r[0]) for r in db.execute('SELECT i.record FROM inventory i JOIN products p USING(product_code) WHERE p.active=1 ORDER BY p.category, p.name COLLATE NOCASE')]
   for i,p in enumerate(products):p['sno']=i+1
   orders=[]
   for r in db.execute('SELECT * FROM orders ORDER BY created_at DESC'):
@@ -116,10 +133,12 @@ def update(connect,data):
   if not data.get('importLegacy'):db.execute('UPDATE products SET active=0')
   for i,p in enumerate(data['products']):
    code=p['code'];old=db.execute('SELECT * FROM products WHERE product_code=?',(code,)).fetchone()
+   image=p.get('image','') if isinstance(p.get('image',''),str) else ''
    if old:
-    db.execute('UPDATE products SET name=?,category=?,price=?,active=1 WHERE product_code=?',(p['name'],p['cat'],p['sp'],code))
+    db.execute('UPDATE products SET name=?,category=?,image=?,price=?,active=1 WHERE product_code=?',(p['name'],p['cat'],image or old['image'],p['sp'],code))
    else:
-    db.execute('INSERT INTO products VALUES (?,?,?,?,?,?,?,?,?)',(code,p['name'],p['cat'],'',p['sp'],0,2000+i,1,1))
+    db.execute('INSERT INTO products VALUES (?,?,?,?,?,?,?,?,?)',(code,p['name'],p['cat'],image,p['sp'],0,2000+i,1,1))
+   p['image']=image or (old['image'] if old else '')
    old_inv=db.execute('SELECT record FROM inventory WHERE product_code=?',(code,)).fetchone()
    # Availability follows inventory once inventory quantities are actually changed.
    if old_inv and any(p[k]!=json.loads(old_inv[0]).get(k,0) for k in ('open','purch','made','sold','dmg')):

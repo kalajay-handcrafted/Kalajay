@@ -30,8 +30,8 @@
 
   <aside style="background:#231E19;color:#EDE4D8;display:flex;flex-direction:column;gap:2px;padding:20px 0 14px;position:sticky;top:0;height:100vh;overflow:auto">
     <div style="padding:0 20px 18px;display:flex;flex-direction:column;gap:10px">
-      <div style="width:176px;height:112px;border-radius:8px;background:#F6EEDF;overflow:hidden;position:relative;flex:none">
-        <img src="assets/kalajay-logo.png" alt="Kalajay" style="position:absolute;width:475px;left:-150px;top:-207px">
+      <div style="width:176px;height:112px;border-radius:8px;background:#F6EEDF;overflow:hidden;display:grid;place-items:center;flex:none">
+        <img src="/assets/kalajay-brand.png" alt="Kalajay" style="width:142px;height:auto;display:block">
       </div>
       <div style="display:flex;flex-direction:column;gap:3px">
         <div style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#9C8E7E">Inventory &amp; Production ERP</div>
@@ -184,7 +184,7 @@
                 <tr style="border-bottom:1px solid #F2EBE1;background:{{ r.rowBg }}" style-hover="background:#FBF4EA">
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;color:var(--mut);text-align:right">{{ r.sno }}</td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;white-space:nowrap;color:#4A4038">{{ r.code }}</td>
-                  <td style="padding:4px 6px;min-width:250px"><input data-admin-write="true" value="{{ r.name }}" onChange="{{ r.onName }}" style="width:100%;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-weight:500" style-hover="border-color:var(--line)"></td>
+                  <td style="padding:4px 6px;min-width:280px"><div style="display:flex;align-items:center;gap:8px"><img src="{{ r.imageSrc }}" alt="" style="width:38px;height:38px;object-fit:cover;border-radius:4px;border:1px solid var(--line);background:#F6EFE5;flex:none"><input data-admin-write="true" value="{{ r.name }}" onChange="{{ r.onName }}" style="width:100%;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-weight:500" style-hover="border-color:var(--line)"></div></td>
                   <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.cat }}" onChange="{{ r.onCat }}" style="width:150px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px" style-hover="border-color:var(--line)"></td>
                   <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.unit }}" onChange="{{ r.onUnit }}" style="width:52px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;text-align:center" style-hover="border-color:var(--line)"></td>
                   <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.hsn }}" onChange="{{ r.onHsn }}" style="width:62px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace" style-hover="border-color:var(--line)"></td>
@@ -223,6 +223,13 @@
             </tfoot>
           </table>
         </div>
+      </sc-if>
+      <sc-if value="{{ scrTeam }}" hint-placeholder-val="{{ false }}">
+        <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:12px">
+          <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:20px">Team Members Directory</h2>
+          <p style="margin:0;color:var(--mut);font-size:13px;max-width:70ch">Open the secure team directory to add members, update membership type, and maintain the website’s live member count.</p>
+          <a href="/erp/team" style="align-self:flex-start;padding:10px 16px;background:var(--accent);color:#fff;border-radius:6px;font-size:13px">Open team members directory</a>
+        </section>
       </sc-if>
 
       <sc-if value="{{ scrLow }}" hint-placeholder-val="{{ true }}">
@@ -409,7 +416,6 @@
       </sc-if>
 
     </div>
-    <section style="padding:24px 28px;border-top:1px solid var(--line)" id="team-members"><h2>Team Members</h2><p>Register new members in any role to update the website’s live member count.</p><a href="/erp/team">Manage team members →</a></section>
     <section style="padding:24px 28px;border-top:1px solid var(--line)" id="catalogue-excel">
       <h2>Catalogue Excel</h2>
       <p>Download the current catalogue, fill the yellow New quantity / New price cells, then upload the saved .xlsx. Blank cells keep existing values. Quantity replaces available stock; zero marks a product sold out.</p>
@@ -607,6 +613,7 @@ class Component extends DCLogic {
       sno: existing ? existing.sno : this.state.products.length + 1,
       code, name: String(d.name).trim(),
       cat: d.cat || "NA", unit: d.unit || "pcs",
+      image: d.image || (existing ? existing.image || "" : ""),
       hsn: d.hsn || "NA", gst: this.num(d.gst),
       open: this.num(d.open), purch: 0, made: this.num(d.made), sold: this.num(d.sold), dmg: this.num(d.dmg),
       reorder: this.num(d.reorder), cp: this.num(d.cp), sp: this.num(d.sp), mrp: this.num(d.mrp),
@@ -656,14 +663,16 @@ class Component extends DCLogic {
       prod: ["Record production", "Log units beaded or crocheted by the studio units. Adds to quantity made and remaining stock."],
       sale: ["Record sale", "Log a dispatch against an invoice, or write off damaged and returned goods."],
       purch: ["Purchase / stock-in", "Log finished pieces or crystal stock bought in from vendors against a purchase order."],
-      reports: ["Reports & margin analysis", "Category-level profitability, best and worst performers, wastage."]
+      reports: ["Reports & margin analysis", "Category-level profitability, best and worst performers, wastage."],
+      team: ["Team Members Directory", "Manage Kalajay members, roles, membership types and live website member count."]
     };
 
     const navGroups = [
       { label: "Overview", items: [["dash", "Dashboard", lows.length ? String(lows.length) : ""]] },
       { label: "Inventory", items: [["grid", "Master inventory", String(P.length)], ["low", "Low stock", lows.length ? String(lows.length) : ""], ["add", "Add / edit product", ""]] },
       { label: "Transactions", items: [["prod", "Production entry", ""], ["sale", "Sale entry", ""], ["purch", "Purchase / stock-in", ""]] },
-      { label: "Insights", items: [["reports", "Reports", ""]] }
+      { label: "Insights", items: [["reports", "Reports", ""]] },
+      { label: "People", items: [["team", "Team Members", ""]] }
     ].map(g => ({
       label: g.label,
       items: g.items.map(it => {
@@ -717,6 +726,7 @@ class Component extends DCLogic {
       const m = p.cp ? ((p.sp - p.cp) / p.cp) * 100 : 0;
       return {
         sno: p.sno, code: p.code, name: p.name, cat: p.cat, unit: p.unit, hsn: p.hsn, gst: p.gst,
+        imageSrc: p.image ? (p.image.indexOf('/') === 0 || p.image.indexOf('http') === 0 ? p.image : '/v2/' + p.image + (p.image.indexOf('.') < 0 ? '.jpg' : '')) : '/assets/kalajay-brand.png',
         open: p.open, purch: p.purch, made: p.made, sold: p.sold, dmg: p.dmg, reorder: p.reorder,
         cp: p.cp, sp: p.sp, mrp: p.mrp, upd: p.upd, stock: st,
         margin: Math.round(m) + "%", marginFg: m >= 50 ? "#2F6F5E" : m >= 30 ? "#6B5F52" : "#A4442C",
@@ -792,7 +802,7 @@ class Component extends DCLogic {
     const d = S.draft;
     const dset = k => e => this.setState({ draft: Object.assign({}, this.state.draft, { [k]: e.target.value }) });
     const addFields = [
-      ["Product code", "code", "KJ-ORG-111"], ["Product name", "name", "Product name"],
+      ["Product code", "code", "KJ-ORG-111"], ["Product name", "name", "Product name"], ["Product image path", "image", "p6-4 or assets/photo.jpg"],
       ["Category", "cat", "NA"], ["Unit", "unit", "pcs"],
       ["HSN", "hsn", "NA"], ["GST %", "gst", "0"], ["Opening stock", "open", "0"],
       ["Qty made", "made", "0"], ["Qty sold", "sold", "0"], ["Damaged", "dmg", "0"],
@@ -870,6 +880,7 @@ class Component extends DCLogic {
       scrDash: screen === "dash", scrGrid: screen === "grid", scrLow: screen === "low", scrAdd: screen === "add",
       scrEntry: screen === "prod" || screen === "sale" || screen === "purch",
       scrReports: screen === "reports",
+      scrTeam: screen === "team",
       navGroups, skuCount: String(P.length), totalValue: this.inrShort(totalValue),
       kpis, trend, alerts, topSellers, slowMovers, activity,
       columns, rows: gridRows, rowCount: String(rows.length),
