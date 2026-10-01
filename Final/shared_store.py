@@ -23,10 +23,6 @@ CATALOGUE_FIXES={
  'KJ-SPL-901':{'name':'Crystal Bling Bottle','price':1699},
 }
 PRODUCT_CODE_RENAMES=[
- ('KJ-KEY-701','KJ-KEY-7013','Pearl Beaded Keyring'),
- ('KJ-KEY-702','KJ-KEY-7021','Pastel Alphabet Keyring Set A-Z'),
- ('KJ-ORG-110','KJ-ORG-110s','Pink Crystal Beaded Vanity Set'),
- ('KJ-SLG-301','KJ-SLG-301S','Beaded Sling Bag, Multicolour'),
  ('KJ-WEB-029','KJ-SLG-301',None),
  ('KJ-WEB-038','KJ-MAT-510',None),
  ('KJ-WEB-050','KJ-KEY-701',None),
@@ -35,7 +31,15 @@ PRODUCT_CODE_RENAMES=[
  ('KJ-WEB-010','KJ-ORG-110','Crystal Beaded Tissue Dispenser'),
  ('KJ-WEB-012','KJ-ORG-112','Matte Beaded Pen/Brush Holder'),
 ]
-ARCHIVED_PRODUCT_CODES={'KJ-CRO-802','KJ-KEY-7013','KJ-KEY-7021','KJ-KEY-705','KJ-ORG-110s','KJ-SLG-301S'}
+REMOVED_PRODUCT_NAMES={
+ 'Crochet Charms & Motifs Set',
+ 'Pearl Beaded Keyring',
+ 'Pastel Alphabet Keyring Set A-Z',
+ 'Beaded Initial Keyring',
+ 'Pink Crystal Beaded Vanity Set',
+ 'Beaded Sling Bag, Multicolour',
+}
+REMOVED_PRODUCT_CODES={'KJ-CRO-802','KJ-KEY-7013','KJ-KEY-7021','KJ-KEY-705','KJ-ORG-110s','KJ-SLG-301S'}
 IMAGE_FIXES={
  'KJ-MAT-501':'p13-2',
  'KJ-MAT-510':'p13-2',
@@ -65,10 +69,22 @@ def rename_product_code(db,old,new,expected_name):
 def apply_product_code_renames(db):
  for old,new,expected_name in PRODUCT_CODE_RENAMES:
   rename_product_code(db,old,new,expected_name)
+def purge_removed_products(db):
+ removed_names={norm(name).replace('–','-') for name in REMOVED_PRODUCT_NAMES}
+ codes=set(REMOVED_PRODUCT_CODES)
+ for row in db.execute('SELECT product_code,name FROM products').fetchall():
+  if row['product_code'] in REMOVED_PRODUCT_CODES or norm(row['name']).replace('–','-') in removed_names:
+   codes.add(row['product_code'])
+ for code in codes:
+  db.execute('DELETE FROM inventory WHERE product_code=?',(code,))
+  db.execute('DELETE FROM product_aliases WHERE product_code=?',(code,))
+  if db.execute('SELECT 1 FROM inventory_transactions WHERE product_code=? LIMIT 1',(code,)).fetchone() or db.execute('SELECT 1 FROM order_items WHERE product_code=? LIMIT 1',(code,)).fetchone():
+   db.execute('UPDATE products SET active=0,published=0 WHERE product_code=?',(code,))
+  else:
+   db.execute('DELETE FROM products WHERE product_code=?',(code,))
 def sync_inventory_metadata(db):
+ purge_removed_products(db)
  apply_product_code_renames(db)
- for code in ARCHIVED_PRODUCT_CODES:
-  db.execute('UPDATE products SET active=0,published=0 WHERE product_code=?',(code,))
  for code,image in IMAGE_FIXES.items():
   db.execute("UPDATE products SET image=? WHERE product_code=? AND image=''",(image,code))
  for row in db.execute('SELECT p.product_code,p.name,p.category,p.image,p.price,i.record FROM products p JOIN inventory i USING(product_code) WHERE p.active=1'):
