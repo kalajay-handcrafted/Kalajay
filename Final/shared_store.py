@@ -26,14 +26,16 @@ PRODUCT_CODE_RENAMES=[
  ('KJ-KEY-701','KJ-KEY-7013','Pearl Beaded Keyring'),
  ('KJ-KEY-702','KJ-KEY-7021','Pastel Alphabet Keyring Set A-Z'),
  ('KJ-ORG-110','KJ-ORG-110s','Pink Crystal Beaded Vanity Set'),
- ('KJ-WEB-049','KJ-KEY-702','Pastel Beaded Alphabet Keyring'),
- ('KJ-WEB-048','KJ-KEY-701','Pearl Beaded Alphabet Keyring'),
- ('KJ-WEB-037','KJ-MAT-510','Beaded Nike Theme Mat'),
+ ('KJ-SLG-301','KJ-SLG-301S','Beaded Sling Bag, Multicolour'),
+ ('KJ-WEB-029','KJ-SLG-301',None),
+ ('KJ-WEB-038','KJ-MAT-510',None),
+ ('KJ-WEB-050','KJ-KEY-701',None),
+ ('KJ-WEB-049','KJ-KEY-702',None),
  ('KJ-WEB-011','KJ-ORG-111','Crystal Beaded Pen/Brush Holder'),
  ('KJ-WEB-010','KJ-ORG-110','Crystal Beaded Tissue Dispenser'),
  ('KJ-WEB-012','KJ-ORG-112','Matte Beaded Pen/Brush Holder'),
 ]
-ARCHIVED_PRODUCT_CODES={'KJ-CRO-802','KJ-KEY-7013','KJ-KEY-7021','KJ-KEY-705','KJ-ORG-110s','KJ-SLG-301'}
+ARCHIVED_PRODUCT_CODES={'KJ-CRO-802','KJ-KEY-7013','KJ-KEY-7021','KJ-KEY-705','KJ-ORG-110s','KJ-SLG-301S'}
 IMAGE_FIXES={
  'KJ-MAT-501':'p13-2',
  'KJ-MAT-510':'p13-2',
@@ -45,7 +47,8 @@ def stock(p):return p['open']+p['purch']+p['made']-p['sold']-p['dmg']+p.get('adj
 def rename_product_code(db,old,new,expected_name):
  if old==new:return
  row=db.execute('SELECT * FROM products WHERE product_code=?',(old,)).fetchone()
- if not row or norm(row['name']).replace('–','-')!=norm(expected_name).replace('–','-'):return
+ if not row:return
+ if expected_name and norm(row['name']).replace('–','-')!=norm(expected_name).replace('–','-'):return
  if db.execute('SELECT 1 FROM products WHERE product_code=?',(new,)).fetchone():return
  db.execute('INSERT INTO products VALUES (?,?,?,?,?,?,?,?,?)',(new,row['name'],row['category'],row['image'],row['price'],row['sold_out'],row['position'],row['published'],row['active']))
  inv_row=db.execute('SELECT record FROM inventory WHERE product_code=?',(old,)).fetchone()
