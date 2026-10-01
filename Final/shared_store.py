@@ -22,10 +22,9 @@ CATALOGUE_FIXES={
  'KJ-CRO-805':{'name':'Crochet Flower Broad Bookmark'},
  'KJ-SPL-901':{'name':'Crystal Bling Bottle','price':1699},
 }
-ARCHIVED_PRODUCT_CODES={'KJ-CRO-802','KJ-KEY-701','KJ-KEY-702','KJ-KEY-705','KJ-SLG-301'}
+ARCHIVED_PRODUCT_CODES={'KJ-CRO-802','KJ-KEY-701','KJ-KEY-702','KJ-KEY-705','KJ-ORG-110','KJ-SLG-301'}
 IMAGE_FIXES={
  'KJ-MAT-501':'p13-2',
- 'KJ-ORG-110':'p3-5',
 }
 def norm(s):return ' '.join(s.strip().lower().split())
 def record(code,name,cat,unit='pcs'):
