@@ -570,6 +570,7 @@ class Component extends DCLogic {
 
   stock(p) { return p.open + p.purch + p.made - p.sold - p.dmg + (p.adjustment || 0); }
   stockValue(p) { return this.stock(p) * p.cp; }
+  stockValueAtSp(p) { return this.stock(p) * p.sp; }
   revenue(p) { return p.sold * p.sp; }
   cogs(p) { return p.sold * p.cp; }
   grossProfit(p) { return this.revenue(p) - this.cogs(p); }
@@ -654,6 +655,7 @@ class Component extends DCLogic {
     const stock = p => this.stock(p);
 
     const totalValue = P.reduce((s, p) => s + this.stockValue(p), 0);
+    const totalValueAtSp = P.reduce((s, p) => s + this.stockValueAtSp(p), 0);
     const revenue = P.reduce((s, p) => s + this.revenue(p), 0);
     const cogs = P.reduce((s, p) => s + this.cogs(p), 0);
     const lows = P.filter(p => stock(p) <= p.reorder);
@@ -788,6 +790,7 @@ class Component extends DCLogic {
 
     const kpis = [
       { label: "Stock value at cost", value: this.inrShort(totalValue), sub: P.length + " SKUs in " + cats.length + " categories", tone: "#2A241E" },
+      { label: "Stock value at SP", value: this.inrShort(totalValueAtSp), sub: "Remaining stock valued at selling price", tone: "#2F6F5E" },
       { label: "Revenue booked", value: this.inrShort(revenue), sub: "Gross profit " + this.inrShort(revenue - cogs), tone: "#2F6F5E" },
       { label: "Low stock alerts", value: String(lows.length), sub: outs.length + " fully out of stock", tone: lows.length ? "#A4442C" : "#2F6F5E" },
       { label: "Units made / sold", value: totMade.toLocaleString("en-IN") + " / " + totSold.toLocaleString("en-IN"), sub: "Sell-through " + Math.round((totSold / Math.max(totMade, 1)) * 100) + "%", tone: "#2A241E" },
