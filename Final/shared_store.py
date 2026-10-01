@@ -22,11 +22,8 @@ CATALOGUE_FIXES={
  'KJ-CRO-805':{'name':'Crochet Flower Broad Bookmark'},
  'KJ-SPL-901':{'name':'Crystal Bling Bottle','price':1699},
 }
-ARCHIVED_PRODUCT_CODES={'KJ-CRO-802'}
+ARCHIVED_PRODUCT_CODES={'KJ-CRO-802','KJ-KEY-701','KJ-KEY-702','KJ-KEY-705'}
 IMAGE_FIXES={
- 'KJ-KEY-701':'p17-2',
- 'KJ-KEY-702':'p17-3',
- 'KJ-KEY-705':'p17-2',
  'KJ-MAT-501':'p13-2',
  'KJ-ORG-110':'p3-5',
  'KJ-SLG-301':'p10-2',
