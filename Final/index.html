@@ -261,9 +261,14 @@
 </section>
 <section id="our-team" aria-labelledby="our-team-heading" style="max-width:1200px;margin:0 auto;padding:64px 24px 0">
   <h2 id="our-team-heading" style="font-family:'Prata',serif;font-size:32px;color:#40291C">Our Team</h2>
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start">
   <figure style="margin:0">
-    <img src="assets/ratanpur-team.jpg" alt="Kalajay’s Ratanpur team together" width="1280" height="960" loading="lazy" style="display:block;width:100%;height:auto;border-radius:8px">
+    <img src="assets/ratanpur-team.jpg" alt="Kalajay’s Ratanpur team together" width="1280" height="960" loading="lazy" style="display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px">
   </figure>
+  <figure style="margin:0">
+    <img src="assets/kalajay-story-team.png" alt="Kalajay team members together at an event" width="310" height="174" loading="lazy" style="display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px">
+  </figure>
+  </div>
 </section>
 </sc-if>
 <sc-if value="{{ isHome }}">
