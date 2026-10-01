@@ -22,15 +22,48 @@ CATALOGUE_FIXES={
  'KJ-CRO-805':{'name':'Crochet Flower Broad Bookmark'},
  'KJ-SPL-901':{'name':'Crystal Bling Bottle','price':1699},
 }
-ARCHIVED_PRODUCT_CODES={'KJ-CRO-802','KJ-KEY-701','KJ-KEY-702','KJ-KEY-705','KJ-ORG-110','KJ-SLG-301'}
+PRODUCT_CODE_RENAMES=[
+ ('KJ-KEY-701','KJ-KEY-7013','Pearl Beaded Keyring'),
+ ('KJ-KEY-702','KJ-KEY-7021','Pastel Alphabet Keyring Set A-Z'),
+ ('KJ-ORG-110','KJ-ORG-110s','Pink Crystal Beaded Vanity Set'),
+ ('KJ-WEB-049','KJ-KEY-702','Pastel Beaded Alphabet Keyring'),
+ ('KJ-WEB-048','KJ-KEY-701','Pearl Beaded Alphabet Keyring'),
+ ('KJ-WEB-037','KJ-MAT-510','Beaded Nike Theme Mat'),
+ ('KJ-WEB-011','KJ-ORG-111','Crystal Beaded Pen/Brush Holder'),
+ ('KJ-WEB-010','KJ-ORG-110','Crystal Beaded Tissue Dispenser'),
+ ('KJ-WEB-012','KJ-ORG-112','Matte Beaded Pen/Brush Holder'),
+]
+ARCHIVED_PRODUCT_CODES={'KJ-CRO-802','KJ-KEY-7013','KJ-KEY-7021','KJ-KEY-705','KJ-ORG-110s','KJ-SLG-301'}
 IMAGE_FIXES={
  'KJ-MAT-501':'p13-2',
+ 'KJ-MAT-510':'p13-2',
 }
 def norm(s):return ' '.join(s.strip().lower().split())
 def record(code,name,cat,unit='pcs'):
  return dict(code=code,name=name,cat=cat,unit=unit,image='',hsn='NA',upd='NA',sno=0,**{k:0 for k in NUMBERS})
 def stock(p):return p['open']+p['purch']+p['made']-p['sold']-p['dmg']+p.get('adjustment',0)
+def rename_product_code(db,old,new,expected_name):
+ if old==new:return
+ row=db.execute('SELECT * FROM products WHERE product_code=?',(old,)).fetchone()
+ if not row or norm(row['name']).replace('–','-')!=norm(expected_name).replace('–','-'):return
+ if db.execute('SELECT 1 FROM products WHERE product_code=?',(new,)).fetchone():return
+ db.execute('INSERT INTO products VALUES (?,?,?,?,?,?,?,?,?)',(new,row['name'],row['category'],row['image'],row['price'],row['sold_out'],row['position'],row['published'],row['active']))
+ inv_row=db.execute('SELECT record FROM inventory WHERE product_code=?',(old,)).fetchone()
+ if inv_row:
+  inv=json.loads(inv_row[0]);inv['code']=new
+  db.execute('INSERT OR REPLACE INTO inventory VALUES (?,?)',(new,json.dumps(inv)))
+  db.execute('DELETE FROM inventory WHERE product_code=?',(old,))
+ for tx in db.execute('SELECT id,record FROM inventory_transactions WHERE product_code=?',(old,)).fetchall():
+  rec=json.loads(tx['record']);rec['code']=new
+  db.execute('UPDATE inventory_transactions SET product_code=?,record=? WHERE id=?',(new,json.dumps(rec),tx['id']))
+ db.execute('UPDATE order_items SET product_code=? WHERE product_code=?',(new,old))
+ db.execute('UPDATE product_aliases SET product_code=? WHERE product_code=?',(new,old))
+ db.execute('DELETE FROM products WHERE product_code=?',(old,))
+def apply_product_code_renames(db):
+ for old,new,expected_name in PRODUCT_CODE_RENAMES:
+  rename_product_code(db,old,new,expected_name)
 def sync_inventory_metadata(db):
+ apply_product_code_renames(db)
  for code in ARCHIVED_PRODUCT_CODES:
   db.execute('UPDATE products SET active=0,published=0 WHERE product_code=?',(code,))
  for code,image in IMAGE_FIXES.items():
