@@ -721,7 +721,7 @@ class Component extends DCLogic {
       waLink: this.waLink("Hi Kalajay! I'd like to know more about your handcrafted pieces."),
       cartWaLink: this.waLink(
         cartItems.length
-          ? "Hi Kalajay! I'd like a quote for:\n" +
+          ? "Hi Kalajay! I'd like to order:\n" +
             cartItems.map(i => "• " + i.name + " × " + i.qty + " — " + this.inr(i.price * i.qty)).join("\n") +
             "\nDelivery: " + (delivery ? this.inr(delivery) : "Free") +
             "\nThe cart value is " + this.inr(total) + "."

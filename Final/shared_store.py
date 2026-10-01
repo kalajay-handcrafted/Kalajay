@@ -22,10 +22,30 @@ CATALOGUE_FIXES={
  'KJ-CRO-805':{'name':'Crochet Flower Broad Bookmark'},
  'KJ-SPL-901':{'name':'Crystal Bling Bottle','price':1699},
 }
+IMAGE_FIXES={
+ 'KJ-CRO-802':'p19-2',
+ 'KJ-KEY-701':'p17-2',
+ 'KJ-KEY-702':'p17-3',
+ 'KJ-KEY-705':'p17-2',
+ 'KJ-MAT-501':'p13-2',
+ 'KJ-ORG-110':'p3-5',
+ 'KJ-SLG-301':'p10-2',
+}
 def norm(s):return ' '.join(s.strip().lower().split())
 def record(code,name,cat,unit='pcs'):
- return dict(code=code,name=name,cat=cat,unit=unit,hsn='NA',upd='NA',sno=0,**{k:0 for k in NUMBERS})
+ return dict(code=code,name=name,cat=cat,unit=unit,image='',hsn='NA',upd='NA',sno=0,**{k:0 for k in NUMBERS})
 def stock(p):return p['open']+p['purch']+p['made']-p['sold']-p['dmg']+p.get('adjustment',0)
+def sync_inventory_metadata(db):
+ for code,image in IMAGE_FIXES.items():
+  db.execute("UPDATE products SET image=? WHERE product_code=? AND image=''",(image,code))
+ for row in db.execute('SELECT p.product_code,p.name,p.category,p.image,p.price,i.record FROM products p JOIN inventory i USING(product_code) WHERE p.active=1'):
+  inv=json.loads(row['record'])
+  changed=False
+  updates={'name':row['name'],'cat':row['category'],'image':row['image'],'sp':row['price']}
+  for key,value in updates.items():
+   if inv.get(key)!=value:
+    inv[key]=value;changed=True
+  if changed:db.execute('UPDATE inventory SET record=? WHERE product_code=?',(json.dumps(inv),row['product_code']))
 def migrate(connect,root,erp_root):
  with connect() as db:
   done=db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='shared_meta'").fetchone()
@@ -83,8 +103,9 @@ def migrate(connect,root,erp_root):
    inv_row=db.execute('SELECT record FROM inventory WHERE product_code=?',(code,)).fetchone()
    if inv_row:
     inv=json.loads(inv_row[0]);inv.update(name=name,sp=price)
-    db.execute('UPDATE inventory SET record=? WHERE product_code=?',(json.dumps(inv),code))
+   db.execute('UPDATE inventory SET record=? WHERE product_code=?',(json.dumps(inv),code))
    db.execute('INSERT OR IGNORE INTO product_aliases VALUES (?,?)',(row['name'],code))
+  sync_inventory_metadata(db)
 
 def catalog(connect):
  with connect() as db:
@@ -97,6 +118,7 @@ def catalog(connect):
 
 def state(connect):
  with connect() as db:
+  sync_inventory_metadata(db)
   products=[json.loads(r[0]) for r in db.execute('SELECT i.record FROM inventory i JOIN products p USING(product_code) WHERE p.active=1 ORDER BY p.category, p.name COLLATE NOCASE')]
   for i,p in enumerate(products):p['sno']=i+1
   orders=[]

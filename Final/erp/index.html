@@ -217,7 +217,7 @@
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tStock }}</td>
                 <td colspan="4"></td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tMargin }}</td>
-                <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap">{{ totalValue }}</td>
+                <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap">{{ tValue }}</td>
                 <td colspan="2"></td>
               </tr>
             </tfoot>
@@ -567,6 +567,11 @@ class Component extends DCLogic {
   }
 
   stock(p) { return p.open + p.purch + p.made - p.sold - p.dmg + (p.adjustment || 0); }
+  stockValue(p) { return this.stock(p) * p.cp; }
+  revenue(p) { return p.sold * p.sp; }
+  cogs(p) { return p.sold * p.cp; }
+  grossProfit(p) { return this.revenue(p) - this.cogs(p); }
+  marginPct(p) { return p.cp ? ((p.sp - p.cp) / p.cp) * 100 : 0; }
   inr(n) { return "₹" + Math.round(n).toLocaleString("en-IN"); }
   inrShort(n) {
     if (n >= 10000000) return "₹" + (n / 10000000).toFixed(2) + " Cr";
@@ -628,7 +633,7 @@ class Component extends DCLogic {
 
   exportCsv(rows) {
     const head = ["S.No","Product Code","Product Name","Category","Unit","HSN","GST %","Opening","Stock In","Qty Made","Qty Sold","Damaged","Remaining Stock","Reorder Level","CP","SP","MRP","Margin %","Stock Value","Last Updated"];
-    const body = rows.map(p => [p.sno, p.code, p.name, p.cat, p.unit, p.hsn, p.gst, p.open, p.purch, p.made, p.sold, p.dmg, this.stock(p), p.reorder, p.cp, p.sp, p.mrp, p.cp ? Math.round(((p.sp - p.cp) / p.cp) * 100) : 0, this.stock(p) * p.cp, p.upd]);
+    const body = rows.map(p => [p.sno, p.code, p.name, p.cat, p.unit, p.hsn, p.gst, p.open, p.purch, p.made, p.sold, p.dmg, this.stock(p), p.reorder, p.cp, p.sp, p.mrp, Math.round(this.marginPct(p)), this.stockValue(p), p.upd]);
     const csv = [head].concat(body).map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(",")).join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
@@ -646,9 +651,9 @@ class Component extends DCLogic {
     const compact = (this.props.density || "Comfortable") === "Compact";
     const stock = p => this.stock(p);
 
-    const totalValue = P.reduce((s, p) => s + stock(p) * p.cp, 0);
-    const revenue = P.reduce((s, p) => s + p.sold * p.sp, 0);
-    const cogs = P.reduce((s, p) => s + p.sold * p.cp, 0);
+    const totalValue = P.reduce((s, p) => s + this.stockValue(p), 0);
+    const revenue = P.reduce((s, p) => s + this.revenue(p), 0);
+    const cogs = P.reduce((s, p) => s + this.cogs(p), 0);
     const lows = P.filter(p => stock(p) <= p.reorder);
     const outs = P.filter(p => stock(p) <= 0);
     const totMade = P.reduce((s, p) => s + p.made, 0);
@@ -697,8 +702,8 @@ class Component extends DCLogic {
     if (S.stockFilter === "out") rows = rows.filter(p => stock(p) <= 0);
     const sk = S.sortKey;
     rows.sort((a, b) => {
-      const va = sk === "stock" ? stock(a) : sk === "value" ? stock(a) * a.cp : sk === "margin" ? (a.cp ? (a.sp - a.cp) / a.cp : 0) : a[sk];
-      const vb = sk === "stock" ? stock(b) : sk === "value" ? stock(b) * b.cp : sk === "margin" ? (b.cp ? (b.sp - b.cp) / b.cp : 0) : b[sk];
+      const va = sk === "stock" ? stock(a) : sk === "value" ? this.stockValue(a) : sk === "margin" ? this.marginPct(a) : a[sk];
+      const vb = sk === "stock" ? stock(b) : sk === "value" ? this.stockValue(b) : sk === "margin" ? this.marginPct(b) : b[sk];
       if (typeof va === "string") return va.localeCompare(vb) * S.sortDir;
       return (va - vb) * S.sortDir;
     });
@@ -723,14 +728,14 @@ class Component extends DCLogic {
     const gridRows = rows.map(p => {
       const st = stock(p);
       const low = st <= p.reorder;
-      const m = p.cp ? ((p.sp - p.cp) / p.cp) * 100 : 0;
+      const m = this.marginPct(p);
       return {
         sno: p.sno, code: p.code, name: p.name, cat: p.cat, unit: p.unit, hsn: p.hsn, gst: p.gst,
         imageSrc: p.image ? (p.image.indexOf('/') === 0 || p.image.indexOf('http') === 0 ? p.image : '/v2/' + p.image + (p.image.indexOf('.') < 0 ? '.jpg' : '')) : '/assets/kalajay-brand.png',
         open: p.open, purch: p.purch, made: p.made, sold: p.sold, dmg: p.dmg, reorder: p.reorder,
         cp: p.cp, sp: p.sp, mrp: p.mrp, upd: p.upd, stock: st,
         margin: Math.round(m) + "%", marginFg: m >= 50 ? "#2F6F5E" : m >= 30 ? "#6B5F52" : "#A4442C",
-        value: this.inr(st * p.cp),
+        value: this.inr(this.stockValue(p)),
         stockBg: st <= 0 ? "#F6E2DA" : low ? "#FAEFD9" : "#E7F1EC",
         stockFg: st <= 0 ? "#9B2F16" : low ? "#8A6206" : "#25604F",
         rowBg: st <= 0 ? "#FDF7F4" : "transparent",
@@ -849,18 +854,18 @@ class Component extends DCLogic {
     // ---------- reports ----------
     const catRows = cats.map(c => {
       const list = P.filter(p => p.cat === c);
-      const rev = list.reduce((s, p) => s + p.sold * p.sp, 0);
-      const cost = list.reduce((s, p) => s + p.sold * p.cp, 0);
+      const rev = list.reduce((s, p) => s + this.revenue(p), 0);
+      const cost = list.reduce((s, p) => s + this.cogs(p), 0);
       const mg = rev ? ((rev - cost) / rev) * 100 : 0;
       return {
         cat: c, skus: list.length, made: list.reduce((s, p) => s + p.made, 0), sold: list.reduce((s, p) => s + p.sold, 0),
         rev: this.inrShort(rev), profit: this.inrShort(rev - cost), margin: Math.round(mg) + "%", pct: Math.round(mg),
-        value: this.inrShort(list.reduce((s, p) => s + stock(p) * p.cp, 0)), _mg: mg
+        value: this.inrShort(list.reduce((s, p) => s + this.stockValue(p), 0)), _mg: mg
       };
     }).sort((a, b) => b._mg - a._mg);
 
-    const profitRows = P.slice().sort((a, b) => (b.sold * (b.sp - b.cp)) - (a.sold * (a.sp - a.cp))).slice(0, 8)
-      .map(p => ({ name: p.name, profit: this.inrShort(p.sold * (p.sp - p.cp)) }));
+    const profitRows = P.slice().sort((a, b) => this.grossProfit(b) - this.grossProfit(a)).slice(0, 8)
+      .map(p => ({ name: p.name, profit: this.inrShort(this.grossProfit(p)) }));
     const damageRows = P.slice().filter(p => p.dmg > 0).sort((a, b) => (b.dmg / Math.max(b.made + b.purch + b.open, 1)) - (a.dmg / Math.max(a.made + a.purch + a.open, 1))).slice(0, 8)
       .map(p => ({ name: p.name, dmg: p.dmg + " " + p.unit, rate: (p.dmg / Math.max(p.made + p.purch + p.open, 1) * 100).toFixed(1) }));
     const reportKpis = [
@@ -870,7 +875,9 @@ class Component extends DCLogic {
       { label: "MRP headroom", value: Math.round((P.reduce((s, p) => s + (p.mrp - p.sp), 0) / Math.max(P.reduce((s, p) => s + p.sp, 0), 1)) * 100) + "%", sub: "Average SP to MRP gap", tone: "#B8860B" }
     ];
 
-    const tMarginPct = revenue ? Math.round(((revenue - cogs) / revenue) * 100) + "%" : "0%";
+    const rowRevenue = rows.reduce((s, p) => s + this.revenue(p), 0);
+    const rowCogs = rows.reduce((s, p) => s + this.cogs(p), 0);
+    const tMarginPct = rowRevenue ? Math.round(((rowRevenue - rowCogs) / rowRevenue) * 100) + "%" : "0%";
 
     return {
       accent, cellPad: compact ? "5px 10px" : "9px 12px",
@@ -897,6 +904,7 @@ class Component extends DCLogic {
       tDmg: rows.reduce((s, p) => s + p.dmg, 0).toLocaleString("en-IN"),
       tStock: rows.reduce((s, p) => s + stock(p), 0).toLocaleString("en-IN"),
       tMargin: tMarginPct,
+      tValue: this.inr(rows.reduce((s, p) => s + this.stockValue(p), 0)),
       lowRows,
       addFields, addPreview, addError: S.addError,
       addHeading: existingDraft ? "Editing " + existingDraft.name : "New product",
