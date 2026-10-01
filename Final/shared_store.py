@@ -22,8 +22,8 @@ CATALOGUE_FIXES={
  'KJ-CRO-805':{'name':'Crochet Flower Broad Bookmark'},
  'KJ-SPL-901':{'name':'Crystal Bling Bottle','price':1699},
 }
+ARCHIVED_PRODUCT_CODES={'KJ-CRO-802'}
 IMAGE_FIXES={
- 'KJ-CRO-802':'p19-2',
  'KJ-KEY-701':'p17-2',
  'KJ-KEY-702':'p17-3',
  'KJ-KEY-705':'p17-2',
@@ -36,6 +36,8 @@ def record(code,name,cat,unit='pcs'):
  return dict(code=code,name=name,cat=cat,unit=unit,image='',hsn='NA',upd='NA',sno=0,**{k:0 for k in NUMBERS})
 def stock(p):return p['open']+p['purch']+p['made']-p['sold']-p['dmg']+p.get('adjustment',0)
 def sync_inventory_metadata(db):
+ for code in ARCHIVED_PRODUCT_CODES:
+  db.execute('UPDATE products SET active=0,published=0 WHERE product_code=?',(code,))
  for code,image in IMAGE_FIXES.items():
   db.execute("UPDATE products SET image=? WHERE product_code=? AND image=''",(image,code))
  for row in db.execute('SELECT p.product_code,p.name,p.category,p.image,p.price,i.record FROM products p JOIN inventory i USING(product_code) WHERE p.active=1'):
