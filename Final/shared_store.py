@@ -22,6 +22,11 @@ CATALOGUE_FIXES={
  'KJ-CRO-805':{'name':'Crochet Flower Broad Bookmark'},
  'KJ-SPL-901':{'name':'Crystal Bling Bottle','price':1699},
 }
+CATALOGUE_ADDITIONS=[
+ ('KJ-MAT-511','Pear Beaded Accent Coaster Set','Mats','kj-mat-511.png',300,'set'),
+ ('KJ-MAT-512','Pearl Hexagon Coaster Set','Mats','kj-mat-512.png',300,'set'),
+ ('KJ-MAT-513','Blush Crystal Coaster Set','Mats','kj-mat-513.png',400,'set'),
+]
 PRODUCT_CODE_RENAMES=[
  ('KJ-WEB-029','KJ-SLG-301',None),
  ('KJ-WEB-038','KJ-MAT-510',None),
@@ -38,10 +43,10 @@ REMOVED_PRODUCT_NAMES={
  'Beaded Initial Keyring',
  'Pink Crystal Beaded Vanity Set',
  'Beaded Sling Bag, Multicolour',
+ 'Beaded Sport-Theme Mat',
 }
-REMOVED_PRODUCT_CODES={'KJ-CRO-802','KJ-KEY-7013','KJ-KEY-7021','KJ-KEY-705','KJ-ORG-110s','KJ-SLG-301S'}
+REMOVED_PRODUCT_CODES={'KJ-CRO-802','KJ-KEY-7013','KJ-KEY-7021','KJ-KEY-705','KJ-ORG-110s','KJ-SLG-301S','KJ-MAT-501'}
 IMAGE_FIXES={
- 'KJ-MAT-501':'p13-2',
  'KJ-MAT-510':'p13-2',
 }
 def norm(s):return ' '.join(s.strip().lower().split())
@@ -82,6 +87,18 @@ def purge_removed_products(db):
    db.execute('UPDATE products SET active=0,published=0 WHERE product_code=?',(code,))
   else:
    db.execute('DELETE FROM products WHERE product_code=?',(code,))
+def ensure_catalogue_additions(db):
+ for offset,(code,name,cat,image,price,unit) in enumerate(CATALOGUE_ADDITIONS):
+  row=db.execute('SELECT * FROM products WHERE product_code=?',(code,)).fetchone()
+  if row:
+   db.execute('UPDATE products SET name=?,category=?,image=?,price=?,sold_out=0,published=1,active=1 WHERE product_code=?',(name,cat,image,price,code))
+  else:
+   db.execute('INSERT INTO products VALUES (?,?,?,?,?,?,?,?,?)',(code,name,cat,image,price,0,1500+offset,1,1))
+  inv_row=db.execute('SELECT record FROM inventory WHERE product_code=?',(code,)).fetchone()
+  inv=json.loads(inv_row[0]) if inv_row else record(code,name,cat,unit)
+  inv.update(code=code,name=name,cat=cat,unit=unit,image=image,sp=price)
+  db.execute('INSERT OR REPLACE INTO inventory VALUES (?,?)',(code,json.dumps(inv)))
+  db.execute('INSERT OR IGNORE INTO product_aliases VALUES (?,?)',(name,code))
 def sync_inventory_metadata(db):
  purge_removed_products(db)
  apply_product_code_renames(db)
@@ -144,6 +161,7 @@ def migrate(connect,root,erp_root):
      db.execute('INSERT INTO order_items VALUES (?,?,?,?,?)',(order['id'],row[0],item['quantity'],item['unitPrice'],item['name']))
  with connect() as db:
   db.execute('INSERT OR REPLACE INTO content VALUES (?,?)',('erp_homepage',(erp_root/'index.html').read_text()))
+  ensure_catalogue_additions(db)
   for code,fix in CATALOGUE_FIXES.items():
    row=db.execute('SELECT * FROM products WHERE product_code=?',(code,)).fetchone()
    if not row:continue
