@@ -5,12 +5,19 @@ from datetime import datetime, timezone
 
 NUMBERS=('open','purch','made','sold','dmg','reorder','cp','sp','mrp','gst')
 ALIASES={
+ "Beaded Coaster Set, Grey & Blue":"Beaded Coaster Set, Grey & Blue (Set of 2)",
+ "Beaded Coaster Set, Blue & White":"Beaded Coaster Set, Blue & White (Set of 2)",
+ "Pearl Beaded Round Coaster Set":"Pearl Beaded Round Coaster (Set of 2)",
+ "Pearl Beaded Tealight Holder Set":"Pearl Beaded Tealight Holder (Set of 2)",
+ "Lilac Beaded Tealight Holder Set":"Lilac Beaded Tealight Holder (Set of 2)",
+ "Pearl Beaded Tealight Holder Set of 2":"Pearl Beaded Tealight Holder (Set of 2)",
+ "Lilac Beaded Tealight Holder Set of 2":"Lilac Beaded Tealight Holder (Set of 2)",
  'Pearl Beaded Ring/Earring Box':'Pearl Beaded Ring & Earring Box',
  'Pearl Beaded Round Watch/Accessory Box':'Pearl Beaded Round Watch Box',
  'Beaded Desk Organiser Baskets':'Beaded Desk Organiser Basket Set',
  'Pearl Beaded Mini Pouch with Flower Charm':'Pearl Beaded Mini Pouch, Flower Charm',
- 'Pearl Beaded Tealight Holder Set':'Pearl Beaded Tealight Holder Set of 2',
- 'Lilac Beaded Tealight Holder Set':'Lilac Beaded Tealight Holder Set of 2',
+ 'Pearl Beaded Tealight Holder Set':'Pearl Beaded Tealight Holder (Set of 2)',
+ 'Lilac Beaded Tealight Holder Set':'Lilac Beaded Tealight Holder (Set of 2)',
  'Crochet Flower Bookmark/Bag Charm':'Crochet Flower Bookmark / Bag Charm',
  'Crochet Chicken Bookmarks':'Crochet Chicken Bookmark',
  'Crochet Flower Bookmarks':'Crochet Flower Bookmark Set of 3',

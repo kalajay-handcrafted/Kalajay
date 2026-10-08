@@ -46,6 +46,7 @@
       <a href="/#top" style="color:#40291C">Home</a>
       <a href="/#collections" style="color:#40291C">Collections</a>
 
+      <a href="/hampers" style="color:#40291C">Gift Hampers</a>
       <a href="/story" style="color:#40291C">Our Story</a>
       <div style="display:flex;align-items:center;gap:18px;flex-wrap:nowrap">
       <details class="shop-menu" style="position:relative">
@@ -190,6 +191,18 @@
 </section>
 </sc-if>
 <sc-if value="{{ isHome }}">
+<sc-if value="{{ isHampers }}">
+<section id="hampers" style="max-width:1100px;margin:0 auto;padding:64px 24px 0">
+  <p style="margin:0 0 16px;font-size:13px"><a href="/#top">Home</a> / Gift Hampers</p>
+  <h1 style="font-family:'Prata',serif;font-size:clamp(30px,4vw,44px);margin:0 0 18px;color:#40291C">Custom Gift Hampers</h1>
+  <p style="font-size:17px;line-height:1.7;color:#5B4331;max-width:68ch;margin:0 0 32px">Choose handcrafted pieces, colours, quantities, packaging style, and note cards. We prepare wedding favours, festive hampers, corporate gifting sets, and personalised beadwork bundles.</p>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <a href="/uploads/Kalajay_Catalog_S.pdf" download="Kalajay-Catalogue.pdf" style="display:inline-flex;background:#A9482A;color:#FBF7E8;padding:14px 24px;border-radius:999px;font-size:13px;letter-spacing:.16em;text-transform:uppercase">Download catalogue (PDF)</a>
+    <a href="#contact" style="display:inline-flex;border:1px solid #C6B491;color:#40291C;padding:14px 24px;border-radius:999px;font-size:13px;letter-spacing:.16em;text-transform:uppercase">Enquire for hampers</a>
+  </div>
+</section>
+</sc-if>
+
 <section id="custom" style="max-width:1200px;margin:0 auto;padding:88px 24px 0">
   <h2 style="font-family:'Prata',serif;font-size:clamp(30px,4vw,44px);margin:0 0 40px;color:#40291C">Ask for something of your own</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px">
@@ -318,14 +331,15 @@
 <script type="text/x-dc" data-dc-script data-props="{&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#A9482A&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#A9482A&quot;,&quot;#8A6318&quot;,&quot;#8E3A20&quot;,&quot;#6E4A2E&quot;]},&quot;introAnimation&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
 const IS_SHOP = window.location.pathname.replace(/\/$/, "") === "/shop";
 const IS_STORY = window.location.pathname.replace(/\/$/, "") === "/story";
+const IS_HAMPERS = window.location.pathname.replace(/\/$/, "") === "/hampers";
 const INITIAL_PARAMS = new URLSearchParams(window.location.search);
 const { collections: CATS, products: PRODUCTS, soldOut: SOLD_OUT, defaultPrice: DEFAULT_PRICE, prices: PRICES } = window.KALAJAY_DATA;
 
 class Component extends DCLogic {
-  state = { cityCount: window.KALAJAY_DATA.cityCount, memberCount: window.KALAJAY_DATA.memberCount, cat: CATS.some(c => c[0] === INITIAL_PARAMS.get("category")) ? INITIAL_PARAMS.get("category") : "All", active: null, cart: {}, cartOpen: false, justAdded: null, q: INITIAL_PARAMS.get("q") || "", intro: !IS_SHOP && !IS_STORY && window.location.hash !== "#top", customerName: "", customerPhone: "", customerAddress: "", orderNote: "", orderMessage: "", savingOrder: false };
+  state = { cityCount: window.KALAJAY_DATA.cityCount, memberCount: window.KALAJAY_DATA.memberCount, cat: CATS.some(c => c[0] === INITIAL_PARAMS.get("category")) ? INITIAL_PARAMS.get("category") : "All", active: null, cart: {}, cartOpen: false, justAdded: null, q: INITIAL_PARAMS.get("q") || "", intro: !IS_SHOP && !IS_STORY && !IS_HAMPERS && window.location.hash !== "#top", customerName: "", customerPhone: "", customerAddress: "", orderNote: "", orderMessage: "", savingOrder: false };
 
   componentDidMount() {
-    document.title = IS_STORY ? "Our Story | Kalajay" : IS_SHOP ? "Shop | Kalajay" : "Kalajay | Handcrafted with care";
+    document.title = IS_HAMPERS ? "Gift Hampers | Kalajay" : IS_STORY ? "Our Story | Kalajay" : IS_SHOP ? "Shop | Kalajay" : "Kalajay | Handcrafted with care";
     this._closeShop = e => { const menu = document.querySelector('.shop-menu'); if (menu && (e.key === 'Escape' || (e.type === 'click' && !menu.contains(e.target)))) menu.open = false; };
     document.addEventListener('click', this._closeShop);
     document.addEventListener('keydown', this._closeShop);
@@ -360,7 +374,7 @@ class Component extends DCLogic {
     window.addEventListener('focus', this._catalogueRefresh);
     this._catalogueTimer = setInterval(this._catalogueRefresh, 10000);
 
-    if (IS_SHOP || IS_STORY || window.location.hash === "#top" || this.props.introAnimation === false) return this.setState({ intro: false });
+    if (IS_SHOP || IS_STORY || IS_HAMPERS || window.location.hash === "#top" || this.props.introAnimation === false) return this.setState({ intro: false });
     const video = document.querySelector('.kj-intro-video');
     let finishing = false;
     const finish = () => {
@@ -561,7 +575,8 @@ class Component extends DCLogic {
         current: label === cat ? 'page' : 'false',
         pick: e => { e.preventDefault(); const url = new URL('/shop', window.location.origin); if (label !== 'All') url.searchParams.set('category', label); if (this.state.q) url.searchParams.set('q', this.state.q); window.history.pushState({}, '', url); this.setState({ cat: label }); }
       })),
-      isHome: !IS_SHOP && !IS_STORY,
+      isHome: !IS_SHOP && !IS_STORY && !IS_HAMPERS,
+      isHampers: IS_HAMPERS,
       isStory: IS_STORY,
       isShop: IS_SHOP,
       selectedCategory: IS_SHOP ? cat : '',
