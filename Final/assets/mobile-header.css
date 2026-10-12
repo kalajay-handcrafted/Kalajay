@@ -176,3 +176,19 @@
   .kj-compact #collections { padding-top:24px !important; }
   .kj-compact #collections h2 { font-size:26px !important; }
 }
+
+/* Less white space under category photos and a slimmer wordmark header. */
+.kj-category-card > div { padding:4px 8px !important; }
+.kj-category-card h3 { font-size:15px !important; line-height:1.2 !important; margin:0 !important; }
+.kj-header .kj-header-inner { padding-top:8px !important; padding-bottom:8px !important; }
+.kj-brand-emblem { display:block; width:64px; height:64px; margin:0 0 10px; border:1px solid #E7DCC2; border-radius:50%; background:#FBF7E8; }
+.kj-hero-cta a { text-transform:none !important; letter-spacing:.03em !important; }
+.kj-desktop-announcement { padding-top:6px !important; padding-bottom:6px !important; }
+@media(max-width:760px) {
+  .kj-header .kj-header-inner { padding-top:4px !important; padding-bottom:4px !important; }
+  .kj-mobile-announcement { height:22px; }
+  .kj-mobile-ticker { line-height:22px; }
+  .kj-category-card > div { padding:3px 7px !important; }
+  .kj-category-card h3 { font-size:14px !important; }
+  .kj-brand-emblem { width:56px; height:56px; margin-bottom:8px; }
+}
