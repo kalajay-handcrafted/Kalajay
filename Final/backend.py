@@ -5,6 +5,7 @@ import mimetypes
 import sqlite3
 import uuid
 import shared_store as shared
+import website_refresh
 import team_store as team
 import auth_store as auth
 import catalogue_excel as excel
@@ -41,6 +42,7 @@ def initialize():
         db.execute('INSERT OR REPLACE INTO content VALUES (?,?)', ('homepage', (ROOT / 'index.html').read_text()))
     DB.chmod(0o600)
     shared.migrate(connect, ROOT, ERP_ROOT)
+    website_refresh.migrate(connect, ROOT)
     team.initialize(connect)
     auth.initialize(connect, ROOT)
 
@@ -113,7 +115,7 @@ class Handler(BaseHTTPRequestHandler):
             if not allowed or not file.is_relative_to(ERP_ROOT) or not file.is_file():
                 return self.send(404, {'error': 'Not found'})
             return self.send(200, file.read_bytes(), mimetypes.guess_type(file.name)[0] or 'application/octet-stream')
-        if path in ('/', '/index.html', '/shop', '/shop/', '/story', '/story/'):
+        if path in ('/', '/index.html', '/shop', '/shop/', '/story', '/story/', '/hampers', '/hampers/', '/returns', '/returns/'):
             with connect() as db:
                 return self.send(200, db.execute("SELECT value FROM content WHERE key='homepage'").fetchone()[0], 'text/html; charset=utf-8')
         if path == '/api/catalogue':
@@ -208,3 +210,4 @@ if __name__ == '__main__':
     initialize()
     print(f'Kalajay running at http://127.0.0.1:{args.port}', flush=True)
     ThreadingHTTPServer(('127.0.0.1', args.port), Handler).serve_forever()
+
