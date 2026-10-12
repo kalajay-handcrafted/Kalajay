@@ -55,9 +55,21 @@
   ],
   [
     "KJ-ORG-110",
-    "Pink Crystal Beaded Vanity Set",
+    "Crystal Beaded Tissue Dispenser",
     "Organisers",
-    "set"
+    "pcs"
+  ],
+  [
+    "KJ-ORG-111",
+    "Crystal Beaded Pen/Brush Holder",
+    "Organisers",
+    "pcs"
+  ],
+  [
+    "KJ-ORG-112",
+    "Matte Beaded Pen/Brush Holder",
+    "Organisers",
+    "pcs"
   ],
   [
     "KJ-PRS-201",
@@ -156,12 +168,6 @@
     "pcs"
   ],
   [
-    "KJ-SLG-301",
-    "Beaded Sling Bag, Multicolour",
-    "Slings",
-    "pcs"
-  ],
-  [
     "KJ-SLG-302",
     "Sunset Ombre Beaded Sling Bag",
     "Slings",
@@ -207,12 +213,6 @@
     "KJ-APC-404",
     "Crystal Beaded AirPods Case",
     "AirPod Cases",
-    "pcs"
-  ],
-  [
-    "KJ-MAT-501",
-    "Beaded Sport-Theme Mat",
-    "Mats & Coasters",
     "pcs"
   ],
   [
@@ -264,6 +264,30 @@
     "pcs"
   ],
   [
+    "KJ-MAT-510",
+    "Beaded Nike Theme Mat",
+    "Mats & Coasters",
+    "pcs"
+  ],
+  [
+    "KJ-MAT-511",
+    "Pear Beaded Accent Coaster Set",
+    "Mats & Coasters",
+    "set"
+  ],
+  [
+    "KJ-MAT-512",
+    "Pearl Hexagon Coaster Set",
+    "Mats & Coasters",
+    "set"
+  ],
+  [
+    "KJ-MAT-513",
+    "Blush Crystal Coaster Set",
+    "Mats & Coasters",
+    "set"
+  ],
+  [
     "KJ-CDL-601",
     "Pearl Beaded Tealight Holder Set of 2",
     "Candle Holders",
@@ -277,15 +301,15 @@
   ],
   [
     "KJ-KEY-701",
-    "Pearl Beaded Keyring",
+    "Pearl Beaded Alphabet Keyring",
     "Key Rings",
     "pcs"
   ],
   [
     "KJ-KEY-702",
-    "Pastel Alphabet Keyring Set A\u2013Z",
+    "Pastel Beaded Alphabet Keyring",
     "Key Rings",
-    "set"
+    "pcs"
   ],
   [
     "KJ-KEY-703",
@@ -296,12 +320,6 @@
   [
     "KJ-KEY-704",
     "Pearl Beaded Heart Keyring",
-    "Key Rings",
-    "pcs"
-  ],
-  [
-    "KJ-KEY-705",
-    "Beaded Initial Keyring",
     "Key Rings",
     "pcs"
   ],
@@ -324,12 +342,6 @@
     "pcs"
   ],
   [
-    "KJ-CRO-802",
-    "Crochet Charms & Motifs Set",
-    "Crochet Magic",
-    "set"
-  ],
-  [
     "KJ-CRO-803",
     "Crochet Chicken Bookmark",
     "Crochet Magic",
@@ -343,7 +355,7 @@
   ],
   [
     "KJ-CRO-805",
-    "Crochet Flower Bookmark Set of 3",
+    "Crochet Flower Broad Bookmark",
     "Crochet Magic",
     "set"
   ],

@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: kalajay-shared
+    runtime: python
+    plan: starter
+    region: singapore
+    rootDir: Final
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -u backend.py
+    healthCheckPath: /healthz
+    autoDeploy: false
+    envVars:
+      - key: KALAJAY_PRODUCTION
+        value: "1"
+      - key: KALAJAY_DATA_DIR
+        value: /var/data/kalajay
+      - key: PYTHON_VERSION
+        value: "3.12.10"
+    disk:
+      name: kalajay-data
+      mountPath: /var/data
+      sizeGB: 1

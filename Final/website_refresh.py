@@ -1,6 +1,7 @@
 """Apply website category and typography changes to the shared store."""
 import json
 import sqlite3
+from pathlib import Path
 
 def clean(text):
     return text.replace('\u2014', '-')
@@ -18,7 +19,9 @@ def migrate(connect, root):
                    if clean(name) != name or category(cat) != cat]
     if not pending and collections == updated:
         return
-    backup = root / 'private' / 'before-website-refresh.sqlite3'
+    with connect() as db:
+        data_dir = Path(db.execute('PRAGMA database_list').fetchone()[2]).parent
+    backup = data_dir / 'before-website-refresh.sqlite3'
     if not backup.exists():
         with connect() as source, sqlite3.connect(backup) as target:
             source.backup(target)
