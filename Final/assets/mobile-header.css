@@ -1,0 +1,77 @@
+/* Header and announcement layout. Mobile has one sticky header, no bottom strip. */
+.kj-mobile-announcement { display: none; }
+.kj-nav, .kj-nav button { text-transform: none !important; letter-spacing: 0 !important; }
+.kj-search { position: relative; width: 160px; min-width: 130px; }
+.kj-header .kj-search input {
+  display: block; box-sizing: border-box; width: 100% !important;
+  min-width: 0; height: 40px; padding: 9px 38px 9px 12px !important;
+  font-size: 16px !important; letter-spacing: 0 !important; text-transform: none !important;
+}
+.kj-header .kj-search input::placeholder { color: #5B4331; opacity: 1; }
+.kj-header .kj-search input:focus-visible { outline: 2px solid #A9482A; outline-offset: 2px; }
+.kj-search-submit {
+  position: absolute; top: 0; right: 2px; width: 36px; height: 40px;
+  display: grid; place-items: center; padding: 0; border: 0;
+  background: transparent; color: #A9482A; cursor: pointer; border-radius: 50%;
+}
+.kj-search-submit:focus-visible { outline: 2px solid #A9482A; outline-offset: -3px; }
+.kj-cart-button { position: relative; flex-shrink: 0; }
+.kj-header .kj-cart-button span {
+  position: static !important; inset: auto !important;
+  min-width: 16px; line-height: 1; letter-spacing: 0 !important;
+}
+@media (max-width: 760px) {
+  .kj-desktop-announcement, .kj-bottom-announcement { display: none !important; }
+  #top { padding-bottom: 0 !important; }
+  .kj-header { top: 0; }
+  .kj-mobile-announcement {
+    display: block; overflow: hidden; height: 26px;
+    background: #A9482A; color: #FBF7E8; border-bottom: 1px solid #8E3A20;
+  }
+  .kj-mobile-ticker {
+    display: flex; width: max-content; white-space: nowrap;
+    animation: kj-drift 65s linear infinite; will-change: transform;
+    font-size: 11px; line-height: 26px; letter-spacing: .02em;
+  }
+  .kj-mobile-ticker > div { flex: none; padding-right: 24px; }
+  .kj-header-inner {
+    display: grid !important; grid-template-columns: 64px minmax(0, 1fr);
+    padding: 8px 10px !important; gap: 8px !important; align-items: center !important;
+  }
+  .kj-header .kj-logo { width: 64px !important; }
+  .kj-nav {
+    min-width: 0; margin-left: 0 !important; justify-content: flex-end;
+    gap: 8px !important; font-size: 12px !important;
+  }
+  .kj-shop-tools {
+    min-width: 0; gap: 6px !important; flex: 1 1 auto;
+    flex-wrap: nowrap !important; justify-content: flex-end !important;
+  }
+  .kj-nav .shop-menu { flex: none; }
+  .kj-nav .shop-menu summary { padding: 8px 0; }
+  .kj-nav .shop-menu > div { left: auto !important; right: 0; width: min(220px, calc(100vw - 20px)) !important; }
+  .kj-search { width: 130px !important; min-width: 130px; flex: none; }
+  .kj-header .kj-search input, .kj-header .kj-search input:focus { width: 100% !important; padding-right: 38px !important; }
+  .kj-cart-button {
+    width: auto !important; min-width: 40px; height: 40px !important;
+    padding: 0 6px !important; gap: 3px !important;
+    justify-content: center !important; border-radius: 20px !important;
+  }
+  .kj-header .kj-cart-button span {
+    height: auto !important; padding: 0 !important; border-radius: 0 !important;
+    background: transparent !important; color: #40291C !important;
+    display: inline !important; font-size: 11px !important;
+  }
+  .kj-whatsapp { bottom: max(16px, env(safe-area-inset-bottom)) !important; right: 12px !important; }
+}
+@media (max-width: 350px) {
+  .kj-header-inner { grid-template-columns: 1fr !important; }
+  .kj-header-inner > a { justify-self: center; }
+  .kj-nav { justify-content: center !important; }
+  .kj-shop-tools { flex: 0 1 auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kj-mobile-ticker { animation: none; will-change: auto; }
+  .kj-mobile-announcement { overflow-x: auto; }
+  .kj-mobile-ticker > div[aria-hidden] { display: none; }
+}

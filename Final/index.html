@@ -5,6 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="/api/catalogue.js"></script>
+<link rel="stylesheet" href="/assets/mobile-header.css">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -35,32 +36,32 @@
     </video>
   </div>
 </sc-if>
-<div style="background:#A9482A;color:#FBF7E8;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;text-align:center;padding:10px 16px">HANDMADE TO ORDER&nbsp; ·&nbsp; SHIPS ACROSS INDIA&nbsp;&nbsp;·&nbsp; HANDCRAFTED WITH LOVE</div>
+<div class="kj-desktop-announcement" style="background:#A9482A;color:#FBF7E8;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;text-align:center;padding:10px 16px">HANDMADE TO ORDER&nbsp; ·&nbsp; SHIPS ACROSS INDIA&nbsp;&nbsp;·&nbsp; HANDCRAFTED WITH LOVE</div>
 
-<header style="position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px); border-bottom: 1px solid #E7DCC2; background-color: #FBF7E8F0">
-  <div style="max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 24px; justify-content: space-between">
+<header class="kj-header" style="position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px); border-bottom: 1px solid #E7DCC2; background-color: #FBF7E8F0">
+<div class="kj-mobile-announcement" aria-label="Announcements"><div class="kj-mobile-ticker"><div>Handmade to order · Ships across India · Handcrafted with love · Hand-crafted: one at a time ❤️ · Handcrafted. Pretty. You. · Hand-strung beauty · Made to order · Single piece price, unless specifically mentioned · Free delivery for orders above INR 599 ·</div><div aria-hidden="true">Handmade to order · Ships across India · Handcrafted with love · Hand-crafted: one at a time ❤️ · Handcrafted. Pretty. You. · Hand-strung beauty · Made to order · Single piece price, unless specifically mentioned · Free delivery for orders above INR 599 ·</div></div></div>
+  <div class="kj-header-inner" style="max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 24px; justify-content: space-between">
     <a href="/" style="display:flex;align-items:center;gap:12px;min-width:0">
-      <img src="assets/kalajay-brand.png" alt="Kalajay — handcrafted, pretty, you" style="width: 120px; height: auto; object-fit: contain; object-position: left center; display: block; flex: none">
+      <img class="kj-logo" src="assets/kalajay-brand.png" alt="Kalajay — handcrafted, pretty, you" style="width: 120px; height: auto; object-fit: contain; object-position: left center; display: block; flex: none">
     </a>
-    <nav aria-label="Main navigation" style="display:flex;align-items:center;gap:20px;font-size:14px;letter-spacing:0.1em;text-transform:uppercase;flex-wrap:wrap;justify-content:flex-end;margin-left:auto">
+    <nav class="kj-nav" aria-label="Main navigation" style="display:flex;align-items:center;gap:20px;font-size:14px;letter-spacing:0.1em;text-transform:uppercase;flex-wrap:wrap;justify-content:flex-end;margin-left:auto">
       <a href="/#top" style="color:#40291C">Home</a>
       <a href="/#collections" style="color:#40291C">Collections</a>
 
-      <a href="/story" style="color:#40291C">Our Story</a>
-      <div style="display:flex;align-items:center;gap:18px;flex-wrap:nowrap">
+      <a href="/story" style="color:#40291C">Our story</a>
+      <div class="kj-shop-tools" style="display:flex;align-items:center;gap:18px;flex-wrap:nowrap">
       <details class="shop-menu" style="position:relative">
         <summary style="color:#40291C;cursor:pointer;list-style:none;display:flex;align-items:center;gap:7px;padding:8px 0">Shop <span aria-hidden="true" style="font-size:10px">▾</span></summary>
         <div style="position:absolute;top:100%;left:0;width:220px;max-height:70vh;overflow-y:auto;background:#FBF7E8;border:1px solid #E7DCC2;border-radius:10px;box-shadow:0 10px 28px #40291C20;padding:8px;z-index:30;text-transform:none;letter-spacing:0">
           <sc-for list="{{ categoryOptions }}" as="o"><a href="{{ o.href }}" style="display:block;padding:10px 12px;border-radius:6px;color:#40291C;font-size:14px" style-hover="background:#F0E6CC;color:#A9482A">{{ o.name }}</a></sc-for>
         </div>
       </details>
-      <form onSubmit="{{ searchCatalogue }}" role="search" style="position:relative;display:flex;align-items:center;flex:none">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#8A6318" stroke-width="1.7" stroke-linecap="round" style="position:absolute;left:17px;pointer-events:none"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg>
-        <input type="search" value="{{ query }}" onChange="{{ setQuery }}" placeholder="Search" aria-label="Search the catalogue" style="font:inherit;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;width:150px;padding:12px 18px 12px 42px;border-radius:999px;border:1px solid #C6B491;background:transparent;color:#40291C;outline:none;transition:width .3s cubic-bezier(.4,0,.2,1),border-color .2s ease,background .2s ease" style-hover="width:300px;border-color:#A9482A" style-focus="width:300px;border-color:#A9482A;background:#FFFDF6">
-        <button type="submit" aria-label="Search products" style="background:none;border:0;color:#A9482A;cursor:pointer;padding:6px">Go</button>
+      <form class="kj-search" onSubmit="{{ searchCatalogue }}" role="search" style="position:relative;display:flex;align-items:center;flex:none">
+        <input type="search" value="{{ query }}" onChange="{{ setQuery }}" placeholder="search" aria-label="Search the catalogue" style="font:inherit;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;width:150px;padding:12px 18px 12px 42px;border-radius:999px;border:1px solid #C6B491;background:transparent;color:#40291C;outline:none;transition:width .3s cubic-bezier(.4,0,.2,1),border-color .2s ease,background .2s ease" style-hover="width:300px;border-color:#A9482A" style-focus="width:300px;border-color:#A9482A;background:#FFFDF6">
+        <button class="kj-search-submit" type="submit" aria-label="Search products"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg></button>
       </form>
       </div>
-      <button onClick="{{ openCart }}" style="font:inherit;font-size:14px;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:9px;background:transparent;border:1px solid #C6B491;color:#40291C;padding:11px 18px;border-radius:999px;cursor:pointer" style-hover="border-color:#A9482A;color:#A9482A">
+      <button class="kj-cart-button" aria-label="Open cart" onClick="{{ openCart }}" style="font:inherit;font-size:14px;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:9px;background:transparent;border:1px solid #C6B491;color:#40291C;padding:11px 18px;border-radius:999px;cursor:pointer" style-hover="border-color:#A9482A;color:#A9482A">
         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8Z"></path><path d="M9 7a3 3 0 0 1 6 0"></path></svg>
         <span>{{ cartCount }}</span>
       </button>
@@ -237,7 +238,7 @@
 </section>
 
 
-<div style="position:fixed;bottom:0;left:0;right:0;z-index:40;overflow:hidden;border-top:1px solid #E7DCC2;padding:14px 0;background-color:#F5EFDB">
+<div class="kj-bottom-announcement" style="position:fixed;bottom:0;left:0;right:0;z-index:40;overflow:hidden;border-top:1px solid #E7DCC2;padding:14px 0;background-color:#F5EFDB">
   <div class="kj-ticker" style="display:flex;width:max-content;animation:kj-drift 34s linear infinite;font-family:'Prata',serif;font-size:20px;color:#8A6318;white-space:nowrap">
     <div style="display:flex;align-items:center;gap:56px;padding-right:56px;flex-shrink:0"><span>HAND-CRAFTED : ONE AT A TIME ❤️</span><span>·</span><span>Handcrafted. Pretty. You.</span><span>·</span><span>Hand-strung beauty</span><span>·</span><span>Made to order</span><span>·</span><span>Prices mentioned are per piece</span><span>·</span><span>Free Delivery for order above INR 599</span><span>·</span></div>
     <div aria-hidden="true" style="display:flex;align-items:center;gap:56px;padding-right:56px;flex-shrink:0"><span>HAND-CRAFTED : ONE AT A TIME ❤️</span><span>·</span><span>Handcrafted. Pretty. You.</span><span>·</span><span>Hand-strung beauty</span><span>·</span><span>Made to order</span><span>·</span><span>Prices mentioned are per piece</span><span>·</span><span>Free Delivery for order above INR 599</span><span>·</span></div>
@@ -251,7 +252,7 @@
   </div>
 </footer>
 
-<a href="{{ waLink }}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" style="position:fixed;right:22px;bottom:82px;z-index:45;display:flex;align-items:center;gap:11px;background:#25D366;color:#0B3D22;padding:14px 20px 14px 16px;border-radius:999px;box-shadow:0 10px 28px rgba(64,41,28,0.28);font-size:14px;letter-spacing:0.08em;text-transform:uppercase" style-hover="background:#1FB457;color:#08301A">
+<a class="kj-whatsapp" href="{{ waLink }}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" style="position:fixed;right:22px;bottom:82px;z-index:45;display:flex;align-items:center;gap:11px;background:#25D366;color:#0B3D22;padding:14px 20px 14px 16px;border-radius:999px;box-shadow:0 10px 28px rgba(64,41,28,0.28);font-size:14px;letter-spacing:0.08em;text-transform:uppercase" style-hover="background:#1FB457;color:#08301A">
   <svg viewBox="0 0 32 32" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M16.04 3.2C9.01 3.2 3.3 8.91 3.3 15.94c0 2.25.59 4.44 1.71 6.38L3.2 28.8l6.65-1.74a12.7 12.7 0 0 0 6.19 1.58h.01c7.02 0 12.74-5.71 12.74-12.74 0-3.4-1.33-6.6-3.73-9.01a12.65 12.65 0 0 0-9.02-3.69Zm0 23.03h-.01a10.6 10.6 0 0 1-5.39-1.47l-.39-.23-4.01 1.05 1.07-3.9-.25-.4a10.5 10.5 0 0 1-1.62-5.63c0-5.84 4.76-10.59 10.6-10.59 2.83 0 5.49 1.1 7.49 3.11a10.5 10.5 0 0 1 3.1 7.49c0 5.84-4.75 10.57-10.59 10.57Zm5.81-7.92c-.32-.16-1.88-.93-2.17-1.03-.29-.11-.5-.16-.71.16-.21.32-.82 1.03-1 1.24-.19.21-.37.24-.68.08-.32-.16-1.34-.5-2.56-1.58-.95-.84-1.58-1.88-1.77-2.2-.19-.32-.02-.49.14-.65.14-.14.32-.37.48-.56.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.71-1.72-.98-2.35-.26-.62-.52-.54-.71-.55l-.61-.01c-.21 0-.56.08-.85.4-.29.32-1.11 1.09-1.11 2.65s1.14 3.08 1.3 3.29c.16.21 2.24 3.42 5.43 4.8.76.33 1.35.52 1.81.67.76.24 1.45.21 2 .13.61-.09 1.88-.77 2.14-1.51.26-.74.26-1.38.19-1.51-.08-.13-.29-.21-.61-.37Z"></path></svg>
   <span>WhatsApp</span>
 </a>
@@ -389,6 +390,7 @@ class Component extends DCLogic {
       });
       const image = logo.cloneNode();
       image.alt = '';
+      image.removeAttribute('class'); // Keep responsive logo widths off the temporary animation clone.
       image.style.cssText = 'display:block;width:100%;height:auto;max-width:none;';
       emblem.appendChild(image);
       document.body.appendChild(emblem);
@@ -566,7 +568,7 @@ class Component extends DCLogic {
       isShop: IS_SHOP,
       selectedCategory: IS_SHOP ? cat : '',
       shopHeading: cat === 'All' ? 'All handcrafted pieces' : cat,
-      categoryOptions: ['All'].concat(CATS.map(c => c[0])).map(name => ({ name, href: name === 'All' ? '/shop' : '/shop?category=' + encodeURIComponent(name) })),
+      categoryOptions: ['All'].concat(CATS.map(c => c[0])).map(name => ({ name: name.charAt(0).toUpperCase() + name.slice(1).toLowerCase(), href: name === 'All' ? '/shop' : '/shop?category=' + encodeURIComponent(name) })),
       navigateCategory: e => { if (!e.target.value) return; window.location.href = e.target.value === 'All' ? '/shop' : '/shop?category=' + encodeURIComponent(e.target.value); },
       searchCatalogue: e => { e.preventDefault(); const url = new URL('/shop', window.location.origin); if (this.state.q.trim()) url.searchParams.set('q',this.state.q.trim()); window.location.href = url.pathname + url.search; },
       query: this.state.q,
