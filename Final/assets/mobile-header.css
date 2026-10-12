@@ -131,3 +131,26 @@
 
 .kj-compact #cities-map svg { max-height:340px; }
 @media(max-width:760px) { .kj-compact #cities-map svg { max-height:300px; } }
+
+/* Wordmark-only header with mobile navigation at the far left. */
+.kj-header .kj-logo { object-fit: contain; }
+@media(max-width:760px) {
+  .kj-header .kj-header-inner {
+    grid-template-columns:36px 78px minmax(0,1fr) !important;
+    padding:8px !important; gap:6px !important;
+  }
+  .kj-header-inner > .kj-mobile-menu { grid-column:1; grid-row:1; }
+  .kj-header-inner > a { grid-column:2; grid-row:1; justify-self:start; }
+  .kj-header-inner > .kj-header-actions { grid-column:3; grid-row:1; }
+  .kj-header .kj-logo { width:78px !important; }
+  .kj-header .kj-mobile-menu > summary { width:36px; }
+  .kj-header .kj-search { width:112px !important; min-width:112px; }
+  .kj-header .kj-header-actions { gap:4px; }
+}
+@media(max-width:319px) {
+  .kj-header .kj-header-inner { grid-template-columns:36px minmax(0,1fr) !important; }
+  .kj-header-inner > .kj-header-actions { grid-column:1 / -1; grid-row:2; justify-content:space-between; }
+  .kj-header .kj-search { flex:1; width:auto !important; }
+}
+
+@media(max-width:760px) { .kj-header .kj-cart-button { width:auto !important; min-width:46px; padding:0 5px !important; gap:2px !important; } }
