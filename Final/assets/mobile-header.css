@@ -233,3 +233,13 @@
 .kj-featured-card img {height:140px;}
 }
 
+
+/* Smaller secondary headline and one scrolling best-seller row on every screen. */
+.kj-home-hero h1 span.kj-hero-secondary {font-family:'Prata',serif !important;font-size:clamp(28px,3.4vw,42px) !important;}
+.kj-featured-list {display:flex !important;flex-wrap:nowrap;overflow-x:auto;gap:14px;padding-bottom:12px;scroll-snap-type:x proximity;}
+.kj-featured-card {flex:0 0 230px;max-width:230px;scroll-snap-align:start;}
+.kj-featured-list:focus-visible {outline:2px solid #A9482A;outline-offset:4px;}
+@media(max-width:760px) {
+ .kj-home-hero h1 span.kj-hero-secondary {font-size:24px !important;}
+ .kj-featured-card {flex-basis:44%;max-width:220px;}
+}
