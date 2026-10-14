@@ -78,7 +78,7 @@
   <div>
 
     
-    <h1 style="font-family: 'Prata',serif; font-size: clamp(40px,6vw,72px); line-height: 1.04; margin: 0 0 24px; color: #40291C; text-wrap: pretty"><span style="color: rgb(169, 72, 42); font-size: 65px; font-family: 'Caveat', cursive">Handcrafted with Love,</span><br>One at a Time <span class="kj-theme-heart" aria-label="love">♥</span></h1>
+    <h1 style="font-family: 'Prata',serif; font-size: clamp(40px,6vw,72px); line-height: 1.04; margin: 0 0 24px; color: #40291C; text-wrap: pretty"><span style="color: rgb(169, 72, 42); font-size: 65px; font-family: 'Caveat', cursive">Handcrafted with Love,</span><br><span class="kj-hero-secondary">One at a Time</span> <span class="kj-theme-heart" aria-label="love">♥</span></h1>
 
     <div class="kj-hero-cta" style="display:flex;gap:14px;flex-wrap:wrap">
       <a href="/shop" style="background:#A9482A;color:#FBF7E8;padding:16px 30px;border-radius:999px;font-size:13px;letter-spacing:0.18em;text-transform:uppercase" style-hover="background:#8E3A20;color:#FBF7E8">View the catalogue</a>
@@ -89,13 +89,13 @@
 <img class="kj-home-mark" src="/assets/logo-emblem.svg" alt="Kalajay elephants and lotus">
     <img src="v2/p6-4.jpg" alt="Pearl beaded mini tote bag" style="width:100%;height:100%;min-height:240px;object-fit:cover;border-radius:200px 200px 8px 8px;grid-row:span 2">
     <img src="v2/p3-2.jpg" alt="Pearl beaded jewellery box with mirror" style="width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:8px">
-    <img src="v2/p16-3.jpg" alt="Lilac beaded tealight holders" style="width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:8px 8px 200px 200px">
+    <img src="/assets/hero-pink-vanity.jpg" alt="Pink crystal beaded tissue box and brush holders" style="width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:8px 8px 200px 200px">
   </div>
 </section>
 
 <section class="kj-best-sellers" aria-labelledby="best-sellers-heading">
   <h2 id="best-sellers-heading">Best sellers</h2>
-  <div class="kj-featured-list"><sc-for list="{{ bestSellers }}" as="p" hint-placeholder-count="4">
+  <div class="kj-featured-list" tabindex="0" role="region" aria-label="Best sellers - scroll horizontally"><sc-for list="{{ bestSellers }}" as="p" hint-placeholder-count="8">
     <a href="{{ p.href }}" class="kj-featured-card"><img src="{{ p.img }}" alt="{{ p.name }}" fetchpriority="high"><span>{{ p.name }}</span><strong>{{ p.priceLabel }}</strong></a>
   </sc-for></div>
 </section>
@@ -667,7 +667,7 @@ class Component extends DCLogic {
       bestSellers: ['KJ-PRS-203', 'KJ-ORG-101', 'KJ-KEY-704', 'KJ-APC-401']
         .map(code => items.find(p => p.code === code && !p.soldOut))
         .filter(Boolean).concat(items.filter(p => !p.soldOut && !['KJ-PRS-203', 'KJ-ORG-101', 'KJ-KEY-704', 'KJ-APC-401'].includes(p.code)))
-        .slice(0, 4).map(p => ({ ...p, priceLabel: this.inr(p.price), href: '/shop?category=' + encodeURIComponent(p.cat) + '&q=' + encodeURIComponent(p.name) })),
+        .slice(0, 8).map(p => ({ ...p, priceLabel: this.inr(p.price), href: '/shop?category=' + encodeURIComponent(p.cat) + '&q=' + encodeURIComponent(p.name) })),
       cityCount: this.state.cityCount,
       memberCount: this.state.memberCount,
       collections: [["All", "Browse every handcrafted piece", "v2/p6-4.jpg"]].concat(CATS).map((c, i) => ({
