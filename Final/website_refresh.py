@@ -7,7 +7,7 @@ def clean(text):
     return text.replace('\u2014', '-')
 
 def category(text):
-    return 'Little Treasures' if text == 'Special Pieces' else clean(text)
+    return 'Little Treasures' if text == 'Special Pieces' else 'Coasters & Mats' if text == 'Mats' else clean(text)
 
 def migrate(connect, root):
     with connect() as db:
@@ -21,7 +21,7 @@ def migrate(connect, root):
         return
     with connect() as db:
         data_dir = Path(db.execute('PRAGMA database_list').fetchone()[2]).parent
-    backup = data_dir / 'before-website-refresh.sqlite3'
+    backup = data_dir / 'before-coasters-refresh.sqlite3'
     if not backup.exists():
         with connect() as source, sqlite3.connect(backup) as target:
             source.backup(target)
@@ -56,3 +56,4 @@ def migrate(connect, root):
                 changed = True
         if changed:
             db.execute("UPDATE shared_meta SET value=value+1 WHERE key='revision'")
+

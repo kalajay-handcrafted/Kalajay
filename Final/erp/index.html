@@ -273,6 +273,9 @@
                 </label>
               </sc-for>
             </div>
+            <label style="display:block;font-size:13px">Colour options and photos
+              <textarea data-admin-write="true" value="{{ variantsText }}" onChange="{{ setVariantsText }}" rows="5" placeholder="Yellow | p18-4.jpg&#10;Blue | uploads/blue-heart.jpg" style="display:block;width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;font:inherit"></textarea>
+            </label><p style="margin:0;font-size:12px;color:var(--mut)">One colour per line: Colour | photo path, second photo path. Use existing website image paths. Leave empty to remove options. Colours share this product's price and stock.</p>
             <div style="display:flex;gap:10px;align-items:center">
               <button data-admin-write="true" onClick="{{ saveProduct }}" style="padding:10px 18px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#8E3F1E">Save product</button>
               <button data-admin-write="true" onClick="{{ clearProduct }}" style="padding:10px 16px;border:1px solid var(--line);border-radius:6px;background:none;font-size:13px;cursor:pointer">Clear</button>
@@ -617,7 +620,12 @@ class Component extends DCLogic {
     if (!d.name || !String(d.name).trim()) return this.setState({ addError: "Product name is required." });
     const code = (d.code && String(d.code).trim()) || ("KJ-NEW-" + (this.state.products.length + 1));
     const existing = this.state.products.find(p => p.code === code);
-    const rec = {
+    let variants = existing?.variants || [];
+    if(d.variantsText !== undefined) {
+      try { variants = d.variantsText.trim() ? d.variantsText.trim().split('\n').map(line => { const [label,...paths] = line.split('|'); const images=paths.join('|').split(',').map(x=>x.trim()).filter(Boolean); if(!label.trim() || !images.length) throw new Error(); return {label:label.trim(),images}; }) : []; }
+      catch (_) { return this.setState({addError:'Use one colour per line: Colour | image1.jpg, image2.jpg'}); }
+    }
+    const rec = { variants,
       sno: existing ? existing.sno : this.state.products.length + 1,
       code, name: String(d.name).trim(),
       cat: d.cat || "NA", unit: d.unit || "pcs",
@@ -913,6 +921,8 @@ class Component extends DCLogic {
       lowRows,
       addFields, addPreview, addError: S.addError,
       addHeading: existingDraft ? "Editing " + existingDraft.name : "New product",
+      variantsText: d.variantsText === undefined ? (existingDraft?.variants || []).map(v => v.label + ' | ' + v.images.join(', ')).join('\n') : d.variantsText,
+      setVariantsText: e => this.setState({draft:{...this.state.draft,variantsText:e.target.value}}),
       saveProduct: () => this.saveDraft(), clearProduct: () => this.setState({ draft: {}, addError: "" }),
       entry: S.entry, entryFields, entryPreview, entryError: S.entryError, isSale,
       onEntryCode: eset("code"), onEntryKind: eset("kind"),
@@ -939,3 +949,4 @@ class Component extends DCLogic {
 </script>
 </body>
 </html>
+
