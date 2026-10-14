@@ -23,9 +23,9 @@ CATALOGUE_FIXES={
  'KJ-SPL-901':{'name':'Crystal Bling Bottle','price':1699},
 }
 CATALOGUE_ADDITIONS=[
- ('KJ-MAT-511','Pear Beaded Accent Coaster Set','Mats','kj-mat-511.png',300,'set'),
- ('KJ-MAT-512','Pearl Hexagon Coaster Set','Mats','kj-mat-512.png',300,'set'),
- ('KJ-MAT-513','Blush Crystal Coaster Set','Mats','kj-mat-513.png',400,'set'),
+ ('KJ-MAT-511','Pear Beaded Accent Coaster Set','Coasters & Mats','kj-mat-511.png',300,'set'),
+ ('KJ-MAT-512','Pearl Hexagon Coaster Set','Coasters & Mats','kj-mat-512.png',300,'set'),
+ ('KJ-MAT-513','Blush Crystal Coaster Set','Coasters & Mats','kj-mat-513.png',400,'set'),
 ]
 PRODUCT_CODE_RENAMES=[
  ('KJ-WEB-029','KJ-SLG-301',None),
@@ -180,8 +180,9 @@ def catalog(connect):
   cats=json.loads(db.execute("SELECT value FROM content WHERE key='collections'").fetchone()[0])
   for r in rows:
    if r['category'] not in [c[0] for c in cats]:cats.append([r['category'],'Handcrafted pieces','assets/kalajay-brand.png'])
+  variants={row['product_code']:json.loads(row['record']).get('variants',[]) for row in db.execute('SELECT product_code,record FROM inventory')}
   sold=dict(db.execute('SELECT product_code,COALESCE(SUM(quantity),0) FROM order_items GROUP BY product_code').fetchall())
-  return {'cityCount':db.execute("SELECT value FROM shared_meta WHERE key='city_count'").fetchone()[0], 'memberCount':team.count(db), 'collections':cats,'products':[[r['name'],r['image'],r['category'],r['product_code']] for r in rows], 'prices':{r['product_code']:r['price'] for r in rows},'soldOut':[r['product_code'] for r in rows if r['sold_out']], 'soldCounts':sold, 'defaultPrice':500}
+  return {'cityCount':db.execute("SELECT value FROM shared_meta WHERE key='city_count'").fetchone()[0], 'memberCount':team.count(db), 'collections':cats,'products':[[r['name'],r['image'],r['category'],r['product_code']] for r in rows], 'prices':{r['product_code']:r['price'] for r in rows},'soldOut':[r['product_code'] for r in rows if r['sold_out']], 'soldCounts':sold, 'defaultPrice':500,'variants':variants}
 
 def state(connect):
  with connect() as db:
@@ -204,6 +205,15 @@ def update(connect,data):
   seen.add(p['code'])
   for k in ('name','cat','unit','hsn','upd'):
    if not isinstance(p.get(k),str) or len(p[k])>300:raise ValueError('Invalid product '+k)
+  variants=p.get('variants',[])
+  if not isinstance(variants,list) or len(variants)>30:raise ValueError('Maximum 30 colour options per product.')
+  labels=set()
+  for v in variants:
+   if not isinstance(v,dict) or not isinstance(v.get('label'),str) or not 1<=len(v['label'].strip())<=80 or v['label'].strip().lower() in labels:raise ValueError('Colour names must be unique and non-empty.')
+   labels.add(v['label'].strip().lower())
+   if not isinstance(v.get('images'),list) or not 1<=len(v['images'])<=12:raise ValueError('Each colour needs 1 to 12 image paths.')
+   for image in v['images']:
+    if not isinstance(image,str) or not image or len(image)>500 or '..' in image or not re.fullmatch(r'[A-Za-z0-9_./ -]+',image):raise ValueError('Use a local website image path for each colour.')
   if not p['name'].strip():raise ValueError('Product name required.')
   for k in NUMBERS:
    if type(p.get(k)) not in (int,float) or not math.isfinite(p[k]) or not 0<=p[k]<=1e9:raise ValueError('Invalid non-negative '+k)
@@ -229,6 +239,7 @@ def update(connect,data):
     db.execute('INSERT INTO products VALUES (?,?,?,?,?,?,?,?,?)',(code,p['name'],p['cat'],image,p['sp'],0,2000+i,1,1))
    p['image']=image or (old['image'] if old else '')
    old_inv=db.execute('SELECT record FROM inventory WHERE product_code=?',(code,)).fetchone()
+   if 'variants' not in p and old_inv:p['variants']=json.loads(old_inv[0]).get('variants',[])
    # Availability follows inventory once inventory quantities are actually changed.
    if old_inv and any(p[k]!=json.loads(old_inv[0]).get(k,0) for k in ('open','purch','made','sold','dmg')):
     db.execute('UPDATE products SET sold_out=? WHERE product_code=?',(int(stock(p)<=0),code))
@@ -286,3 +297,4 @@ def confirm(connect,oid):
   db.execute("UPDATE orders SET status='confirmed' WHERE id=?",(oid,))
   db.execute("UPDATE shared_meta SET value=value+1 WHERE key='revision'")
  return {'status':'confirmed'}
+

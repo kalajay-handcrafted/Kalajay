@@ -3,6 +3,7 @@
 <head>
 <base href="/">
 <meta charset="utf-8">
+<title>Kalajay</title>
 <link rel="icon" type="image/svg+xml" href="/assets/favicons/letter-a.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/letter-a-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicons/letter-a-180.png">
@@ -43,6 +44,7 @@
 </style>
 </helmet>
 <div class="kj-compact" id="top" style="display:flow-root;padding-bottom:60px">
+
 <sc-if value="{{ intro }}" hint-placeholder-val="{{ false }}">
   <div class="kj-veil" style="position:fixed;inset:0;z-index:200;background:#F7F0DE;display:flex;align-items:center;justify-content:center;overflow:hidden">
     <video class="kj-intro-video" autoplay muted playsinline preload="auto" aria-label="Kalajay elephants and lotus animation" style="display:block;width:min(720px,96vw);height:auto;max-height:90vh;object-fit:contain">
@@ -55,11 +57,11 @@
 <header class="kj-header" style="position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px); border-bottom: 1px solid #E7DCC2; background-color: #FBF7E8F0">
 <div class="kj-mobile-announcement" aria-label="Announcements"><div class="kj-mobile-ticker"><div>Handcrafted : One at a time ❤️ · Ships across India · Handmade to order · Free delivery for orders above INR 599 · Hand-strung beauty ·</div><div aria-hidden="true">Handcrafted : One at a time ❤️ · Ships across India · Handmade to order · Free delivery for orders above INR 599 · Hand-strung beauty ·</div></div></div>
   <div class="kj-header-inner" style="max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 24px; justify-content: space-between">
-    <details class="kj-mobile-menu"><summary aria-label="Navigation menu"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></summary><nav aria-label="Mobile navigation"><a href="/#top">Home</a><a href="/shop">Shop</a><a href="/hampers">Gift hampers</a><a href="/story">Our story</a><a href="/returns">Returns</a></nav></details>
+    <details class="kj-mobile-menu"><summary aria-label="Navigation menu"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></summary><nav aria-label="Mobile navigation"><a href="/#top">Home</a><a href="/shop">Shop</a><a href="/hampers">Gifts &amp; Celebrations</a><a href="/story">Our story</a><a href="/returns">Returns</a></nav></details>
     <a href="/" style="display:flex;align-items:center;gap:12px;min-width:0">
       <img class="kj-logo" src="assets/wordmark-vector.svg" alt="Kalajay" style="width: 120px; height: auto; object-fit: contain; object-position: left center; display: block; flex: none">
     </a>
-<nav class="kj-nav kj-desktop-nav" aria-label="Main navigation"><a href="/#top">Home</a><a href="/hampers">Gift hampers</a><a href="/story">Our story</a><a href="/returns">Returns</a><details class="shop-menu"><summary>Shop</summary><div><sc-for list="{{ categoryOptions }}" as="o"><a href="{{ o.href }}">{{ o.name }}</a></sc-for></div></details></nav><div class="kj-header-actions"><form class="kj-search" onSubmit="{{ searchCatalogue }}" role="search" style="position:relative;display:flex;align-items:center;flex:none">
+<nav class="kj-nav kj-desktop-nav" aria-label="Main navigation"><a href="/#top">Home</a><a href="/hampers">Gifts &amp; Celebrations</a><a href="/story">Our story</a><a href="/returns">Returns</a><details class="shop-menu"><summary>Shop</summary><div><sc-for list="{{ categoryOptions }}" as="o"><a href="{{ o.href }}">{{ o.name }}</a></sc-for></div></details></nav><div class="kj-header-actions"><form class="kj-search" onSubmit="{{ searchCatalogue }}" role="search" style="position:relative;display:flex;align-items:center;flex:none">
         <input type="search" enterkeyhint="search" value="{{ query }}" onChange="{{ setQuery }}" placeholder="search" aria-label="Search the catalogue" style="font:inherit;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;width:150px;padding:12px 18px 12px 42px;border-radius:999px;border:1px solid #C6B491;background:transparent;color:#40291C;outline:none;transition:width .3s cubic-bezier(.4,0,.2,1),border-color .2s ease,background .2s ease" style-hover="width:300px;border-color:#A9482A" style-focus="width:300px;border-color:#A9482A;background:#FFFDF6">
         <button class="kj-search-submit" type="submit" aria-label="Search products"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg></button>
       </form><button class="kj-cart-button" onClick="{{ openCart }}" aria-label="Open cart" style="font:inherit;font-size:14px;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:9px;background:transparent;border:1px solid #C6B491;color:#40291C;padding:11px 18px;border-radius:999px;cursor:pointer" style-hover="border-color:#A9482A;color:#A9482A">
@@ -74,28 +76,29 @@
 <sc-if value="{{ isHome }}">
 <section class="kj-home-hero" style="max-width:1200px;margin:0 auto;padding:64px 24px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:48px;align-items:center">
   <div>
-    <img class="kj-brand-emblem" src="/assets/favicons/elephants.svg" alt="Kalajay elephants" width="64" height="64">
-<p style="font-size:12px;letter-spacing:0.3em;text-transform:uppercase;color:#8A6318;margin:0 0 22px">HAND-CRAFTED : ONE AT A TIME ❤️</p>
+
     
-    <h1 style="font-family: 'Prata',serif; font-size: clamp(40px,6vw,72px); line-height: 1.04; margin: 0 0 24px; color: #40291C; text-wrap: pretty">Piece by Piece,<br><span style="color: rgb(169, 72, 42); font-size: 65px; font-family: 'Caveat', cursive">Handcrafted with Love</span></h1><p style="font-size:17px;line-height:1.7;max-width:46ch;color:#5B4331;margin:0 0 34px;text-wrap:pretty">Kalajay is a small, Mumbai-based business creating handcrafted pieces that bring a little beauty to your everyday. Each piece is made by hand with love and care, with subtle differences that make it uniquely yours. No two are quite the same!</p>
-<section class="kj-best-sellers" aria-labelledby="best-sellers-heading">
-  <h2 id="best-sellers-heading">Best sellers</h2>
-  <div class="kj-featured-list"><sc-for list="{{ bestSellers }}" as="p" hint-placeholder-count="4">
-    <a href="{{ p.href }}" class="kj-featured-card"><img src="{{ p.img }}" alt="{{ p.name }}" fetchpriority="high"><span>{{ p.name }}</span><strong>{{ p.priceLabel }}</strong></a>
-  </sc-for></div>
-</section>
+    <h1 style="font-family: 'Prata',serif; font-size: clamp(40px,6vw,72px); line-height: 1.04; margin: 0 0 24px; color: #40291C; text-wrap: pretty"><span style="color: rgb(169, 72, 42); font-size: 65px; font-family: 'Caveat', cursive">Handcrafted with Love,</span><br>One at a Time <span class="kj-theme-heart" aria-label="love">♥</span></h1>
+
     <div class="kj-hero-cta" style="display:flex;gap:14px;flex-wrap:wrap">
       <a href="/shop" style="background:#A9482A;color:#FBF7E8;padding:16px 30px;border-radius:999px;font-size:13px;letter-spacing:0.18em;text-transform:uppercase" style-hover="background:#8E3A20;color:#FBF7E8">View the catalogue</a>
       <a href="/#custom" style="border:1px solid #C6B491;color:#40291C;padding:16px 30px;border-radius:999px;font-size:13px;letter-spacing:0.18em;text-transform:uppercase" style-hover="border-color:#A9482A;color:#A9482A">Custom orders</a>
     </div>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+  <div class="kj-hero-images" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<img class="kj-home-mark" src="/assets/logo-emblem.svg" alt="Kalajay elephants and lotus">
     <img src="v2/p6-4.jpg" alt="Pearl beaded mini tote bag" style="width:100%;height:100%;min-height:240px;object-fit:cover;border-radius:200px 200px 8px 8px;grid-row:span 2">
     <img src="v2/p3-2.jpg" alt="Pearl beaded jewellery box with mirror" style="width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:8px">
     <img src="v2/p16-3.jpg" alt="Lilac beaded tealight holders" style="width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:8px 8px 200px 200px">
   </div>
 </section>
 
+<section class="kj-best-sellers" aria-labelledby="best-sellers-heading">
+  <h2 id="best-sellers-heading">Best sellers</h2>
+  <div class="kj-featured-list"><sc-for list="{{ bestSellers }}" as="p" hint-placeholder-count="4">
+    <a href="{{ p.href }}" class="kj-featured-card"><img src="{{ p.img }}" alt="{{ p.name }}" fetchpriority="high"><span>{{ p.name }}</span><strong>{{ p.priceLabel }}</strong></a>
+  </sc-for></div>
+</section>
 <section id="collections" style="max-width:1200px;margin:0 auto;padding:88px 24px 0">
   <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:40px">
     <h2 style="font-family: 'Prata',serif; font-size: clamp(30px,4vw,44px); margin: 0; color: #9E5430">Pretty Little Collection</h2>
@@ -164,14 +167,15 @@
 </sc-if>
 <sc-if value="{{ isHampers }}">
 <section id="hampers" style="max-width:1100px;margin:0 auto;padding:64px 24px 0">
-  <p style="margin:0 0 16px;font-size:13px"><a href="/#top">Home</a> / Gift Hampers</p>
-  <h1 style="font-family:'Prata',serif;font-size:clamp(30px,4vw,44px);margin:0 0 18px;color:#40291C">Custom Gift Hampers</h1>
-  <div class="kj-hamper-actions"><a href="#contact" style="display:inline-flex;margin:0 0 16px;background:#A9482A;color:#FBF7E8;padding:14px 24px;border-radius:999px;font-size:13px;letter-spacing:.16em;text-transform:uppercase">Enquire for hampers</a><a href="/uploads/Kalajay_Catalog_S.pdf" download="Kalajay-Catalogue.pdf" class="kj-catalogue-download">Download catalogue (PDF)</a></div>
+  <p style="margin:0 0 16px;font-size:13px"><a href="/#top">Home</a> / Gifts &amp; Celebrations</p>
+  <h1 style="font-family:'Prata',serif;font-size:clamp(30px,4vw,44px);margin:0 0 18px;color:#40291C">Gifts &amp; Celebrations</h1>
+  <div class="kj-hamper-actions"><a href="#contact" style="display:inline-flex;margin:0 0 16px;background:#A9482A;color:#FBF7E8;padding:14px 24px;border-radius:999px;font-size:13px;letter-spacing:.16em;text-transform:uppercase">Enquire about gifting</a><a href="/uploads/Kalajay_Catalog_S.pdf" download="Kalajay-Catalogue.pdf" class="kj-catalogue-download">Download catalogue (PDF)</a></div>
   <p style="font-size:17px;line-height:1.7;color:#5B4331;max-width:68ch;margin:0 0 32px">Choose handcrafted pieces, colours, quantities, packaging style, and note cards. We prepare wedding favours, festive hampers, corporate gifting sets, and personalised beadwork bundles.</p>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px">
-    <div style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p18-4.jpg" alt="Beaded charms for hampers" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Wedding Favours</h2><p style="margin:0;color:#5B4331;line-height:1.6">Charm sets, coin bags, coasters, and keepsakes matched to your event palette.</p></div></div>
-    <div style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p6-4.jpg" alt="Beaded mini tote gift" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Corporate Gifts</h2><p style="margin:0;color:#5B4331;line-height:1.6">Desk organisers, pen stands, pouches, and branded notes for teams and clients.</p></div></div>
-    <div style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p19-2.jpg" alt="Crochet pieces for festive hampers" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Festive Sets</h2><p style="margin:0;color:#5B4331;line-height:1.6">Mix beadwork, crochet, candles, and personalised pieces into one ready-to-gift hamper.</p></div></div>
+    <div id="wedding" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p18-4.jpg" alt="Beaded charms for hampers" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Wedding favours</h2><p style="margin:0;color:#5B4331;line-height:1.6">Charm sets, coin bags, coasters, and keepsakes matched to your event palette.</p></div></div>
+    <div id="corporate" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p6-4.jpg" alt="Beaded mini tote gift" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Corporate gifting</h2><p style="margin:0;color:#5B4331;line-height:1.6">Desk organisers, pen stands, pouches, and branded notes for teams and clients.</p></div></div>
+    <div id="festive" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p19-2.jpg" alt="Crochet pieces for festive hampers" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Festive gift hampers</h2><p style="margin:0;color:#5B4331;line-height:1.6">Mix beadwork, crochet, candles, and personalised pieces into one ready-to-gift hamper.</p></div></div>
+    <div id="personalised" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p3-2.jpg" alt="Personalised handcrafted gifts" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:Prata,serif;font-size:22px;margin:0 0 8px">Custom pieces</h2><p style="margin:0;color:#5B4331;line-height:1.6">Choose colours, materials and finishing details for a piece made especially for you.</p></div></div>
   </div>
   
 </section>
@@ -245,23 +249,24 @@
 <section id="custom" style="max-width:1200px;margin:0 auto;padding:88px 24px 0">
   <h2 style="font-family:'Prata',serif;font-size:clamp(30px,4vw,44px);margin:0 0 40px;color:#40291C">Ask for something of your own</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px">
-    <div style="border:1px solid #E7DCC2;border-radius:6px;padding:32px;background:#fff">
+    <a href="/hampers#personalised" style="display:block;border:1px solid #E7DCC2;border-radius:6px;padding:24px;background:#fff">
       <h3 style="font-family:'Prata',serif;font-size:24px;margin:0 0 12px;color:#A9482A">Custom pieces</h3>
       <p style="margin:0;font-size:16px;line-height:1.7;color:#5B4331">Pick your beads or yarn or cloth and colours and we can customise the products you need!</p>
-    </div>
-    <div style="border:1px solid #E7DCC2;border-radius:6px;padding:32px;background:#fff">
+    </a>
+    <a href="/hampers#wedding" style="display:block;border:1px solid #E7DCC2;border-radius:6px;padding:24px;background:#fff">
       <h3 style="font-family:'Prata',serif;font-size:24px;margin:0 0 12px;color:#A9482A">Wedding favours</h3>
       <p style="margin:0;font-size:16px;line-height:1.7;color:#5B4331">Beaded charms, coin bag, sling bags coasters, crocheted flower and much more, in your palette, boxed and ready.</p>
-    </div>
-    <div style="border:1px solid #E7DCC2;border-radius:6px;padding:32px;background:#fff">
+    </a>
+    <a href="/hampers#corporate" style="display:block;border:1px solid #E7DCC2;border-radius:6px;padding:24px;background:#fff">
       <h3 style="font-family:'Prata',serif;font-size:24px;margin:0 0 12px;color:#A9482A">Corporate gifting</h3>
       <p style="margin:0;font-size:16px;line-height:1.7;color:#5B4331">Desk organisers, coaster sets and pen holders and much more - minimum 25 pieces, GST invoice included.</p>
-    </div>
+    </a>
+    <a href="/hampers#festive" style="display:block;border:1px solid #E7DCC2;border-radius:6px;padding:24px;background:#fff"><h3 style="font-family:Prata,serif;font-size:24px;margin:0 0 12px;color:#A9482A">Festive gift hampers</h3><p style="margin:0;color:#5B4331">Thoughtful handcrafted gifts for Diwali and every celebration, packed together with care.</p></a>
   </div>
 </section>
 
 </sc-if>
-<sc-if value="{{ isHome }}">
+<sc-if value="{{ isStory }}">
 <section id="cities-map" aria-label="Kalajay artisan and dispatch locations" style="max-width:1100px;margin:0 auto;padding:88px 24px 0">
 
   <div style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;padding:24px;display:grid;grid-template-columns:1fr;gap:24px;align-items:center">
@@ -269,18 +274,18 @@
       <path d="M317 42 286 65 279 104 251 132 269 170 246 207 257 249 230 287 248 330 232 367 263 403 306 420 338 468 383 450 397 404 434 380 421 337 454 303 437 256 462 218 430 184 438 139 397 116 374 77Z" fill="#F5EFDB" stroke="#C6B491" stroke-width="3"></path>
       <circle cx="384" cy="178" r="15" fill="#A9482A"></circle>
       <text x="405" y="171" font-family="Jost, sans-serif" font-size="22" fill="#40291C">Bihar</text>
-      <text x="405" y="196" font-family="Jost, sans-serif" font-size="14" fill="#5B4331">Ratanpur · Chandwara</text>
+      <text x="405" y="196" font-family="Jost, sans-serif" font-size="14" fill="#5B4331">Design.Production</text>
       <circle cx="285" cy="384" r="15" fill="#2F6F5E"></circle>
       <text x="120" y="376" font-family="Jost, sans-serif" font-size="22" fill="#40291C">Mumbai</text>
-      <text x="120" y="401" font-family="Jost, sans-serif" font-size="14" fill="#5B4331">Design · dispatch · customers</text>
+      <text x="120" y="401" font-family="Jost, sans-serif" font-size="14" fill="#5B4331">Inventory.Dispatch</text>
       <path d="M374 190 C326 235 296 302 288 369" fill="none" stroke="#A9482A" stroke-width="3" stroke-dasharray="8 8"></path>
       <text x="315" y="282" font-family="Jost, sans-serif" font-size="28" fill="#A9482A" transform="rotate(38 315 282)">✈</text>
     </svg>
       <p style="font-size:12px;letter-spacing:.25em;text-transform:uppercase;color:#8A6318;margin:0 0 16px">Cities involved</p>
-  <h2 style="font-family:'Prata',serif;font-size:clamp(28px,4vw,40px);margin:0 0 26px;color:#40291C">From Bihar’s artisan communities to Mumbai homes</h2>
+  <h2 style="font-family:'Prata',serif;font-size:clamp(28px,4vw,40px);margin:0 0 26px;color:#40291C">The hands and places behind Kalajay</h2>
     <div style="display:grid;gap:10px;color:#5B4331;font-size:16px;line-height:1.7">
-      <p style="margin:0"><strong style="color:#40291C">Bihar:</strong> Ratanpur and Chandwara teams bring patient handwork and craft skill to Kalajay pieces.</p>
-      <p style="margin:0"><strong style="color:#40291C">Mumbai:</strong> product planning, customer conversations, packing, dispatch, and gifting coordination come together here.</p>
+      <p style="margin:0"><strong style="color:#40291C">Bihar:</strong> Design and production bring our handcrafted pieces to life.</p>
+      <p style="margin:0"><strong style="color:#40291C">Mumbai:</strong> Product planning, customer conversations, packing, dispatch, and gifting coordination come together here.</p>
     </div>
   </div>
 </section>
@@ -386,11 +391,14 @@
 </sc-if>
 
 <sc-if value="{{ active }}" hint-placeholder-val="{{ false }}">
-  <div onClick="{{ close }}" style="position:fixed;inset:0;z-index:50;background:rgba(64,41,28,0.86);display:flex;align-items:center;justify-content:center;padding:5vh 24px;cursor:zoom-out">
-    <div style="max-width:620px;text-align:center">
-      <img src="{{ activeImg }}" alt="{{ activeName }}" style="max-width:100%;max-height:70vh;object-fit:contain;border-radius:6px;background:#FBF7E8">
-      <p style="font-family:'Prata',serif;font-size:24px;color:#FBF7E8;margin:22px 0 6px">{{ activeName }}</p>
-      <p style="margin:0;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#E0BFA6">{{ activeCat }} · tap anywhere to close</p>
+  <div class="kj-product-overlay" onClick="{{ close }}">
+    <div class="kj-product-dialog" onClick="{{ keepOpen }}" role="dialog" aria-modal="true" aria-label="Product details">
+      <button class="kj-gallery-close" onClick="{{ close }}" aria-label="Close product details">×</button>
+      <img class="kj-gallery-main" src="{{ activeImg }}" alt="{{ activeName }}">
+      <h2>{{ activeName }}</h2><p>{{ activePrice }}</p><p>{{ activeColour }}</p>
+      <div class="kj-gallery-options"><sc-for list="{{ activeColours }}" as="v"><button onClick="{{ v.pick }}" aria-pressed="{{ v.selected }}">{{ v.label }}</button></sc-for></div>
+      <div class="kj-gallery-thumbs"><sc-for list="{{ activeImages }}" as="v"><button onClick="{{ v.pick }}" aria-label="{{ v.label }}"><img src="{{ v.src }}" alt="{{ v.label }}"></button></sc-for></div>
+      <button class="kj-gallery-add" onClick="{{ addActive }}" disabled="{{ activeSoldOut }}">{{ activeAddLabel }}</button>
     </div>
   </div>
 </sc-if>
@@ -402,7 +410,7 @@ const IS_STORY = window.location.pathname.replace(/\/$/, "") === "/story";
 const IS_RETURNS = window.location.pathname.replace(/\/$/, "") === "/returns";
 const IS_HAMPERS = window.location.pathname.replace(/\/$/, "") === "/hampers";
 const cleanText = text => String(text || '').replace(/\u2014/g, '-');
-const categoryName = name => name === 'Special Pieces' ? 'Little Treasures' : cleanText(name);
+const categoryName = name => name === 'Special Pieces' ? 'Little Treasures' : name === 'Mats' ? 'Coasters & Mats' : cleanText(name);
 const INITIAL_PARAMS = new URLSearchParams(window.location.search);
 const { collections: CATS, products: PRODUCTS, soldOut: SOLD_OUT, defaultPrice: DEFAULT_PRICE, prices: PRICES } = window.KALAJAY_DATA;
 const normalizeCatalogue = () => {
@@ -410,14 +418,16 @@ const normalizeCatalogue = () => {
   PRODUCTS.forEach(p => { p[0] = cleanText(p[0]); p[2] = categoryName(p[2]); });
 };
 normalizeCatalogue();
+let VARIANTS = window.KALAJAY_DATA.variants || {};
+const imagePath = path => !path ? "/assets/kalajay-brand.png" : path.includes("/") ? path : "v2/" + path + (/\.[a-z]+$/i.test(path) ? "" : ".jpg");
 const SOLD_COUNTS = window.KALAJAY_DATA.soldCounts || {};
 
 class Component extends DCLogic {
-  state = { cityCount: window.KALAJAY_DATA.cityCount, memberCount: window.KALAJAY_DATA.memberCount, cat: CATS.some(c => c[0] === categoryName(INITIAL_PARAMS.get("category"))) ? categoryName(INITIAL_PARAMS.get("category")) : "All", active: null, cart: {}, cartOpen: false, justAdded: null, q: INITIAL_PARAMS.get("q") || "", sortMode: INITIAL_PARAMS.get("sort") || "az", intro: !IS_SHOP && !IS_STORY && !IS_RETURNS && !IS_HAMPERS && window.location.hash !== "#top", customerName: "", customerPhone: "", customerAddress: "", orderNote: "", orderMessage: "", savingOrder: false };
+  state = { cityCount: window.KALAJAY_DATA.cityCount, memberCount: window.KALAJAY_DATA.memberCount, cat: CATS.some(c => c[0] === categoryName(INITIAL_PARAMS.get("category"))) ? categoryName(INITIAL_PARAMS.get("category")) : "All", active: null, activeImage: 0, cart: {}, cartOpen: false, justAdded: null, q: INITIAL_PARAMS.get("q") || "", sortMode: INITIAL_PARAMS.get("sort") || "az", intro: !IS_SHOP && !IS_STORY && !IS_RETURNS && !IS_HAMPERS && window.location.hash !== "#top", customerName: "", customerPhone: "", customerAddress: "", orderNote: "", orderMessage: "", savingOrder: false };
 
   componentDidMount() {
-    document.title = IS_STORY ? "Our Story | Kalajay" : IS_RETURNS ? "Return & Exchange | Kalajay" : IS_HAMPERS ? "Gift Hampers | Kalajay" : IS_SHOP ? "Shop | Kalajay" : "Kalajay | Handcrafted with care";
-    this._closeShop = e => { document.querySelectorAll('.shop-menu, .kj-mobile-menu').forEach(menu => { if (e.key === 'Escape' || (e.type === 'click' && (!menu.contains(e.target) || e.target.closest('a')))) menu.open = false; }); };
+    document.title = IS_STORY ? "Our Story | Kalajay" : IS_RETURNS ? "Return & Exchange | Kalajay" : IS_HAMPERS ? "Gifts & Celebrations | Kalajay" : IS_SHOP ? "Shop | Kalajay" : "Kalajay";
+    this._closeShop = e => { if(e.key === 'Escape' && this.state.active) this.setState({active:null,galleryImage:null}); document.querySelectorAll('.shop-menu, .kj-mobile-menu').forEach(menu => { if (e.key === 'Escape' || (e.type === 'click' && (!menu.contains(e.target) || e.target.closest('a')))) menu.open = false; }); };
     document.addEventListener('click', this._closeShop);
     document.addEventListener('keydown', this._closeShop);
 
@@ -429,7 +439,7 @@ class Component extends DCLogic {
     try {
       const stored = JSON.parse(sessionStorage.getItem('kalajay-cart') || '{}');
       const cart = {};
-      PRODUCTS.forEach(p => { const item = stored[p[3]]; if (item && Number.isInteger(item.qty) && item.qty > 0) cart[p[3]] = { ...item, code:p[3], name:p[0], cat:p[2], price:PRICES[p[3]] }; });
+      Object.entries(stored).forEach(([key,item]) => { const p=PRODUCTS.find(p=>p[3]===item.code); if(p && Number.isInteger(item.qty) && item.qty>0) cart[key]={...item,key,code:p[3],name:p[0],cat:p[2],price:PRICES[p[3]]}; });
       this.setState({ cart });
     } catch (_) {}
     this._saveCart = () => { try { sessionStorage.setItem('kalajay-cart', JSON.stringify(this.state.cart)); } catch (_) {} };
@@ -438,6 +448,7 @@ class Component extends DCLogic {
     this._catalogueRefresh = () => fetch('/api/catalogue').then(r => r.json()).then(data => {
       CATS.splice(0, CATS.length, ...data.collections);
       PRODUCTS.splice(0, PRODUCTS.length, ...data.products);
+      VARIANTS = data.variants || {};
       normalizeCatalogue();
       SOLD_OUT.splice(0, SOLD_OUT.length, ...data.soldOut);
       Object.keys(PRICES).forEach(k => delete PRICES[k]);
@@ -447,7 +458,7 @@ class Component extends DCLogic {
       const cart = {};
       Object.values(this.state.cart).forEach(item => {
         const product = data.products.find(p => p[3] === item.code);
-        if (product) cart[item.code] = { ...item, name: product[0], cat: product[2], price: data.prices[item.code] };
+        if (product) cart[item.key || item.code] = { ...item, name: product[0], cat: product[2], price: data.prices[item.code] };
       });
       this.setState({ cart, memberCount: data.memberCount, cityCount: data.cityCount });
     }).catch(() => {});
@@ -519,8 +530,9 @@ class Component extends DCLogic {
   componentWillUnmount() { document.removeEventListener("click", this._closeShop); document.removeEventListener("keydown", this._closeShop); if (this._flyingEmblem) this._flyingEmblem.remove(); window.removeEventListener("popstate", this._urlChange); window.removeEventListener("pagehide", this._saveCart); clearInterval(this._catalogueTimer); window.removeEventListener("focus", this._catalogueRefresh); clearTimeout(this._i); clearTimeout(this._t); }
 
   addToCart(p) {
+    const key=p.code + (p.colour ? "::" + p.colour : "");
     this.setState(s => ({
-      cart: { ...s.cart, [p.code]: { ...p, qty: (s.cart[p.code] ? s.cart[p.code].qty : 0) + 1 } },
+      cart: { ...s.cart, [key]: { ...p, key, qty: (s.cart[key] ? s.cart[key].qty : 0) + 1 } },
       justAdded: p.code
     }));
     clearTimeout(this._t);
@@ -544,8 +556,8 @@ class Component extends DCLogic {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customer: { name: this.state.customerName, phone: this.state.customerPhone, address: this.state.customerAddress },
-          note: this.state.orderNote,
-          items: Object.values(this.state.cart).map(i => ({ code: i.code, quantity: i.qty }))
+          note: [this.state.orderNote, ...Object.values(this.state.cart).filter(i => i.colour).map(i => i.code + ": " + i.colour + " × " + i.qty)].filter(Boolean).join("\n"),
+          items: Object.values(Object.values(this.state.cart).reduce((all,i) => { all[i.code]={code:i.code,quantity:(all[i.code]?.quantity || 0)+i.qty};return all; },{}))
         })
       });
       const result = await response.json();
@@ -587,9 +599,9 @@ class Component extends DCLogic {
     return {
       ...p,
       priceLabel: "₹" + p.price.toLocaleString("en-IN"),
-      open: () => this.setState({ active: p }),
-      add: () => (out ? null : this.addToCart(p)),
-      addLabel: out ? "Out of stock" : added ? "Added ✓" : inCart ? "Add another" : "Add to cart",
+      open: () => this.setState({ active: p, activeImage: 0, galleryImage: null }),
+      add: () => (out ? null : VARIANTS[p.code]?.length ? this.setState({ active: p, activeImage: 0, galleryImage: null }) : this.addToCart(p)),
+      addLabel: out ? "Out of stock" : VARIANTS[p.code]?.length ? "Choose colour" : added ? "Added ✓" : inCart ? "Add another" : "Add to cart",
       wrapStyle: {
         display: "flex",
         flexDirection: "column",
@@ -641,6 +653,10 @@ class Component extends DCLogic {
       return a.name.localeCompare(b.name);
     });
     const a = this.state.active;
+    const variants = a ? VARIANTS[a.code] || [] : [];
+    const selectedVariant = variants[this.state.activeImage];
+    const gallery = selectedVariant ? selectedVariant.images : a ? [a.img] : [];
+
     const accent = this.props.accentColor || "#A9482A";
     const cartItems = Object.values(this.state.cart);
     const count = cartItems.reduce((n, i) => n + i.qty, 0);
@@ -716,8 +732,9 @@ class Component extends DCLogic {
       cartItems: cartItems.map(i => ({
         ...i,
         priceLine: this.inr(i.price) + " × " + i.qty + " = " + this.inr(i.price * i.qty),
-        inc: () => this.bump(i.code, 1),
-        dec: () => this.bump(i.code, -1)
+        name: i.name + (i.colour ? " (" + i.colour + ")" : ""),
+        inc: () => this.bump(i.key || i.code, 1),
+        dec: () => this.bump(i.key || i.code, -1)
       })),
       cartSummary: count === 0 ? "No pieces added yet" : count + (count === 1 ? " piece" : " pieces") + " on your list",
       cartSubtotalLabel: this.inr(subtotal),
@@ -727,7 +744,7 @@ class Component extends DCLogic {
       cartWaLink: this.waLink(
         cartItems.length
           ? "Hi Kalajay! I'd like to order:\n" +
-            cartItems.map(i => "• " + i.name + " × " + i.qty + " - " + this.inr(i.price * i.qty)).join("\n") +
+            cartItems.map(i => "• " + i.name + (i.colour ? " (" + i.colour + ")" : "") + " × " + i.qty + " - " + this.inr(i.price * i.qty)).join("\n") +
             "\nDelivery: " + (delivery ? this.inr(delivery) : "Free") +
             "\nThe cart value is " + this.inr(total) + "."
           : "Hi Kalajay! I'd like a quote on a few pieces."
@@ -736,10 +753,18 @@ class Component extends DCLogic {
         ? shown.length + (shown.length === 1 ? " piece matching “" : " pieces matching “") + this.state.q.trim() + "”"
         : shown.length + (cat === "All" ? " pieces" : " pieces in " + cat),
       active: !!a,
-      activeImg: a ? a.img : "",
+      activeImg: this.state.galleryImage || (selectedVariant ? imagePath(selectedVariant.images[0]) : a ? a.img : ""),
+      activePrice: a ? this.inr(a.price) : "",
+      activeColour: selectedVariant ? "Colour: " + selectedVariant.label : "",
+      activeColours: variants.map((v,i) => ({label:v.label, selected:i===this.state.activeImage, pick:() => this.setState({activeImage:i, galleryImage:null})})),
+      activeImages: gallery.map((src,i) => ({src:imagePath(src),label:"View image " + (i+1),pick:() => this.setState({galleryImage:imagePath(src)})})),
+      keepOpen: e => e.stopPropagation(),
+      activeSoldOut: a ? a.soldOut : true,
+      activeAddLabel: a && a.soldOut ? "Out of stock" : "Add to cart",
+      addActive: () => { if(a && !a.soldOut) { this.addToCart({...a, colour:selectedVariant?.label || ""}); this.setState({active:null,galleryImage:null}); } },
       activeName: a ? a.name : "",
       activeCat: a ? a.cat : "",
-      close: () => this.setState({ active: null })
+      close: () => this.setState({ active: null, galleryImage: null })
     };
   }
 }
@@ -747,3 +772,4 @@ class Component extends DCLogic {
 </script>
 </body>
 </html>
+
