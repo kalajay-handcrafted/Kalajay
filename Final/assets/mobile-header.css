@@ -271,3 +271,10 @@
  #custom .kj-custom-link {margin-top:auto;padding-top:4px;font-size:12px;color:#A9482A;letter-spacing:.02em;}
  #custom a:focus-visible {outline:2px solid #A9482A;outline-offset:3px;}
 }
+
+/* Laptop emblem sits in the text column, outside the product-photo collage. */
+.kj-laptop-mark {display:none;}
+@media(min-width:761px) {
+ .kj-home-hero .kj-home-mark {display:none;}
+ .kj-home-hero .kj-laptop-mark {display:block;width:92px;height:52px;object-fit:contain;margin:0 0 14px;padding:0;background:transparent;border:0;border-radius:0;}
+}
