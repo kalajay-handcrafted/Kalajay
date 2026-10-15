@@ -1,0 +1,29 @@
+name: Expense integration checks
+on:
+  pull_request:
+    paths:
+      - 'Final/expense*'
+      - 'Final/backend.py'
+      - 'Final/test_expenses.py'
+      - '.github/workflows/expenses.yml'
+permissions:
+  contents: read
+jobs:
+  expenses:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test expense storage, imports and authentication
+        working-directory: Final
+        run: python3 -m unittest -v test_expenses
+      - name: Compile backend modules
+        working-directory: Final
+        run: python3 -m py_compile backend.py expense_store.py expense_import.py expense_bootstrap.py expense_library_transfer.py
+      - name: Check expense page JavaScript
+        run: |
+          node - <<'JS'
+          const fs = require('fs');
+          const vm = require('vm');
+          const html = fs.readFileSync('Final/expenses.html', 'utf8');
+          new vm.Script(html.match(/<script>([\s\S]*?)<\/script>/)[1]);
+          JS
