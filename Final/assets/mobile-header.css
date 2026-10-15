@@ -291,3 +291,7 @@ body::before {
  body::before {background-size:90vw auto;background-position:center bottom 16vh;}
  .kj-home-hero > div:first-child {padding-right:0;}
 }
+
+/* Keep the watermark centred in the viewport on mobile and laptop. */
+body::before {background-position:center center;opacity:.06;}
+@media(max-width:760px) {body::before {background-position:center center;}}
