@@ -688,6 +688,7 @@ class Component extends DCLogic {
       { label: "Overview", items: [["dash", "Dashboard", lows.length ? String(lows.length) : ""]] },
       { label: "Inventory", items: [["grid", "Master inventory", String(P.length)], ["low", "Low stock", lows.length ? String(lows.length) : ""], ["add", "Add / edit product", ""]] },
       { label: "Transactions", items: [["prod", "Production entry", ""], ["sale", "Sale entry", ""], ["purch", "Purchase / stock-in", ""]] },
+      { label: "Finance", items: [["expenses", "Expenses", ""]] },
       { label: "Insights", items: [["reports", "Reports", ""]] },
       { label: "People", items: [["team", "Team Members", ""]] }
     ].map(g => ({
@@ -695,7 +696,7 @@ class Component extends DCLogic {
       items: g.items.map(it => {
         const on = screen === it[0];
         return {
-          label: it[1], badge: it[2], go: () => this.setState({ screen: it[0], entryError: "", addError: "" }),
+          label: it[1], badge: it[2], go: () => it[0] === "expenses" ? window.location.assign("/erp/expenses") : this.setState({ screen: it[0], entryError: "", addError: "" }),
           bg: on ? "#322B24" : "transparent", fg: on ? "#FFFFFF" : "#C9BCAC",
           mark: on ? accent : "transparent",
           badgeBg: it[2] && it[0] === "low" && lows.length ? "#5A2A18" : "transparent",

@@ -9,6 +9,9 @@ import shared_store as shared
 import website_refresh
 import team_store as team
 import auth_store as auth
+import expense_store as expenses
+import expense_import
+import expense_bootstrap
 import catalogue_excel as excel
 import subprocess, tempfile
 from datetime import datetime, timezone
@@ -50,6 +53,10 @@ def initialize():
     website_refresh.migrate(connect, ROOT)
     team.initialize(connect)
     auth.initialize(connect, DATA_DIR)
+    expenses.initialize(connect, DATA_DIR)
+    expense_bootstrap.run(connect, DATA_DIR)
+    with connect() as db:
+        db.execute('INSERT OR REPLACE INTO content VALUES (?,?)', ('expense_page', (ROOT/'expenses.html').read_text()))
 
 def catalogue():
     return shared.catalog(connect)
@@ -113,6 +120,19 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/erp/accounts':return self.erp_page((ROOT/'auth.html').read_text())
             with connect() as db:return self.send(200,[dict(row) for row in db.execute('SELECT username,role FROM auth_users ORDER BY username')])
         if path=='/erp/auth.js':return self.send(200,(ROOT/'erp-auth.js').read_text(),'application/javascript')
+        if path in ('/erp/expenses', '/erp/expenses/'):
+            with connect() as db:
+                return self.erp_page(db.execute("SELECT value FROM content WHERE key='expense_page'").fetchone()[0])
+        if path == '/api/erp/expenses':
+            return self.send(200, expenses.state(connect))
+        if path == '/api/erp/expenses/backup':
+            return self.send(200, expenses.backup(connect, DATA_DIR), headers={'Content-Disposition':'attachment; filename=Kalajay-expenses.json'})
+        if path.startswith('/api/erp/expenses/bills/'):
+            try:
+                raw, mime = expenses.bill(connect, DATA_DIR, path.rsplit('/', 1)[-1])
+                return self.send(200, raw, mime, {'Content-Security-Policy':"sandbox", 'Content-Disposition':'attachment'})
+            except ValueError:
+                return self.send(404, {'error':'Bill not found.'})
         if path == '/erp/team':
             return self.erp_page((ROOT/'team.html').read_text())
         if path == '/api/erp/cities':
@@ -151,6 +171,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         if not self.valid_host():return self.send(400, {"error":"Invalid host."})
+        if self.path in ('/api/erp/expenses', '/api/erp/expenses/import-xlsx'):
+            return self.expenses_post()
         if self.path.startswith('/api/auth/'):
             return self.auth_post()
         if self.path not in ('/api/erp/cities', '/api/erp/team', '/api/orders', '/api/erp', '/api/erp/confirm', '/api/catalogue/import-preview', '/api/catalogue/import'):
@@ -199,6 +221,41 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(400, {'error': str(error)})
         except sqlite3.Error:
             return self.send(503, {'error': 'Could not save your order. Please try again.'})
+
+    def expenses_post(self):
+        user = auth.current(connect, self.headers.get('Cookie'))
+        if not user:
+            return self.send(401, {'error':'Please sign in to ERP.'})
+        if user['role'] != 'admin':
+            return self.send(403, {'error':'Managers have view-only access.'})
+        if self.headers.get('Origin') != self.expected_origin():
+            return self.send(403, {'error':'Same-origin request required.'})
+        try:
+            size = int(self.headers.get('Content-Length', '0'))
+            if not 0 < size <= 25000000:
+                return self.send(413, {'error':'Expense upload must be under 25 MB.'})
+            content_type = self.headers.get('Content-Type', '').split(';')[0]
+            if self.path == '/api/erp/expenses/import-xlsx':
+                if content_type != 'application/octet-stream' or size > 5000000:
+                    return self.send(415, {'error':'Upload an XLSX workbook under 5 MB.'})
+                revision = int(self.headers.get('X-Expense-Revision', '-1'))
+                entries = expense_import.read_workbook(self.rfile.read(size))
+                current = expenses.state(connect)
+                if current['revision'] != revision:
+                    raise expenses.Conflict('Expenses changed. Reload before importing.')
+                merged, count = expense_import.merge(current['book'], entries)
+                result = expenses.update(connect, DATA_DIR, {'revision':revision,'book':merged}, user['username'])
+                return self.send(200, {**result, 'imported':count})
+            if content_type != 'application/json':
+                return self.send(415, {'error':'JSON required.'})
+            request = json.loads(self.rfile.read(size))
+            return self.send(200, expenses.update(connect, DATA_DIR, request, user['username']))
+        except expenses.Conflict as error:
+            return self.send(409, {'error':str(error)})
+        except (ValueError, UnicodeError) as error:
+            return self.send(400, {'error':str(error)})
+        except (sqlite3.Error, OSError):
+            return self.send(503, {'error':'Unable to save expenses. Your previous records are unchanged.'})
 
     def auth_post(self):
         if self.headers.get('Origin') != self.expected_origin():
