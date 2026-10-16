@@ -1,5 +1,6 @@
 """Private team directory; only its aggregate count is included in public catalogue data."""
 import uuid, json
+import team_images
 from datetime import date
 FIELDS=('name','capacity','member_code','membership_type','phone','email','address','date_of_birth','emergency_name','emergency_phone','notes')
 def initialize(connect):
@@ -17,10 +18,11 @@ def count(db):
     return db.execute("SELECT value FROM shared_meta WHERE key='team_baseline'").fetchone()[0] + db.execute('SELECT COALESCE(SUM(active-existing_member),0) FROM team_members').fetchone()[0]
 def state(connect):
     with connect() as db:
-        members=[dict(json.loads(r['details']),id=r['id'],name=r['name'],capacity=r['capacity'],joined_on=r['joined_on'],existing_member=bool(r['existing_member']),active=bool(r['active'])) for r in db.execute('SELECT * FROM team_members ORDER BY name COLLATE NOCASE')]
+        images=team_images.attachments(db)
+        members=[dict(json.loads(r['details']),images=images.get(r['id'],[]),id=r['id'],name=r['name'],capacity=r['capacity'],joined_on=r['joined_on'],existing_member=bool(r['existing_member']),active=bool(r['active'])) for r in db.execute('SELECT * FROM team_members ORDER BY name COLLATE NOCASE')]
         baseline=db.execute("SELECT value FROM shared_meta WHERE key='team_baseline'").fetchone()[0]
         return dict(count=count(db), baseline=baseline,unregistered=baseline-sum(m['existing_member'] for m in members),members=members)
-def add(connect,data):
+def add(connect,data,image_root=None):
     if not isinstance(data,dict): raise ValueError('Member details required.')
     clean={}
     for key in FIELDS:
@@ -46,4 +48,7 @@ def add(connect,data):
         registered=db.execute('SELECT COUNT(*) FROM team_members WHERE existing_member=1 AND id<>?',(member_id,)).fetchone()[0]
         if data['existing_member'] and registered>=baseline: raise ValueError('All 21 existing members have already been registered.')
         db.execute('INSERT INTO team_members VALUES (?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,capacity=excluded.capacity,joined_on=excluded.joined_on,details=excluded.details,existing_member=excluded.existing_member,active=excluded.active',(member_id,clean['name'],clean['capacity'],joined,json.dumps(clean),int(data['existing_member']),int(data['active'])))
+        if 'images' in data:
+            if image_root is None: raise ValueError('Image storage is unavailable.')
+            team_images.save(db,image_root,member_id,data['images'],data.get('image_ids'))
     return state(connect)
