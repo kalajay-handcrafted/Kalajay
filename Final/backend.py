@@ -8,6 +8,7 @@ import uuid
 import shared_store as shared
 import website_refresh
 import team_store as team
+import team_images
 import auth_store as auth
 import expense_store as expenses
 import expense_import
@@ -52,6 +53,7 @@ def initialize():
     shared.migrate(connect, ROOT, ERP_ROOT)
     website_refresh.migrate(connect, ROOT)
     team.initialize(connect)
+    team_images.initialize(connect, DATA_DIR)
     auth.initialize(connect, DATA_DIR)
     expenses.initialize(connect, DATA_DIR)
     expense_bootstrap.run(connect, DATA_DIR)
@@ -137,6 +139,15 @@ class Handler(BaseHTTPRequestHandler):
             return self.erp_page((ROOT/'team.html').read_text())
         if path == '/api/erp/cities':
             return self.send(200, team.cities(connect))
+        if path.startswith('/api/erp/team/images/'):
+            parts = path.split('/')
+            if len(parts) != 7:
+                return self.send(404, {'error':'Image not found.'})
+            try:
+                raw, mime = team_images.read(connect, DATA_DIR, parts[5], parts[6])
+                return self.send(200, raw, mime, {'Content-Disposition':'inline', 'Content-Security-Policy':'sandbox'})
+            except ValueError:
+                return self.send(404, {'error':'Image not found.'})
         if path == '/api/erp/team':
             return self.send(200, team.state(connect))
         if path in ('/erp', '/erp/', '/erp/index.html'):
@@ -201,13 +212,13 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(415, {'error': 'JSON required.'})
         try:
             size = int(self.headers.get('Content-Length', '0'))
-            if not 0 < size <= (5000000 if self.path == '/api/erp' else 32768):
+            if not 0 < size <= (5000000 if self.path in ('/api/erp', '/api/erp/team') else 32768):
                 return self.send(413, {'error': 'Invalid request size.'})
             data = json.loads(self.rfile.read(size))
             if self.path == '/api/erp/cities':
                 return self.send(200, team.cities(connect, data))
             if self.path == '/api/erp/team':
-                return self.send(200, team.add(connect, data))
+                return self.send(200, team.add(connect, data, DATA_DIR))
             if self.path == '/api/erp':
                 return self.send(200, shared.update(connect, data))
             if self.path == '/api/erp/confirm':

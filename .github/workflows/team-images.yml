@@ -1,0 +1,32 @@
+name: Employee image checks
+on:
+  pull_request:
+    paths:
+      - 'Final/team*'
+      - 'Final/test_team_images.py'
+      - 'Final/backend.py'
+      - '.github/workflows/team-images.yml'
+permissions:
+  contents: read
+jobs:
+  employee-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test private employee attachments and expense regressions
+        working-directory: Final
+        run: python3 -m unittest -v test_team_images test_expenses
+      - name: Compile changed Python modules
+        working-directory: Final
+        run: python3 -m py_compile backend.py team_store.py team_images.py
+      - name: Check employee page JavaScript
+        run: |
+          node - <<'JS'
+          const fs = require('fs'), vm = require('vm'), assert = require('assert');
+          const html = fs.readFileSync('Final/team.html','utf8');
+          new vm.Script(html.match(/<script>([\s\S]*?)<\/script>/)[1]);
+          assert(html.includes('id="member-images"'));
+          assert(html.includes('<th>Images</th>'));
+          assert(html.includes('images:structuredClone(memberImages)'));
+          assert(html.includes('image_ids:originalImageIds.slice()'));
+          JS
