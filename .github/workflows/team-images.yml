@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install application dependencies
+        run: python3 -m pip install -r Final/requirements.txt
       - name: Test private employee attachments and expense regressions
         working-directory: Final
         run: python3 -m unittest -v test_team_images test_expenses
