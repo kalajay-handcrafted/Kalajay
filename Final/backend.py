@@ -9,6 +9,7 @@ import shared_store as shared
 import website_refresh
 import team_store as team
 import team_images
+import product_images
 import auth_store as auth
 import expense_store as expenses
 import expense_import
@@ -108,6 +109,11 @@ class Handler(BaseHTTPRequestHandler):
         if not self.valid_host(): return self.send(400, {'error':'Invalid host.'})
         path = unquote(urlsplit(self.path).path)
         if path == '/healthz':return self.send(200, {'status':'ok'})
+        if path.startswith('/media/products/'):
+            try:
+                return self.send(200, product_images.read(DATA_DIR, path[len('/media/products/'):]), 'image/webp')
+            except ValueError:
+                return self.send(404, {'error':'Image not found.'})
         if path == '/' and self.headers.get('Host','').split(':')[0].lower() == 'erp.kalajay.in':
             return self.send(302, '', 'text/plain', {'Location':'/erp/'})
         if path in ('/erp/login','/erp/setup'):
@@ -186,7 +192,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.expenses_post()
         if self.path.startswith('/api/auth/'):
             return self.auth_post()
-        if self.path not in ('/api/erp/cities', '/api/erp/team', '/api/orders', '/api/erp', '/api/erp/confirm', '/api/catalogue/import-preview', '/api/catalogue/import'):
+        if self.path not in ('/api/erp/product-image', '/api/erp/cities', '/api/erp/team', '/api/orders', '/api/erp', '/api/erp/confirm', '/api/catalogue/import-preview', '/api/catalogue/import'):
             return self.send(404, {'error': 'Not found'})
         origin = self.headers.get('Origin')
         if origin and origin != self.expected_origin():
@@ -196,6 +202,21 @@ class Handler(BaseHTTPRequestHandler):
             if not user:return self.send(401,{'error':'Please sign in to ERP.'})
             if user['role']!='admin':return self.send(403,{'error':'Managers have view-only access.'})
             if origin != self.expected_origin():return self.send(403,{'error':'Same-origin request required.'})
+        if self.path == '/api/erp/product-image':
+            try:
+                size = int(self.headers.get('Content-Length', '0'))
+                if not 0 < size <= product_images.MAX_BYTES:
+                    return self.send(413, {'error':'Choose an image under 8 MB.'})
+                if self.headers.get('Content-Type', '').split(';')[0] not in ('image/jpeg', 'image/png', 'image/webp', 'application/octet-stream'):
+                    return self.send(415, {'error':'Choose a JPG, PNG or WebP image.'})
+                raw = self.rfile.read(size)
+                if len(raw) != size:
+                    raise ValueError('Upload was interrupted. Please try again.')
+                return self.send(201, product_images.save(DATA_DIR, raw))
+            except ValueError as error:
+                return self.send(400, {'error':str(error)})
+            except OSError:
+                return self.send(503, {'error':'Could not store this image. Please try again.'})
         if self.path in ('/api/catalogue/import-preview', '/api/catalogue/import'):
             try:
                 size = int(self.headers.get('Content-Length', '0'))
@@ -300,3 +321,4 @@ if __name__ == '__main__':
     initialize()
     print(f'Kalajay running at http://127.0.0.1:{args.port}', flush=True)
     ThreadingHTTPServer(('0.0.0.0' if PRODUCTION else '127.0.0.1', args.port), Handler).serve_forever()
+
