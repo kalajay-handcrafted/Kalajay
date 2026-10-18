@@ -532,7 +532,7 @@ class Component extends DCLogic {
   componentWillUnmount() { document.removeEventListener("click", this._closeShop); document.removeEventListener("keydown", this._closeShop); if (this._flyingEmblem) this._flyingEmblem.remove(); window.removeEventListener("popstate", this._urlChange); window.removeEventListener("pagehide", this._saveCart); clearInterval(this._catalogueTimer); window.removeEventListener("focus", this._catalogueRefresh); clearTimeout(this._i); clearTimeout(this._t); }
 
   addToCart(p) {
-    const key=p.code + (p.colour ? "::" + p.colour : "");
+    const key=p.code + (p.variantCode ? "::" + p.variantCode : p.colour ? "::" + p.colour : "");
     this.setState(s => ({
       cart: { ...s.cart, [key]: { ...p, key, qty: (s.cart[key] ? s.cart[key].qty : 0) + 1 } },
       justAdded: p.code
@@ -558,8 +558,8 @@ class Component extends DCLogic {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customer: { name: this.state.customerName, phone: this.state.customerPhone, address: this.state.customerAddress },
-          note: [this.state.orderNote, ...Object.values(this.state.cart).filter(i => i.colour).map(i => i.code + ": " + i.colour + " × " + i.qty)].filter(Boolean).join("\n"),
-          items: Object.values(Object.values(this.state.cart).reduce((all,i) => { all[i.code]={code:i.code,quantity:(all[i.code]?.quantity || 0)+i.qty};return all; },{}))
+          note: [this.state.orderNote, ...Object.values(this.state.cart).filter(i => i.colour).map(i => (i.variantCode || i.code) + ": " + i.colour + " × " + i.qty)].filter(Boolean).join("\n"),
+          items: Object.values(Object.values(this.state.cart).reduce((all,i) => { const row=all[i.code] || {code:i.code,quantity:0,varieties:[]};row.quantity+=i.qty;if(i.variantCode)row.varieties.push({code:i.variantCode,quantity:i.qty});all[i.code]=row;return all; },{}))
         })
       });
       const result = await response.json();
@@ -603,7 +603,7 @@ class Component extends DCLogic {
       priceLabel: "₹" + p.price.toLocaleString("en-IN"),
       open: () => this.setState({ active: p, activeImage: 0, galleryImage: null }),
       add: () => (out ? null : VARIANTS[p.code]?.length ? this.setState({ active: p, activeImage: 0, galleryImage: null }) : this.addToCart(p)),
-      addLabel: out ? "Out of stock" : VARIANTS[p.code]?.length ? "Choose colour" : added ? "Added ✓" : inCart ? "Add another" : "Add to cart",
+      addLabel: out ? "Out of stock" : VARIANTS[p.code]?.length ? "Choose option" : added ? "Added ✓" : inCart ? "Add another" : "Add to cart",
       wrapStyle: {
         display: "flex",
         flexDirection: "column",
@@ -757,13 +757,13 @@ class Component extends DCLogic {
       active: !!a,
       activeImg: this.state.galleryImage || (selectedVariant ? imagePath(selectedVariant.images[0]) : a ? a.img : ""),
       activePrice: a ? this.inr(a.price) : "",
-      activeColour: selectedVariant ? "Colour: " + selectedVariant.label : "",
+      activeColour: selectedVariant ? selectedVariant.label + " · " + (selectedVariant.code || a.code) : "",
       activeColours: variants.map((v,i) => ({label:v.label, selected:i===this.state.activeImage, pick:() => this.setState({activeImage:i, galleryImage:null})})),
       activeImages: gallery.map((src,i) => ({src:imagePath(src),label:"View image " + (i+1),pick:() => this.setState({galleryImage:imagePath(src)})})),
       keepOpen: e => e.stopPropagation(),
       activeSoldOut: a ? a.soldOut : true,
       activeAddLabel: a && a.soldOut ? "Out of stock" : "Add to cart",
-      addActive: () => { if(a && !a.soldOut) { this.addToCart({...a, colour:selectedVariant?.label || ""}); this.setState({active:null,galleryImage:null}); } },
+      addActive: () => { if(a && !a.soldOut) { this.addToCart({...a, colour:selectedVariant?.label || "", variantCode:selectedVariant?.code || "", img:selectedVariant ? imagePath(selectedVariant.images[0]) : a.img}); this.setState({active:null,galleryImage:null}); } },
       activeName: a ? a.name : "",
       activeCat: a ? a.cat : "",
       close: () => this.setState({ active: null, galleryImage: null })
@@ -774,4 +774,5 @@ class Component extends DCLogic {
 </script>
 </body>
 </html>
+
 

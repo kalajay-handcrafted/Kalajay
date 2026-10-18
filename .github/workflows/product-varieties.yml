@@ -1,0 +1,26 @@
+name: Product varieties and income checks
+on:
+  pull_request:
+    paths:
+      - 'Final/shared_store.py'
+      - 'Final/erp/index.html'
+      - 'Final/index.html'
+      - 'Final/expenses.html'
+      - 'Final/test_product_varieties.py'
+      - 'Final/test_erp_varieties.js'
+      - '.github/workflows/product-varieties.yml'
+permissions:
+  contents: read
+jobs:
+  varieties-and-income:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install application dependencies
+        run: python3 -m pip install -r Final/requirements.txt
+      - name: Test numbered varieties, order snapshots, uploads and income
+        working-directory: Final
+        run: python3 -m unittest -v test_product_varieties test_product_images
+      - name: Check ERP variety and income forms
+        working-directory: Final
+        run: node test_erp_varieties.js

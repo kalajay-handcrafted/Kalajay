@@ -186,7 +186,7 @@
                 <tr style="border-bottom:1px solid #F2EBE1;background:{{ r.rowBg }}" style-hover="background:#FBF4EA">
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;color:var(--mut);text-align:right">{{ r.sno }}</td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;white-space:nowrap;color:#4A4038">{{ r.code }}</td>
-                  <td style="padding:4px 6px;min-width:280px"><div style="display:flex;align-items:center;gap:8px"><img src="{{ r.imageSrc }}" alt="" style="width:38px;height:38px;object-fit:cover;border-radius:4px;border:1px solid var(--line);background:#F6EFE5;flex:none"><input data-admin-write="true" value="{{ r.name }}" onChange="{{ r.onName }}" style="width:100%;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-weight:500" style-hover="border-color:var(--line)"></div></td>
+                  <td style="padding:4px 6px;min-width:280px"><div style="display:flex;align-items:center;gap:8px"><img src="{{ r.imageSrc }}" alt="" style="width:38px;height:38px;object-fit:cover;border-radius:4px;border:1px solid var(--line);background:#F6EFE5;flex:none"><button data-admin-write="true" onClick="{{ r.editOptions }}" title="Edit product colours and varieties" style="font-size:11px;padding:4px;white-space:nowrap">Edit options</button><input data-admin-write="true" value="{{ r.name }}" onChange="{{ r.onName }}" style="width:100%;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-weight:500" style-hover="border-color:var(--line)"></div></td>
                   <td style="padding:4px 6px"><select data-admin-write="true" aria-label="Product category" value="{{ r.cat }}" onChange="{{ r.onCat }}" style="width:150px;border:1px solid var(--line);border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px"><option value="">Select category</option><sc-for list="{{ categoryChoices }}" as="category"><option value="{{ category }}">{{ category }}</option></sc-for></select></td>
                   <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.unit }}" onChange="{{ r.onUnit }}" style="width:52px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;text-align:center" style-hover="border-color:var(--line)"></td>
                   <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.hsn }}" onChange="{{ r.onHsn }}" style="width:62px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace" style-hover="border-color:var(--line)"></td>
@@ -286,9 +286,26 @@
                 </label>
               </sc-for>
             </div>
-            <label style="display:block;font-size:13px">Colour options and photos
-              <textarea data-admin-write="true" value="{{ variantsText }}" onChange="{{ setVariantsText }}" rows="5" placeholder="Yellow | p18-4.jpg&#10;Blue | uploads/blue-heart.jpg" style="display:block;width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;font:inherit"></textarea>
-            </label><p style="margin:0;font-size:12px;color:var(--mut)">One colour per line: Colour | photo path, second photo path. Use existing website image paths. Leave empty to remove options. Colours share this product's price and stock.</p>
+            <section style="border-top:1px solid var(--line);padding-top:14px;display:grid;gap:12px">
+              <h3 style="margin:0;font-size:15px">Colours and varieties</h3>
+              <label style="font-size:13px">Add options to an existing product
+                <select data-admin-write="true" value="{{ editingProductCode }}" onChange="{{ selectOptionProduct }}" style="display:block;width:100%;padding:8px;margin-top:5px;border:1px solid var(--line);border-radius:6px">
+                  <option value="">Choose a product, or fill in a new product above</option>
+                  <sc-for list="{{ productOptions }}" as="p"><option value="{{ p.code }}">{{ p.label }}</option></sc-for>
+                </select>
+              </label>
+              <p style="margin:0;font-size:12px;color:var(--mut)">Add a colour, size or variety with its own photos. Numbered codes are assigned automatically. Options appear together on the website and share this product's price and stock.</p>
+              <sc-for list="{{ variantRows }}" as="v">
+                <div style="padding:12px;border:1px solid var(--line);border-radius:6px;display:grid;gap:8px">
+                  <strong style="font-size:12px">{{ v.code }}</strong>
+                  <label style="font-size:12px">Colour / variety name<input data-admin-write="true" value="{{ v.label }}" onChange="{{ v.onLabel }}" placeholder="e.g. Yellow or Large" style="display:block;width:100%;padding:8px;border:1px solid var(--line);border-radius:5px"></label>
+                  <label style="font-size:12px">Add a photo<input data-admin-write="true" type="file" accept="image/jpeg,image/png,image/webp" onChange="{{ v.onUpload }}" style="display:block;max-width:100%;margin-top:5px"></label>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ v.photos }}" as="photo"><div><img src="{{ photo.src }}" alt="Variety photo" style="width:80px;height:80px;object-fit:contain;border-radius:4px"><button data-admin-write="true" onClick="{{ photo.remove }}" style="display:block;font-size:11px">Remove photo</button></div></sc-for></div>
+                  <button data-admin-write="true" onClick="{{ v.remove }}" style="justify-self:start;font-size:12px;padding:5px 9px">Remove option</button>
+                </div>
+              </sc-for>
+              <button data-admin-write="true" onClick="{{ addVariant }}" style="justify-self:start;padding:9px 12px;border:1px solid var(--accent);border-radius:6px;background:none;color:var(--accent)">+ Add colour / variety</button>
+            </section>
             <div style="display:flex;gap:10px;align-items:center">
               <button data-admin-write="true" onClick="{{ saveProduct }}" style="padding:10px 18px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#8E3F1E">{{ saveProductLabel }}</button>
               <button data-admin-write="true" onClick="{{ clearProduct }}" style="padding:10px 16px;border:1px solid var(--line);border-radius:6px;background:none;font-size:13px;cursor:pointer">Clear</button>
@@ -629,11 +646,26 @@ class Component extends DCLogic {
     this.commit(products, [txn].concat(this.state.txns), type + " of " + qty + " " + p.unit + " recorded for " + p.name);
   }
 
-  async uploadProductImage(e) {
+  draftVariants() {
+    const d=this.state.draft;
+    return d.variants === undefined ? (this.state.products.find(p=>p.code===(d.code||'').trim())?.variants || []) : d.variants;
+  }
+  editVariant(index, changes) {
+    this.setState({draft:{...this.state.draft,variants:this.draftVariants().map((v,i)=>i===index?{...v,...changes}:v)}});
+  }
+  editOptionProduct(code) {
+    const product=this.state.products.find(p=>p.code===code);
+    if (!product) return;
+    if (this._imageUploading) return this.setState({addError:'Wait for the image upload to finish.'});
+    this._draftVersion=(this._draftVersion||0)+1;
+    this.setState({draft:{...product,variants:(product.variants||[]).map(v=>({...v,images:v.images.slice()}))},screen:'add',addError:'',imageMessage:'Choose a photo, then save the product.'});
+  }
+  async uploadProductImage(e, variantIndex=null) {
     const input = e.target, file = input.files && input.files[0];
     if (!file) return;
     input.value = '';
-    if (this._imageUploading) return;
+    if (this._imageUploading) return this.setState({imageMessage:'Wait for the current image upload to finish.'});
+    if (variantIndex !== null && this.draftVariants()[variantIndex].images.length >= 12) return this.setState({imageMessage:'Use up to 12 photos per option.'});
     if (file.size > 8 * 1024 * 1024) return this.setState({imageMessage:'Choose an image under 8 MB.'});
     this._imageUploading = true;
     const draftVersion = this._draftVersion || 0;
@@ -642,7 +674,11 @@ class Component extends DCLogic {
       const response = await fetch('/api/erp/product-image', {method:'POST', headers:{'Content-Type':file.type || 'application/octet-stream'}, body:file});
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Image upload failed. Please try again.');
-      if (draftVersion === (this._draftVersion || 0)) this.setState({draft:{...this.state.draft,image:data.image}, imageMessage:'Image ready. Click Save product to use it on the website.'});
+      if (draftVersion === (this._draftVersion || 0)) {
+        if (variantIndex === null) this.setState({draft:{...this.state.draft,image:data.image}});
+        else this.editVariant(variantIndex,{images:[...this.draftVariants()[variantIndex].images,data.image]});
+        this.setState({imageMessage:'Image ready. Click Save product to use it on the website.'});
+      }
     } catch (error) {
       if (draftVersion === (this._draftVersion || 0)) this.setState({imageMessage:error.message});
     } finally {
@@ -657,16 +693,14 @@ class Component extends DCLogic {
     if (!d.name || !String(d.name).trim()) return this.setState({ addError: "Product name is required." });
     const code = (d.code && String(d.code).trim()) || ("KJ-NEW-" + (this.state.products.length + 1));
     const existing = this.state.products.find(p => p.code === code);
-    let variants = existing?.variants || [];
-    if(d.variantsText !== undefined) {
-      try { variants = d.variantsText.trim() ? d.variantsText.trim().split('\n').map(line => { const [label,...paths] = line.split('|'); const images=paths.join('|').split(',').map(x=>x.trim()).filter(Boolean); if(!label.trim() || !images.length) throw new Error(); return {label:label.trim(),images}; }) : []; }
-      catch (_) { return this.setState({addError:'Use one colour per line: Colour | image1.jpg, image2.jpg'}); }
-    }
+    const variants=this.draftVariants();
+    if (variants.length>30 || variants.some(v=>!v.label.trim() || !v.images.length)) return this.setState({addError:'Each colour / variety needs a name and at least one photo (up to 30 options).'});
+    if (new Set(variants.map(v=>v.label.trim().toLowerCase())).size!==variants.length) return this.setState({addError:'Use a different name for each colour / variety.'});
     const rec = { variants,
       sno: existing ? existing.sno : this.state.products.length + 1,
       code, name: String(d.name).trim(),
       cat: d.cat || existing?.cat || "NA", unit: d.unit || "pcs",
-      image: d.image || (existing ? existing.image || "" : ""),
+      image: d.image || (existing ? existing.image || "" : "") || variants[0]?.images[0] || "",
       hsn: d.hsn || "NA", gst: this.num(d.gst),
       open: this.num(d.open), purch: 0, made: this.num(d.made), sold: this.num(d.sold), dmg: this.num(d.dmg),
       reorder: this.num(d.reorder), cp: this.num(d.cp), sp: this.num(d.sp), mrp: this.num(d.mrp),
@@ -789,6 +823,7 @@ class Component extends DCLogic {
         stockBg: st <= 0 ? "#F6E2DA" : low ? "#FAEFD9" : "#E7F1EC",
         stockFg: st <= 0 ? "#9B2F16" : low ? "#8A6206" : "#25604F",
         rowBg: st <= 0 ? "#FDF7F4" : "transparent",
+        editOptions: () => this.editOptionProduct(p.code),
         onName: txt(p.code, "name"), onCat: txt(p.code, "cat"), onUnit: txt(p.code, "unit"),
         onHsn: txt(p.code, "hsn"), onGst: nm(p.code, "gst"),
         onReorder: nm(p.code, "reorder"), onCp: nm(p.code, "cp"), onSp: nm(p.code, "sp"), onMrp: nm(p.code, "mrp"),
@@ -967,8 +1002,19 @@ class Component extends DCLogic {
       saveProductLabel: S.imageUploading ? 'Uploading image…' : 'Save product',
       hasProductImage: !!productImagePreview, productImagePreview, imageMessage: S.imageMessage,
       addHeading: existingDraft ? "Editing " + existingDraft.name : "New product",
-      variantsText: d.variantsText === undefined ? (existingDraft?.variants || []).map(v => v.label + ' | ' + v.images.join(', ')).join('\n') : d.variantsText,
-      setVariantsText: e => this.setState({draft:{...this.state.draft,variantsText:e.target.value}}),
+      editingProductCode: existingDraft?.code || '',
+      selectOptionProduct: e => this.editOptionProduct(e.target.value),
+      variantRows: (() => {
+        let sequence=Math.max(existingDraft?.variantSequence || 0,...(existingDraft?.variants || []).map((v,i)=>Number((v.code||'').split('-').pop()) || i+1),0);
+        return this.draftVariants().map((v,index)=>({
+          code:v.code || ((d.code||'Product code')+'-'+(++sequence)),label:v.label,
+          onLabel:e=>this.editVariant(index,{label:e.target.value}),
+          onUpload:e=>this.uploadProductImage(e,index),
+          photos:v.images.map((path,i)=>({src:/^(\/|https?:)/.test(path)?path:'/v2/'+path+(path.indexOf('.')<0?'.jpg':''),remove:()=>{if(this._imageUploading)return;this.editVariant(index,{images:v.images.filter((_,j)=>i!==j)})}})),
+          remove:()=>{if(this._imageUploading)return;this.setState({draft:{...this.state.draft,variants:this.draftVariants().filter((_,i)=>i!==index)}})}
+        }));
+      })(),
+      addVariant: () => { if(this._imageUploading)return;const variants=this.draftVariants();if(variants.length>=30)return this.setState({addError:'Use up to 30 colours / varieties.'});this.setState({draft:{...this.state.draft,variants:[...variants,{label:'',images:[]}]}}); },
       saveProduct: () => this.saveDraft(), clearProduct: () => { this._draftVersion = (this._draftVersion || 0) + 1; this.setState({ draft: {}, addError: "", imageMessage: 'JPG, PNG or WebP, up to 8 MB. Choose a photo, then save the product.' }); },
       entry: S.entry, entryFields, entryPreview, entryError: S.entryError, isSale,
       onEntryCode: eset("code"), onEntryKind: eset("kind"),
@@ -984,7 +1030,7 @@ class Component extends DCLogic {
       excelReady: S.excelReady,
       previewExcel: e => this.previewExcel(e),
       applyExcel: () => this.applyExcel(),
-      sharedOrders: S.orders.map(o => ({ ...o, customerLabel: o.customer.name + ' · ' + o.customer.phone, address: o.customer.address, summary: o.items.map(i => i.product_code + ' · ' + i.name_snapshot + ' × ' + i.quantity).join('; '), amount: this.inr(o.total), pending: o.status === 'new', confirm: () => this.confirmOrder(o.id) })),
+      sharedOrders: S.orders.map(o => ({ ...o, customerLabel: o.customer.name + ' · ' + o.customer.phone, address: o.customer.address, summary: o.items.map(i => i.product_code + ' · ' + i.name_snapshot + ' × ' + i.quantity + (i.varieties?.length ? ' [' + i.varieties.map(v=>v.code+' '+v.label+' × '+v.quantity).join(', ') + ']' : '')).join('; '), amount: this.inr(o.total), pending: o.status === 'new', confirm: () => this.confirmOrder(o.id) })),
       importBrowserBackup: () => this.importBrowserBackup(),
       exportBackup: () => this.exportBackup(),
       importBackup: e => this.importBackup(e),
@@ -995,6 +1041,7 @@ class Component extends DCLogic {
 </script>
 </body>
 </html>
+
 
 
 
