@@ -327,6 +327,29 @@
                 </label>
               </sc-for>
             </div>
+            <section aria-label="Product costing" style="border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;gap:12px">
+              <h3 style="margin:0;font-size:17px">Materials &amp; cost price</h3>
+              <label style="display:grid;gap:6px;font-size:13px">Beads Used
+                <input data-admin-write="true" value="{{ draftBeadsUsed }}" onChange="{{ setDraftBeadsUsed }}" maxlength="2000" placeholder="Bead names / types used in this product" style="width:100%;padding:9px;border:1px solid var(--line);border-radius:6px;background:#fff">
+              </label>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+                <sc-for list="{{ costingFields }}" as="f">
+                  <label style="display:grid;gap:6px;font-size:13px">{{ f.label }}
+                    <input data-admin-write="true" type="number" min="0" step="any" inputmode="decimal" value="{{ f.value }}" onInput="{{ f.onChange }}" placeholder="0" style="width:100%;padding:9px;border:1px solid var(--line);border-radius:6px;background:#fff">
+                  </label>
+                </sc-for>
+              </div>
+              <label style="display:grid;gap:6px;font-size:13px">Notes
+                <textarea data-admin-write="true" value="{{ draftCostNotes }}" onChange="{{ setDraftCostNotes }}" maxlength="4000" rows="3" placeholder="Materials, making instructions or other product notes" style="width:100%;padding:9px;border:1px solid var(--line);border-radius:6px;background:#fff;resize:vertical"></textarea>
+              </label>
+              <div style="background:#F4EDE3;border-radius:6px;padding:12px">
+                <label style="display:grid;gap:6px;font-size:13px">CP — Cost price (₹)
+                  <input readonly aria-label="Calculated cost price" value="{{ draftCostPrice }}" style="width:100%;padding:9px;border:1px solid var(--line);border-radius:6px;background:#fff;font-weight:600">
+                </label>
+                <p style="margin:8px 0 0;font-size:12px;color:var(--mut)">CP = (Cost of 1kg beads × Quantity of beads in kg) + (₹50 × Labor Hour) + Other Material Cost</p>
+                <p style="margin:6px 0 0;font-size:12px;color:var(--mut)">{{ draftCostMessage }}</p>
+              </div>
+            </section>
             <section style="border-top:1px solid var(--line);padding-top:14px;display:grid;gap:12px">
               <h3 style="margin:0;font-size:15px">Colours and varieties</h3>
               <label style="font-size:13px">Add options to an existing product
@@ -742,6 +765,10 @@ class Component extends DCLogic {
     if (!d.name || !String(d.name).trim()) return this.setState({ addError: "Product name is required." });
     const code = (d.code && String(d.code).trim()) || ("KJ-NEW-" + (this.state.products.length + 1));
     const existing = this.state.products.find(p => p.code === code);
+    for (const key of ['beadKg','beadCostKg','laborHours','otherMaterialCost']) {
+      const value = Number(d[key] ?? 0);
+      if (!Number.isFinite(value) || value < 0) return this.setState({addError:'Costing quantities, costs and labor hours must be zero or greater.'});
+    }
     const variants=this.draftVariants();
     if (variants.length>30 || variants.some(v=>!v.label.trim() || !v.images.length)) return this.setState({addError:'Each colour / variety needs a name and at least one photo (up to 30 options).'});
     if (new Set(variants.map(v=>v.label.trim().toLowerCase())).size!==variants.length) return this.setState({addError:'Use a different name for each colour / variety.'});
@@ -952,8 +979,12 @@ class Component extends DCLogic {
       ["Unit", "unit", "pcs"],
       ["HSN", "hsn", "NA"], ["GST %", "gst", "0"], ["Opening stock", "open", "0"],
       ["Qty made", "made", "0"], ["Qty sold", "sold", "0"], ["Damaged", "dmg", "0"],
-      ["Reorder level", "reorder", "0"], ["Beads Used", "beadsUsed", "Bead type / name"], ["Quantity of beads (kg)", "beadKg", "0"], ["Cost of 1kg beads ₹", "beadCostKg", "0"], ["Labor Hour", "laborHours", "0"], ["Other Material Cost ₹", "otherMaterialCost", "0"], ["Notes", "notes", "Notes"], ["SP ₹", "sp", "0"], ["MRP ₹", "mrp", "0"]
+      ["Reorder level", "reorder", "0"], ["SP ₹", "sp", "0"], ["MRP ₹", "mrp", "0"]
     ].map(f => ({ label: f[0], hint: f[2], value: d[f[1]] === undefined ? "" : d[f[1]], onChange: dset(f[1]) }));
+    const costingFields = [
+      ["Quantity of beads (in kg)", "beadKg"], ["Cost of 1kg beads (₹)", "beadCostKg"],
+      ["Labor Hour", "laborHours"], ["Other Material Cost (₹)", "otherMaterialCost"]
+    ].map(([label,key])=>({label,value:d[key] ?? "",onChange:dset(key)}));
     const dcp = this.num(d.cp), dsp = this.num(d.sp);
     const dstock = this.num(d.open) + this.num(d.purch) + this.num(d.made) - this.num(d.sold) - this.num(d.dmg) + this.num(d.adjustment);
     const addPreview = [
@@ -1051,6 +1082,12 @@ class Component extends DCLogic {
       tValue: this.inr(rows.reduce((s, p) => s + this.stockValue(p), 0)),
       lowRows,
       addFields, addPreview, addError: S.addError,
+      costingFields,
+      draftBeadsUsed:d.beadsUsed||"", setDraftBeadsUsed:dset("beadsUsed"),
+      draftCostNotes:d.notes||"", setDraftCostNotes:dset("notes"),
+      draftCostPrice:dcp.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2}),
+      draftCostMessage: d.costingEnabled ? "Calculated automatically. Labor is charged at ₹50 per hour." : dcp ? "Existing saved CP is shown. Enter costing values to calculate it automatically." : "Enter material quantities, costs and labor hours to calculate CP.",
+
       categoryChoices: cats,
       draftCategory: d.cat === undefined ? (existingDraft?.cat || '') : d.cat,
       setDraftCategory: dset('cat'),
