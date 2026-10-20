@@ -886,7 +886,7 @@ class Component extends DCLogic {
     const nameOf = c => { const p = P.find(x => x.code === c); return p ? p.name : c; };
     const toneOf = t => t === "Sale" ? "#2F6F5E" : t === "Damage" ? "#A4442C" : t === "Purchase" ? "#3A4A7A" : accent;
     const activity = S.txns.slice(0, 7).map(t => ({
-      date: t.date.slice(5), type: t.type, name: nameOf(t.code), qty: (t.type === "Sale" || t.type === "Damage" ? "−" : "+") + t.qty, tone: toneOf(t.type)
+      date: t.date.slice(5), type: t.type, name: nameOf(t.code), qty: t.type === "Adjustment" ? (t.qty < 0 ? "−" : "+") + Math.abs(t.qty) : (t.type === "Sale" || t.type === "Damage" ? "−" : "+") + t.qty, tone: toneOf(t.type)
     }));
 
     const kpis = [
@@ -920,7 +920,7 @@ class Component extends DCLogic {
       ["Reorder level", "reorder", "0"], ["Beads Used", "beadsUsed", "Bead type / name"], ["Quantity of beads (kg)", "beadKg", "0"], ["Cost of 1kg beads ₹", "beadCostKg", "0"], ["Labor Hour", "laborHours", "0"], ["Other Material Cost ₹", "otherMaterialCost", "0"], ["Notes", "notes", "Notes"], ["SP ₹", "sp", "0"], ["MRP ₹", "mrp", "0"]
     ].map(f => ({ label: f[0], hint: f[2], value: d[f[1]] === undefined ? "" : d[f[1]], onChange: dset(f[1]) }));
     const dcp = this.num(d.cp), dsp = this.num(d.sp);
-    const dstock = this.num(d.open) + this.num(d.made) - this.num(d.sold) - this.num(d.dmg);
+    const dstock = this.num(d.open) + this.num(d.purch) + this.num(d.made) - this.num(d.sold) - this.num(d.dmg) + this.num(d.adjustment);
     const addPreview = [
       { label: "CP: kg × cost/kg + ₹50 × labor hours + other materials", value: this.inr(dcp) },
       { label: "Remaining stock", value: String(dstock) },

@@ -6,6 +6,7 @@ import mimetypes
 import sqlite3
 import uuid
 import shared_store as shared
+import stock_reset
 import website_refresh
 import team_store as team
 import team_images
@@ -50,6 +51,7 @@ def initialize():
         db.execute('INSERT OR REPLACE INTO content VALUES (?,?)', ('homepage', (ROOT / 'index.html').read_text()))
     DB.chmod(0o600)
     shared.migrate(connect, ROOT, ERP_ROOT)
+    stock_reset.apply_once(connect, DATA_DIR)
     team.initialize(connect)
     team_images.initialize(connect, DATA_DIR)
     auth.initialize(connect, DATA_DIR)
