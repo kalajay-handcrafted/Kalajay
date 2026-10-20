@@ -25,6 +25,35 @@
   table { border-collapse: collapse; }
   ::-webkit-scrollbar { height: 10px; width: 10px; }
   ::-webkit-scrollbar-thumb { background: #D8CCBB; border-radius: 8px; }
+
+  .inventory-scroll {
+    container-type: inline-size;
+    --pin-sno: min(56px, 7cqw);
+    --pin-code: min(172px, 17cqw);
+    --pin-name: min(360px, 34cqw);
+    --pin-total: calc(var(--pin-sno) + var(--pin-code) + var(--pin-name));
+  }
+  .inventory-grid { border-collapse: separate; border-spacing: 0; table-layout: fixed; width: calc(var(--pin-total) + 3840px) !important; }
+  .inventory-grid th:nth-child(-n+3),
+  .inventory-grid tbody td:nth-child(-n+3) { position: sticky; }
+  .inventory-grid th:nth-child(1), .inventory-grid tbody td:nth-child(1) { left: 0; }
+  .inventory-grid th:nth-child(2), .inventory-grid tbody td:nth-child(2) { left: var(--pin-sno); }
+  .inventory-grid th:nth-child(3), .inventory-grid tbody td:nth-child(3) { left: calc(var(--pin-sno) + var(--pin-code)); box-shadow: 3px 0 4px -3px #7E7266; }
+  .inventory-grid thead th:nth-child(-n+3) { z-index: 6 !important; }
+  .inventory-grid tbody td:nth-child(-n+3) { z-index: 3; background: var(--panel); }
+  .inventory-grid tbody tr:hover td:nth-child(-n+3) { background: #FBF4EA; }
+  .inventory-grid tbody td:nth-child(1), .inventory-grid tbody td:nth-child(2) { overflow-wrap: anywhere; white-space: normal !important; }
+  .inventory-grid tbody td:nth-child(3) { min-width: 0 !important; }
+  .inventory-grid input, .inventory-grid select { max-width: 100%; min-width: 0; }
+  .inventory-grid tbody td:nth-child(3) > div { min-width: 0; }
+  .inventory-grid tbody td:nth-child(3) input { flex: 1; width: 0 !important; }
+  .inventory-grid tfoot td:first-child { position: sticky; left: 0; z-index: 3; background: #F4EDE3; }
+  @container (max-width: 650px) {
+    .inventory-grid tbody td:nth-child(3) img { display: none; }
+    .inventory-grid tbody td:nth-child(3) > div { flex-wrap: wrap; gap: 4px !important; }
+    .inventory-grid tbody td:nth-child(3) input { flex-basis: 100%; width: 100% !important; }
+    .inventory-grid th { white-space: normal !important; overflow-wrap: anywhere; }
+  }
   @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 </style>
 </helmet>
@@ -172,8 +201,14 @@
           <button onClick="{{ exportCsv }}" style="padding:9px 14px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:13px;cursor:pointer" style-hover="border-color:var(--accent);color:var(--accent)">Export CSV</button>
         </div>
         <p style="margin:0;font-size:11.5px;color:var(--mut);font-family:'IBM Plex Mono',monospace">Remaining stock = Opening + Stock-in + Made − Sold − Damaged · {{ rowCount }} rows · white cells are editable in place</p>
-        <div style="overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);max-height:70vh">
-          <table style="width:100%;font-size:12.5px;min-width:1900px">
+        <div class="inventory-scroll" role="region" aria-label="Master inventory — first three columns stay fixed" tabindex="0" style="overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);max-height:70vh">
+          <table class="inventory-grid" style="font-size:12.5px">
+            <colgroup>
+              <col style="width:var(--pin-sno)">
+              <col style="width:var(--pin-code)">
+              <col style="width:var(--pin-name)">
+              <col span="24" style="width:160px">
+            </colgroup>
             <thead>
               <tr style="background:#F4EDE3">
                 <sc-for list="{{ columns }}" as="c" hint-placeholder-count="20">
@@ -216,7 +251,7 @@
             </tbody>
             <tfoot>
               <tr style="background:#F4EDE3;font-weight:600">
-                <td colspan="7" style="padding:var(--pad);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#6B5F52">Totals — {{ rowCount }} products</td>
+                <td colspan="3" style="padding:var(--pad);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#6B5F52">Totals — {{ rowCount }} products</td><td colspan="4"></td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tOpen }}</td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tPurch }}</td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tMade }}</td>
