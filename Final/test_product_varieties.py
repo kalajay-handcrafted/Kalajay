@@ -14,6 +14,13 @@ class VarietyTests(unittest.TestCase):
         self.patches=[patch.object(backend,'DATA_DIR',self.directory),patch.object(backend,'DB',self.directory/'kalajay.sqlite3')]
         for item in self.patches:item.start()
         backend.initialize()
+        # Tests own their fixture; production startup no longer imports old catalogues.
+        current=shared.state(backend.connect)
+        self.assertEqual(current['products'], [])
+        product=shared.record('KJ-FIXTURE-001','Fixture product','Bags')
+        product.update(sp=200,cp=100)
+        current['products']=[product]
+        shared.update(backend.connect,current)
     def tearDown(self):
         for item in reversed(self.patches):item.stop()
         self.temp.cleanup()
@@ -54,6 +61,24 @@ class VarietyTests(unittest.TestCase):
         with self.assertRaises(ValueError):shared.save_order(backend.connect,data)
         backend.initialize()
         self.assertEqual(shared.catalog(backend.connect)['variants'][code][0]['code'],code+'-2')
+    def test_current_inventory_survives_restarts_without_old_catalogue(self):
+        current=shared.state(backend.connect)
+        product=current['products'][0]
+        product.update(name='Current edited name', sp=123, beadKg=.25, beadCostKg=800, laborHours=1.5, otherMaterialCost=25, notes='Keep current notes')
+        current=self.save(current)
+        self.assertEqual(current['products'][0]['cp'],300)
+        backend.initialize()
+        current=shared.state(backend.connect)
+        self.assertEqual(len(current['products']),1)
+        self.assertEqual(current['products'][0]['name'],'Current edited name')
+        self.assertEqual(current['products'][0]['notes'],'Keep current notes')
+        self.assertEqual(shared.catalog(backend.connect)['products'][0][0],'Current edited name')
+        current['products']=[]
+        self.save(current)
+        backend.initialize()
+        self.assertEqual(shared.state(backend.connect)['products'],[])
+        self.assertEqual(shared.catalog(backend.connect)['products'],[])
+
     def test_legacy_options_and_validation(self):
         state=shared.state(backend.connect);product=state['products'][0];code=product['code']
         with backend.connect() as db:
@@ -70,7 +95,7 @@ class VarietyTests(unittest.TestCase):
         with self.assertRaises(ValueError):self.save(state)
     def test_income_kept_separate_from_expenses(self):
         book={'version':1,'entries':[{'id':'income-fixture','type':'income','status':'paid','amount':50000,'date':'2026-10-18','description':'Fixture sale','quantity':1,'bills':[]},{'id':'expense-fixture','type':'expense','status':'paid','amount':12000,'date':'2026-10-18','description':'Fixture materials','quantity':1,'bills':[]}],'budgets':{}}
-        saved=expenses.update(backend.connect,self.directory,{'revision':0,'book':book},'fixture-admin')
+        saved=expenses.update(backend.connect,self.directory,{'revision':expenses.state(backend.connect)['revision'],'book':book},'fixture-admin')
         self.assertEqual([e['type'] for e in saved['book']['entries']],['income','expense'])
         self.assertEqual(sum(e['amount'] if e['type']=='income' else -e['amount'] for e in saved['book']['entries']),38000)
 
