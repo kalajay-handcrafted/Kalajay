@@ -39,6 +39,50 @@ class StoreTests(unittest.TestCase):
         return db
     def save(self, book, revision=0):
         return expenses.update(self.connect,self.root/'private',{'revision':revision,'book':book},'test-admin')
+    def test_codes_survive_reorder_edits_deletes_and_imports(self):
+        book = {'version':1, 'entries':[sample('one'), sample('two')], 'budgets':{}}
+        first = self.save(book)
+        one, two = first['book']['entries']
+        self.assertEqual(one['code'], 'KJ-EXP-00001')
+        self.assertEqual(two['serial'], 2)
+        # Client-supplied codes cannot change a saved identity.
+        changed = {**two, 'code':'spoofed', 'serial':999}
+        second = self.save({**first['book'], 'entries':[changed]}, first['revision'])
+        self.assertEqual(second['book']['entries'][0]['code'], two['code'])
+        third = self.save({**second['book'], 'entries':[changed, sample('three')]}, second['revision'])
+        self.assertEqual(third['book']['entries'][1]['serial'], 3)
+        self.assertEqual(third['book']['entries'][1]['code'], 'KJ-EXP-00003')
+
+    def test_paid_migration_has_backup_and_runs_only_once(self):
+        with self.connect() as db:
+            db.execute('CREATE TABLE content (key TEXT PRIMARY KEY,value TEXT NOT NULL)')
+        original = self.save({'version':1, 'entries':[sample('one'),{**sample('two'),'type':'income','status':'pending'}], 'budgets':{}})
+        expenses.migrate_paid_and_codes(self.connect, self.root/'private')
+        current = expenses.state(self.connect)
+        self.assertEqual([e['status'] for e in current['book']['entries']], ['paid','paid'])
+        self.assertEqual(current['book']['entries'][0]['amount'], original['book']['entries'][0]['amount'])
+        backup_path = self.root/'private/before-paid-and-codes-2026-10-21.sqlite3'
+        with sqlite3.connect(backup_path) as db:
+            previous = json.loads(db.execute('SELECT payload FROM expense_book').fetchone()[0])
+        self.assertEqual(previous['entries'][0]['status'], 'recorded')
+        pending = {**current['book']['entries'][0], 'status':'pending'}
+        changed = self.save({**current['book'], 'entries':[pending]}, current['revision'])
+        expenses.migrate_paid_and_codes(self.connect, self.root/'private')
+        self.assertEqual(expenses.state(self.connect), changed)
+
+    def test_vendors_shared_and_invalid_vendor_rejected(self):
+        vendor = {'id':'vendor-one','name':'Bead supplier','gst':'GST details','contact':'1234567','email':'supplier@example.com','contracts':'Annual agreement','knownSince':'2025-04'}
+        book = {'version':1,'entries':[],'budgets':{},'vendors':[vendor]}
+        first = self.save(book)
+        self.assertEqual(first['book']['vendors'], [vendor])
+        stale_client = {k:v for k,v in first['book'].items() if k != 'vendors'}
+        second = self.save(stale_client, first['revision'])
+        self.assertEqual(second['book']['vendors'], [vendor])
+        with self.assertRaises(ValueError):
+            self.save({**second['book'], 'vendors':[vendor,{**vendor,'id':'two'}]}, second['revision'])
+        with self.assertRaises(ValueError):
+            self.save({**second['book'], 'vendors':[{**vendor,'knownSince':'2025-13'}]}, second['revision'])
+
     def test_migration_backup_and_existing_table(self):
         self.assertTrue((self.root/'private/before-expenses.sqlite3').exists())
         expenses.initialize(self.connect,self.root/'private')

@@ -5,6 +5,11 @@ on:
       - 'Final/expense*'
       - 'Final/backend.py'
       - 'Final/test_expenses.py'
+      - 'Final/inventory_costing.py'
+      - 'Final/test_inventory_costing.py'
+      - 'Final/shared_store.py'
+      - 'Final/erp/index.html'
+      - 'Final/index.html'
       - '.github/workflows/expenses.yml'
 permissions:
   contents: read
@@ -17,15 +22,22 @@ jobs:
         run: python3 -m pip install -r Final/requirements.txt
       - name: Test expense storage, imports and authentication
         working-directory: Final
-        run: python3 -m unittest -v test_expenses
+        run: python3 -m unittest -v test_expenses test_inventory_costing test_product_varieties test_product_images test_team_images
       - name: Compile backend modules
         working-directory: Final
-        run: python3 -m py_compile backend.py expense_store.py expense_import.py expense_bootstrap.py expense_library_transfer.py
+        run: python3 -m py_compile backend.py shared_store.py inventory_costing.py expense_store.py expense_import.py expense_bootstrap.py expense_library_transfer.py
       - name: Check expense page JavaScript
         run: |
           node - <<'JS'
           const fs = require('fs');
           const vm = require('vm');
-          const html = fs.readFileSync('Final/expenses.html', 'utf8');
-          new vm.Script(html.match(/<script>([\s\S]*?)<\/script>/)[1]);
+          for (const file of ['Final/expenses.html','Final/erp/index.html','Final/index.html']) {
+            const html = fs.readFileSync(file, 'utf8');
+            for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)) {
+              if (match[1].trim()) new vm.Script(match[1], {filename:file});
+            }
+          }
           JS
+      - name: Check ERP variety and income interactions
+        working-directory: Final
+        run: node test_erp_varieties.js

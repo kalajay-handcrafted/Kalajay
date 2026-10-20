@@ -8,7 +8,7 @@ async function run(){
  c.commit=products=>{const p=products[0];assert.equal(p.code,'KJ-TEST-101');assert.equal(p.open,10);assert.equal(p.sold,2);assert.equal(p.variants.length,3)};c.saveDraft();
  const expenseScript=fs.readFileSync('expenses.html','utf8').match(/<script>([\s\S]*?)<\/script>/)[1];new vm.Script(expenseScript);
  const elements={};for(const name of ['type','date','description','category','subcategory','treatment','frequency','method','status','quantity','unitPrice','amount','party','paidBy','notes','badInvestment'])elements[name]={value:'',options:[{value:'paid',textContent:'Paid'}],type:'text',tagName:'INPUT'};
- const nodes={entryTitle:{},saveEntry:{},entryDialog:{showModal(){},close(){}}};
+ const nodes={entryCode:{},vendorSelect:{},entryTitle:{},saveEntry:{},entryDialog:{showModal(){},close(){}}};
  const form={elements,reset(){},querySelectorAll(){return []}};
  const income={form,$:id=>nodes[id],loaded:true,busy:false,editing:null,book:{entries:[]},fileJob:0,processing:false,draftBills:[],structuredClone,entryOptions(){},dateISO:()=> '2026-10-18',renderBills(){},renderPermissions(){},admin:()=>true,crypto:{randomUUID:()=> 'income-fixture'},FormData:class{constructor(form){this.form=form}get(k){return this.form.elements[k]?.value??null}},save:async next=>{income.saved=next}};
  vm.createContext(income);for(const prefix of ['function openEntry(', 'function entryTypeLabels(', 'form.onsubmit='])vm.runInContext(expenseScript.split('\n').find(line=>line.startsWith(prefix)),income);

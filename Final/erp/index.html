@@ -198,7 +198,13 @@
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#A4442C">{{ r.dmg }}</td>
                   <td style="padding:var(--pad);text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;padding:2px 7px;border-radius:99px;background:{{ r.stockBg }};color:{{ r.stockFg }}">{{ r.stock }}</span></td>
                   <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.reorder }}" onChange="{{ r.onReorder }}" style="width:56px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.cp }}" onChange="{{ r.onCp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" aria-label="Beads Used" value="{{ r.beadsUsed }}" onChange="{{ r.onbeadsUsed }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" aria-label="Quantity of beads (kg)" type="number" min="0" step="any" value="{{ r.beadKg }}" onChange="{{ r.onbeadKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" aria-label="Cost of 1kg beads" type="number" min="0" step="any" value="{{ r.beadCostKg }}" onChange="{{ r.onbeadCostKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" aria-label="Labor Hour" type="number" min="0" step="any" value="{{ r.laborHours }}" onChange="{{ r.onlaborHours }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" aria-label="Other Material Cost" type="number" min="0" step="any" value="{{ r.otherMaterialCost }}" onChange="{{ r.onotherMaterialCost }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></td>
+                  <td style="padding:4px 6px"><input data-admin-write="true" aria-label="Notes" value="{{ r.notes }}" onChange="{{ r.onnotes }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></td>
+                  <td style="padding:var(--pad);text-align:right" title="Bead kg × cost/kg + ₹50 × labor hours + other material cost">{{ r.cp }}</td>
                   <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.sp }}" onChange="{{ r.onSp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
                   <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.mrp }}" onChange="{{ r.onMrp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:{{ r.marginFg }}">{{ r.margin }}</td>
@@ -217,7 +223,7 @@
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tSold }}</td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tDmg }}</td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tStock }}</td>
-                <td colspan="4"></td>
+                <td colspan="10"></td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tMargin }}</td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap">{{ tValue }}</td>
                 <td colspan="2"></td>
@@ -618,9 +624,17 @@ class Component extends DCLogic {
   num(v) { const n = parseFloat(String(v).replace(/[^0-9.\-]/g, "")); return isNaN(n) ? 0 : n; }
   todayISO() { return new Date().toISOString().slice(0, 10); }
 
+  applyCosting(p, enable=false) {
+    if(enable || p.costingEnabled) {
+      p.costingEnabled=true;
+      p.cp=Math.round((this.num(p.beadKg)*this.num(p.beadCostKg)+50*this.num(p.laborHours)+this.num(p.otherMaterialCost))*100)/100;
+    }
+    return p;
+  }
+
   setField(code, key, raw, numeric) {
     const products = this.state.products.map(p =>
-      p.code === code ? Object.assign({}, p, { [key]: numeric ? this.num(raw) : raw, upd: this.todayISO() }) : p
+      p.code === code ? this.applyCosting(Object.assign({}, p, { [key]: numeric ? this.num(raw) : raw, upd: this.todayISO() }), ['beadKg','beadCostKg','laborHours','otherMaterialCost'].includes(key)) : p
     );
     this.commit(products, null);
   }
@@ -697,15 +711,19 @@ class Component extends DCLogic {
     if (variants.length>30 || variants.some(v=>!v.label.trim() || !v.images.length)) return this.setState({addError:'Each colour / variety needs a name and at least one photo (up to 30 options).'});
     if (new Set(variants.map(v=>v.label.trim().toLowerCase())).size!==variants.length) return this.setState({addError:'Use a different name for each colour / variety.'});
     const rec = { variants,
+      beadsUsed: String(d.beadsUsed||''), notes: String(d.notes||''),
+      beadKg:this.num(d.beadKg), beadCostKg:this.num(d.beadCostKg), laborHours:this.num(d.laborHours), otherMaterialCost:this.num(d.otherMaterialCost),
+      costingEnabled: Boolean(d.costingEnabled || !existing),
       sno: existing ? existing.sno : this.state.products.length + 1,
       code, name: String(d.name).trim(),
       cat: d.cat || existing?.cat || "NA", unit: d.unit || "pcs",
       image: d.image || (existing ? existing.image || "" : "") || variants[0]?.images[0] || "",
       hsn: d.hsn || "NA", gst: this.num(d.gst),
       open: this.num(d.open), purch: 0, made: this.num(d.made), sold: this.num(d.sold), dmg: this.num(d.dmg),
-      reorder: this.num(d.reorder), cp: this.num(d.cp), sp: this.num(d.sp), mrp: this.num(d.mrp),
+      reorder: this.num(d.reorder), cp: d.cp === undefined ? (existing?.cp || 0) : this.num(d.cp), sp: this.num(d.sp), mrp: this.num(d.mrp),
       upd: this.todayISO()
     };
+    this.applyCosting(rec);
     const products = existing
       ? this.state.products.map(p => (p.code === code ? Object.assign({}, p, rec, { purch: p.purch }) : p))
       : this.state.products.concat([rec]);
@@ -714,8 +732,8 @@ class Component extends DCLogic {
   }
 
   exportCsv(rows) {
-    const head = ["S.No","Product Code","Product Name","Category","Unit","HSN","GST %","Opening","Stock In","Qty Made","Qty Sold","Damaged","Remaining Stock","Reorder Level","CP","SP","MRP","Margin %","Stock Value","Last Updated"];
-    const body = rows.map(p => [p.sno, p.code, p.name, p.cat, p.unit, p.hsn, p.gst, p.open, p.purch, p.made, p.sold, p.dmg, this.stock(p), p.reorder, p.cp, p.sp, p.mrp, Math.round(this.marginPct(p)), this.stockValue(p), p.upd]);
+    const head = ["S.No","Product Code","Product Name","Category","Unit","HSN","GST %","Opening","Stock In","Qty Made","Qty Sold","Damaged","Remaining Stock","Reorder Level","Beads Used","Quantity of beads (kg)","Cost of 1kg beads","Labor Hour","Other Material Cost","Notes","CP","SP","MRP","Margin %","Stock Value","Last Updated"];
+    const body = rows.map(p => [p.sno, p.code, p.name, p.cat, p.unit, p.hsn, p.gst, p.open, p.purch, p.made, p.sold, p.dmg, this.stock(p), p.reorder, p.beadsUsed||"", p.beadKg||0, p.beadCostKg||0, p.laborHours||0, p.otherMaterialCost||0, p.notes||"", p.cp, p.sp, p.mrp, Math.round(this.marginPct(p)), this.stockValue(p), p.upd]);
     const csv = [head].concat(body).map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(",")).join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
@@ -786,8 +804,8 @@ class Component extends DCLogic {
     if (S.stockFilter === "out") rows = rows.filter(p => stock(p) <= 0);
     const sk = S.sortKey;
     rows.sort((a, b) => {
-      const va = sk === "stock" ? stock(a) : sk === "value" ? this.stockValue(a) : sk === "margin" ? this.marginPct(a) : a[sk];
-      const vb = sk === "stock" ? stock(b) : sk === "value" ? this.stockValue(b) : sk === "margin" ? this.marginPct(b) : b[sk];
+      const va = sk === "stock" ? stock(a) : sk === "value" ? this.stockValue(a) : sk === "margin" ? this.marginPct(a) : (a[sk] ?? (["beadsUsed","notes"].includes(sk) ? "" : 0));
+      const vb = sk === "stock" ? stock(b) : sk === "value" ? this.stockValue(b) : sk === "margin" ? this.marginPct(b) : (b[sk] ?? (["beadsUsed","notes"].includes(sk) ? "" : 0));
       if (typeof va === "string") return va.localeCompare(vb) * S.sortDir;
       return (va - vb) * S.sortDir;
     });
@@ -796,7 +814,7 @@ class Component extends DCLogic {
       ["S.No", "sno", "right"], ["PRODUCT Code", "code", "left"], ["Product name", "name", "left"], ["Category", "cat", "left"],
       ["Unit", "unit", "center"], ["HSN", "hsn", "left"], ["GST %", "gst", "right"],
       ["Opening", "open", "right"], ["Stock in", "purch", "right"], ["Qty made", "made", "right"], ["Qty sold", "sold", "right"],
-      ["Damaged", "dmg", "right"], ["Stock", "stock", "right"], ["Reorder", "reorder", "right"], ["CP ₹", "cp", "right"],
+      ["Damaged", "dmg", "right"], ["Stock", "stock", "right"], ["Reorder", "reorder", "right"], ["Beads Used", "beadsUsed", "left"], ["Quantity of beads (kg)", "beadKg", "right"], ["Cost of 1kg beads ₹", "beadCostKg", "right"], ["Labor Hour", "laborHours", "right"], ["Other Material Cost ₹", "otherMaterialCost", "right"], ["Notes", "notes", "left"], ["CP ₹", "cp", "right"],
       ["SP ₹", "sp", "right"], ["MRP ₹", "mrp", "right"], ["Margin %", "margin", "right"], ["Stock value", "value", "right"],
       ["Updated", "upd", "right"], ["", "", "center"]
     ];
@@ -817,6 +835,8 @@ class Component extends DCLogic {
         sno: p.sno, code: p.code, name: p.name, cat: p.cat, unit: p.unit, hsn: p.hsn, gst: p.gst,
         imageSrc: p.image ? (p.image.indexOf('/') === 0 || p.image.indexOf('http') === 0 ? p.image : '/v2/' + p.image + (p.image.indexOf('.') < 0 ? '.jpg' : '')) : '/assets/kalajay-brand.png',
         open: p.open, purch: p.purch, made: p.made, sold: p.sold, dmg: p.dmg, reorder: p.reorder,
+        beadsUsed:p.beadsUsed||'', beadKg:p.beadKg||0, beadCostKg:p.beadCostKg||0, laborHours:p.laborHours||0, otherMaterialCost:p.otherMaterialCost||0, notes:p.notes||'',
+        onbeadsUsed:txt(p.code,'beadsUsed'), onbeadKg:nm(p.code,'beadKg'), onbeadCostKg:nm(p.code,'beadCostKg'), onlaborHours:nm(p.code,'laborHours'), onotherMaterialCost:nm(p.code,'otherMaterialCost'), onnotes:txt(p.code,'notes'),
         cp: p.cp, sp: p.sp, mrp: p.mrp, upd: p.upd, stock: st,
         margin: Math.round(m) + "%", marginFg: m >= 50 ? "#2F6F5E" : m >= 30 ? "#6B5F52" : "#A4442C",
         value: this.inr(this.stockValue(p)),
@@ -891,17 +911,18 @@ class Component extends DCLogic {
 
     // ---------- add / edit ----------
     const d = S.draft;
-    const dset = k => e => this.setState({ draft: Object.assign({}, this.state.draft, { [k]: e.target.value }) });
+    const dset = k => e => this.setState({ draft: this.applyCosting(Object.assign({}, this.state.draft, { [k]: e.target.value }), ['beadKg','beadCostKg','laborHours','otherMaterialCost'].includes(k)) });
     const addFields = [
       ["Product code", "code", "KJ-ORG-111"], ["Product name", "name", "Product name"], ["Product image path", "image", "p6-4 or assets/photo.jpg"],
       ["Unit", "unit", "pcs"],
       ["HSN", "hsn", "NA"], ["GST %", "gst", "0"], ["Opening stock", "open", "0"],
       ["Qty made", "made", "0"], ["Qty sold", "sold", "0"], ["Damaged", "dmg", "0"],
-      ["Reorder level", "reorder", "0"], ["CP ₹", "cp", "0"], ["SP ₹", "sp", "0"], ["MRP ₹", "mrp", "0"]
+      ["Reorder level", "reorder", "0"], ["Beads Used", "beadsUsed", "Bead type / name"], ["Quantity of beads (kg)", "beadKg", "0"], ["Cost of 1kg beads ₹", "beadCostKg", "0"], ["Labor Hour", "laborHours", "0"], ["Other Material Cost ₹", "otherMaterialCost", "0"], ["Notes", "notes", "Notes"], ["SP ₹", "sp", "0"], ["MRP ₹", "mrp", "0"]
     ].map(f => ({ label: f[0], hint: f[2], value: d[f[1]] === undefined ? "" : d[f[1]], onChange: dset(f[1]) }));
     const dcp = this.num(d.cp), dsp = this.num(d.sp);
     const dstock = this.num(d.open) + this.num(d.made) - this.num(d.sold) - this.num(d.dmg);
     const addPreview = [
+      { label: "CP: kg × cost/kg + ₹50 × labor hours + other materials", value: this.inr(dcp) },
       { label: "Remaining stock", value: String(dstock) },
       { label: "Stock value", value: this.inr(dstock * dcp) },
       { label: "Margin per unit", value: this.inr(dsp - dcp) },

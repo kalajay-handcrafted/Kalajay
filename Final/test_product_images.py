@@ -27,6 +27,11 @@ class ProductImageTests(unittest.TestCase):
                        patch.object(backend, 'DB', cls.directory/'kalajay.sqlite3')]
         for item in cls.patches: item.start()
         backend.initialize()
+        current = shared_store.state(backend.connect)
+        product = shared_store.record('KJ-IMAGE-FIXTURE', 'Image fixture', 'Bags')
+        product.update(sp=200,cp=100)
+        current['products'] = [product]
+        shared_store.update(backend.connect,current)
         cls.server = ThreadingHTTPServer(('127.0.0.1', 0), backend.Handler)
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
