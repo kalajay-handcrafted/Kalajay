@@ -30,7 +30,7 @@
     container-type: inline-size;
     --pin-sno: min(56px, 7cqw);
     --pin-code: min(172px, 17cqw);
-    --pin-name: min(360px, 34cqw);
+    --pin-name: min(420px, 42cqw);
     --pin-total: calc(var(--pin-sno) + var(--pin-code) + var(--pin-name));
   }
   .inventory-grid { border-collapse: separate; border-spacing: 0; table-layout: fixed; width: calc(var(--pin-total) + 3840px) !important; }
@@ -45,13 +45,13 @@
   .inventory-grid tbody td:nth-child(1), .inventory-grid tbody td:nth-child(2) { overflow-wrap: anywhere; white-space: normal !important; }
   .inventory-grid tbody td:nth-child(3) { min-width: 0 !important; }
   .inventory-grid input, .inventory-grid select { max-width: 100%; min-width: 0; }
-  .inventory-grid tbody td:nth-child(3) > div { min-width: 0; }
-  .inventory-grid tbody td:nth-child(3) input { flex: 1; width: 0 !important; }
+  .inventory-grid .inventory-name { display: block; width: 100%; min-width: 0; padding: 6px 7px; border: 1px solid transparent; border-radius: 4px; background: #fff; font: inherit; font-weight: 500; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; resize: none; overflow: hidden; }
+  .inventory-grid .inventory-name:hover { border-color: var(--line); }
+  .inventory-grid .inventory-name-tools { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+
   .inventory-grid tfoot td:first-child { position: sticky; left: 0; z-index: 3; background: #F4EDE3; }
   @container (max-width: 650px) {
     .inventory-grid tbody td:nth-child(3) img { display: none; }
-    .inventory-grid tbody td:nth-child(3) > div { flex-wrap: wrap; gap: 4px !important; }
-    .inventory-grid tbody td:nth-child(3) input { flex-basis: 100%; width: 100% !important; }
     .inventory-grid th { white-space: normal !important; overflow-wrap: anywhere; }
   }
   @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
@@ -221,7 +221,7 @@
                 <tr style="border-bottom:1px solid #F2EBE1;background:{{ r.rowBg }}" style-hover="background:#FBF4EA">
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;color:var(--mut);text-align:right">{{ r.sno }}</td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;white-space:nowrap;color:#4A4038">{{ r.code }}</td>
-                  <td style="padding:4px 6px;min-width:280px"><div style="display:flex;align-items:center;gap:8px"><img src="{{ r.imageSrc }}" alt="" style="width:38px;height:38px;object-fit:cover;border-radius:4px;border:1px solid var(--line);background:#F6EFE5;flex:none"><button data-admin-write="true" onClick="{{ r.editOptions }}" title="Edit product colours and varieties" style="font-size:11px;padding:4px;white-space:nowrap">Edit options</button><input data-admin-write="true" value="{{ r.name }}" onChange="{{ r.onName }}" style="width:100%;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-weight:500" style-hover="border-color:var(--line)"></div></td>
+                  <td style="padding:4px 6px;vertical-align:top"><textarea class="inventory-name" data-inventory-name data-admin-write="true" aria-label="Product name" rows="2" maxlength="300" value="{{ r.name }}" onChange="{{ r.onName }}"></textarea><div class="inventory-name-tools"><img src="{{ r.imageSrc }}" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;border:1px solid var(--line);background:#F6EFE5;flex:none"><button data-admin-write="true" onClick="{{ r.editOptions }}" title="Edit product colours and varieties" style="font-size:11px;padding:4px;white-space:normal">Edit options</button></div></td>
                   <td style="padding:4px 6px"><select data-admin-write="true" aria-label="Product category" value="{{ r.cat }}" onChange="{{ r.onCat }}" style="width:150px;border:1px solid var(--line);border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px"><option value="">Select category</option><sc-for list="{{ categoryChoices }}" as="category"><option value="{{ category }}">{{ category }}</option></sc-for></select></td>
                   <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.unit }}" onChange="{{ r.onUnit }}" style="width:52px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;text-align:center" style-hover="border-color:var(--line)"></td>
                   <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.hsn }}" onChange="{{ r.onHsn }}" style="width:62px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace" style-hover="border-color:var(--line)"></td>
@@ -1094,6 +1094,41 @@ class Component extends DCLogic {
     };
   }
 }
+</script>
+
+<script>
+// Expand each editable product name to its complete wrapped height.
+(() => {
+  const observed = new WeakSet(), sizes = new WeakMap();
+  const fit = field => {
+    if (!field.isConnected || !field.clientWidth) return;
+    const key = field.clientWidth + '|' + field.value;
+    if (sizes.get(field) === key) return;
+    field.style.height = 'auto';
+    field.style.height = (field.scrollHeight + 2) + 'px';
+    sizes.set(field, key);
+  };
+  const resize = new ResizeObserver(entries => entries.forEach(e => fit(e.target)));
+  let frame = 0;
+  const scan = () => {
+    frame = 0;
+    document.querySelectorAll('textarea[data-inventory-name]').forEach(field => {
+      if (!observed.has(field)) {
+        observed.add(field);
+        resize.observe(field);
+      }
+      fit(field);
+    });
+  };
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(scan); };
+  const mutations = new MutationObserver(schedule);
+  mutations.observe(document.body, {childList:true, subtree:true, characterData:true});
+  document.addEventListener('input', e => {
+    if (e.target.matches('textarea[data-inventory-name]')) fit(e.target);
+  });
+  window.addEventListener('resize', schedule);
+  schedule();
+})();
 </script>
 </body>
 </html>
