@@ -43,21 +43,19 @@ def initialize():
         CREATE TABLE IF NOT EXISTS products (name TEXT PRIMARY KEY, image TEXT NOT NULL, category TEXT NOT NULL, price INTEGER NOT NULL, sold_out INTEGER NOT NULL, position INTEGER NOT NULL);
         CREATE TABLE IF NOT EXISTS orders (id TEXT PRIMARY KEY, created_at TEXT NOT NULL, customer TEXT NOT NULL, items TEXT NOT NULL, total INTEGER NOT NULL, note TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'new');
         ''')
-        if not db.execute('SELECT 1 FROM products LIMIT 1').fetchone():
-            data = json.loads((ROOT / 'catalogue.json').read_text())
-            for i, (name, image, category) in enumerate(data['products']):
-                db.execute('INSERT INTO products VALUES (?,?,?,?,?,?)', (name, image, category, data['prices'].get(name, data['defaultPrice']), int(name in data['soldOut']), i))
-            db.execute('INSERT OR REPLACE INTO content VALUES (?,?)', ('collections', json.dumps(data['collections'])))
+        # Current shared data is authoritative, including an intentionally empty inventory.
+        db.execute('INSERT OR IGNORE INTO content VALUES (?,?)', ('collections', '[]'))
+        db.execute('INSERT OR REPLACE INTO content VALUES (?,?)', ('brand_profile', (ROOT/'brand-profile.json').read_text()))
         # Preserve all page content and design in the database; refresh from the editable file at startup.
         db.execute('INSERT OR REPLACE INTO content VALUES (?,?)', ('homepage', (ROOT / 'index.html').read_text()))
     DB.chmod(0o600)
     shared.migrate(connect, ROOT, ERP_ROOT)
-    website_refresh.migrate(connect, ROOT)
     team.initialize(connect)
     team_images.initialize(connect, DATA_DIR)
     auth.initialize(connect, DATA_DIR)
     expenses.initialize(connect, DATA_DIR)
     expense_bootstrap.run(connect, DATA_DIR)
+    expenses.migrate_paid_and_codes(connect, DATA_DIR)
     with connect() as db:
         db.execute('INSERT OR REPLACE INTO content VALUES (?,?)', ('expense_page', (ROOT/'expenses.html').read_text()))
 

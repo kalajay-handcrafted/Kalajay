@@ -53,6 +53,22 @@ def validate(book):
         raise ValueError('Invalid source dropdown options.')
     if not isinstance(entries, list) or len(entries) > 100000 or not isinstance(budgets, dict):
         raise ValueError('Invalid expense records.')
+    vendors = book.get('vendors', [])
+    if not isinstance(vendors, list) or len(vendors) > 10000:
+        raise ValueError('Invalid vendor records.')
+    vendor_ids, vendor_names = set(), set()
+    for vendor in vendors:
+        if not isinstance(vendor, dict):
+            raise ValueError('Invalid vendor.')
+        for field in ('id', 'name', 'gst', 'contact', 'email', 'contracts', 'knownSince'):
+            if not _text(vendor.get(field, ''), 4000 if field == 'contracts' else 200):
+                raise ValueError('Invalid vendor ' + field)
+        if not vendor.get('id') or vendor['id'] in vendor_ids or not vendor.get('name', '').strip() or vendor['name'].strip().casefold() in vendor_names:
+            raise ValueError('Vendor names and IDs must be unique.')
+        if vendor.get('knownSince') and not re.fullmatch(r'\d{4}-(0[1-9]|1[0-2])', vendor['knownSince']):
+            raise ValueError('Known since must be a month and year.')
+        vendor_ids.add(vendor['id'])
+        vendor_names.add(vendor['name'].strip().casefold())
     ids = set()
     for entry in entries:
         if not isinstance(entry, dict):
@@ -129,6 +145,10 @@ def update(connect, root, request, username):
         if row['revision'] != request['revision']:
             raise Conflict('Expenses changed on another device. Reload before saving.')
         existing = json.loads(row['payload'])
+        # Assign IDs under the same revision lock; never reuse a deleted code.
+        assign_codes(book, existing)
+        if 'vendors' not in book:
+            book['vendors'] = existing.get('vendors', [])
         allowed = {b['id']: b for e in existing['entries'] for b in e.get('bills', [])}
         for entry in book['entries']:
             normalized = []
@@ -176,3 +196,46 @@ def backup(connect, root):
             raw, mime = bill(connect, root, attachment['id'])
             attachment['data'] = 'data:' + mime + ';base64,' + base64.b64encode(raw).decode()
     return result
+
+def assign_codes(book, previous=None):
+    previous = previous or {}
+    saved = {e['id']: e for e in previous.get('entries', [])}
+    maximum = max([previous.get('entrySequence', 0)] +
+                  [e.get('serial', 0) for e in previous.get('entries', [])])
+    for entry in book['entries']:
+        prior = saved.get(entry['id'])
+        if prior and type(prior.get('serial')) is int and prior['serial'] > 0:
+            entry['serial'], entry['code'] = prior['serial'], prior['code']
+        else:
+            maximum += 1
+            entry['serial'] = maximum
+            prefix = 'EXP' if entry['type'] == 'expense' else 'INC'
+            entry['code'] = 'KJ-' + prefix + '-' + str(maximum).zfill(5)
+    book['entrySequence'] = maximum
+
+def migrate_paid_and_codes(connect, root):
+    """One-time user-requested status correction after the initial import."""
+    marker = 'transactions-paid-and-coded-2026-10-21'
+    with connect() as db:
+        if db.execute('SELECT 1 FROM content WHERE key=?', (marker,)).fetchone():
+            return
+    backup_path = Path(root) / 'before-paid-and-codes-2026-10-21.sqlite3'
+    if not backup_path.exists():
+        with connect() as source, sqlite3.connect(backup_path) as destination:
+            source.backup(destination)
+        backup_path.chmod(0o600)
+    with connect() as db:
+        db.execute('BEGIN IMMEDIATE')
+        if db.execute('SELECT 1 FROM content WHERE key=?', (marker,)).fetchone():
+            return
+        row = db.execute('SELECT payload FROM expense_book WHERE id=1').fetchone()
+        book = json.loads(row['payload'])
+        assign_codes(book, book)
+        count = len(book['entries'])
+        for entry in book['entries']:
+            entry['status'] = 'paid'
+        book.setdefault('vendors', [])
+        db.execute('UPDATE expense_book SET revision=revision+1,payload=?,updated_by=?,updated_at=? WHERE id=1',
+                   (json.dumps(book, ensure_ascii=False), 'user-request-2026-10-21', datetime.now(timezone.utc).isoformat()))
+        db.execute('INSERT INTO content VALUES (?,?)', (marker, json.dumps({'updated': count})))
+        print('Expense migration: marked', count, 'existing transactions paid and assigned codes.', flush=True)

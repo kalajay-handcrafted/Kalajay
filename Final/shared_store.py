@@ -1,6 +1,7 @@
 """Shared product, ERP and website data; product_code is the stable key."""
 import json, re, sqlite3, uuid, math
 import team_store as team
+import inventory_costing
 from datetime import datetime, timezone
 
 NUMBERS=('open','purch','made','sold','dmg','reorder','cp','sp','mrp','gst')
@@ -100,10 +101,7 @@ def ensure_catalogue_additions(db):
   db.execute('INSERT OR REPLACE INTO inventory VALUES (?,?)',(code,json.dumps(inv)))
   db.execute('INSERT OR IGNORE INTO product_aliases VALUES (?,?)',(name,code))
 def sync_inventory_metadata(db):
- purge_removed_products(db)
- apply_product_code_renames(db)
- for code,image in IMAGE_FIXES.items():
-  db.execute("UPDATE products SET image=? WHERE product_code=? AND image=''",(image,code))
+ # Current shared records are authoritative; never reapply old catalogue fixes.
  for row in db.execute('SELECT p.product_code,p.name,p.category,p.image,p.price,i.record FROM products p JOIN inventory i USING(product_code) WHERE p.active=1'):
   inv=json.loads(row['record'])
   changed=False
@@ -132,7 +130,7 @@ def migrate(connect,root,erp_root):
     db.execute(sql)
    db.execute("INSERT INTO shared_meta VALUES ('revision',1)")
    db.execute("INSERT INTO shared_meta VALUES ('browser_imported',0)")
-   seed=json.loads((root/'erp-seed.json').read_text())
+   seed=[]  # Retired catalogue seeds must not add old products.
    names={}
    for i,(code,name,cat,unit) in enumerate(seed):
     p=record(code,name,cat,unit);p['sno']=i+1
@@ -161,17 +159,6 @@ def migrate(connect,root,erp_root):
      db.execute('INSERT INTO order_items VALUES (?,?,?,?,?)',(order['id'],row[0],item['quantity'],item['unitPrice'],item['name']))
  with connect() as db:
   db.execute('INSERT OR REPLACE INTO content VALUES (?,?)',('erp_homepage',(erp_root/'index.html').read_text()))
-  ensure_catalogue_additions(db)
-  for code,fix in CATALOGUE_FIXES.items():
-   row=db.execute('SELECT * FROM products WHERE product_code=?',(code,)).fetchone()
-   if not row:continue
-   name=fix.get('name',row['name']);price=fix.get('price',row['price'])
-   db.execute('UPDATE products SET name=?,price=? WHERE product_code=?',(name,price,code))
-   inv_row=db.execute('SELECT record FROM inventory WHERE product_code=?',(code,)).fetchone()
-   if inv_row:
-    inv=json.loads(inv_row[0]);inv.update(name=name,sp=price)
-   db.execute('UPDATE inventory SET record=? WHERE product_code=?',(json.dumps(inv),code))
-   db.execute('INSERT OR IGNORE INTO product_aliases VALUES (?,?)',(row['name'],code))
   sync_inventory_metadata(db)
 
 def catalog(connect):
@@ -259,6 +246,7 @@ def update(connect,data):
    code=p['code'];old=db.execute('SELECT * FROM products WHERE product_code=?',(code,)).fetchone()
    prior_record=db.execute('SELECT record FROM inventory WHERE product_code=?',(code,)).fetchone()
    previous=json.loads(prior_record[0]) if prior_record else {}
+   inventory_costing.normalize(p, previous)
    if 'variants' not in p:p['variants']=previous.get('variants',[])
    p['variants'],p['variantSequence']=numbered_variants(p,previous)
    for variant in p['variants']:
