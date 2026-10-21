@@ -358,7 +358,7 @@
                   <sc-for list="{{ productOptions }}" as="p"><option value="{{ p.code }}">{{ p.label }}</option></sc-for>
                 </select>
               </label>
-              <p style="margin:0;font-size:12px;color:var(--mut)">Add a colour, size or variety with its own photos. Numbered codes are assigned automatically. Options appear together on the website and share this product's price and stock.</p>
+              <p style="margin:0;font-size:12px;color:var(--mut)">Add a colour, size or variety with its own photos. Numbered codes are assigned automatically. Each option is a separate inventory item with its own stock. Options appear together on the website and share this product's price.</p>
               <sc-for list="{{ variantRows }}" as="v">
                 <div style="padding:12px;border:1px solid var(--line);border-radius:6px;display:grid;gap:8px">
                   <strong style="font-size:12px">{{ v.code }}</strong>
@@ -772,7 +772,7 @@ class Component extends DCLogic {
     const variants=this.draftVariants();
     if (variants.length>30 || variants.some(v=>!v.label.trim() || !v.images.length)) return this.setState({addError:'Each colour / variety needs a name and at least one photo (up to 30 options).'});
     if (new Set(variants.map(v=>v.label.trim().toLowerCase())).size!==variants.length) return this.setState({addError:'Use a different name for each colour / variety.'});
-    const rec = { variants,
+    const rec = { variantOf: existing?.variantOf, variantLabel: existing?.variantLabel, variants,
       beadsUsed: String(d.beadsUsed||''), notes: String(d.notes||''),
       beadKg:this.num(d.beadKg), beadCostKg:this.num(d.beadCostKg), laborHours:this.num(d.laborHours), otherMaterialCost:this.num(d.otherMaterialCost),
       costingEnabled: Boolean(d.costingEnabled || !existing),
@@ -1169,6 +1169,7 @@ class Component extends DCLogic {
 </script>
 </body>
 </html>
+
 
 
 

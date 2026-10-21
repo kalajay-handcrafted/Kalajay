@@ -605,8 +605,8 @@ class Component extends DCLogic {
       ...p,
       priceLabel: "₹" + p.price.toLocaleString("en-IN"),
       open: () => this.setState({ active: p, activeImage: 0, galleryImage: null }),
-      add: () => (out ? null : VARIANTS[p.code]?.length ? this.setState({ active: p, activeImage: 0, galleryImage: null }) : this.addToCart(p)),
-      addLabel: out ? "Out of stock" : VARIANTS[p.code]?.length ? "Choose option" : added ? "Added ✓" : inCart ? "Add another" : "Add to cart",
+      add: () => (VARIANTS[p.code]?.length ? this.setState({ active: p, activeImage: 0, galleryImage: null }) : out ? null : this.addToCart(p)),
+      addLabel: VARIANTS[p.code]?.length ? "Choose option" : out ? "Out of stock" : added ? "Added ✓" : inCart ? "Add another" : "Add to cart",
       wrapStyle: {
         display: "flex",
         flexDirection: "column",
@@ -761,12 +761,12 @@ class Component extends DCLogic {
       activeImg: this.state.galleryImage || (selectedVariant ? imagePath(selectedVariant.images[0]) : a ? a.img : ""),
       activePrice: a ? this.inr(a.price) : "",
       activeColour: selectedVariant ? selectedVariant.label + " · " + (selectedVariant.code || a.code) : "",
-      activeColours: variants.map((v,i) => ({label:v.label, selected:i===this.state.activeImage, pick:() => this.setState({activeImage:i, galleryImage:null})})),
+      activeColours: variants.map((v,i) => ({label:v.label + (v.soldOut ? " · Out of stock" : ""), selected:i===this.state.activeImage, disabled:!!v.soldOut, pick:() => this.setState({activeImage:i, galleryImage:null})})),
       activeImages: gallery.map((src,i) => ({src:imagePath(src),label:"View image " + (i+1),pick:() => this.setState({galleryImage:imagePath(src)})})),
       keepOpen: e => e.stopPropagation(),
-      activeSoldOut: a ? a.soldOut : true,
-      activeAddLabel: a && a.soldOut ? "Out of stock" : "Add to cart",
-      addActive: () => { if(a && !a.soldOut) { this.addToCart({...a, colour:selectedVariant?.label || "", variantCode:selectedVariant?.code || "", img:selectedVariant ? imagePath(selectedVariant.images[0]) : a.img}); this.setState({active:null,galleryImage:null}); } },
+      activeSoldOut: a ? (selectedVariant ? !!selectedVariant.soldOut : a.soldOut) : true,
+      activeAddLabel: a && (selectedVariant ? selectedVariant.soldOut : a.soldOut) ? "Out of stock" : "Add to cart",
+      addActive: () => { if(a && !(selectedVariant ? selectedVariant.soldOut : a.soldOut)) { this.addToCart({...a, colour:selectedVariant?.label || "", variantCode:selectedVariant?.code || "", img:selectedVariant ? imagePath(selectedVariant.images[0]) : a.img}); this.setState({active:null,galleryImage:null}); } },
       activeName: a ? a.name : "",
       activeCat: a ? a.cat : "",
       close: () => this.setState({ active: null, galleryImage: null })
@@ -777,5 +777,6 @@ class Component extends DCLogic {
 </script>
 </body>
 </html>
+
 
 
