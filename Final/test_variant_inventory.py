@@ -41,4 +41,15 @@ class Tests(unittest.TestCase):
   with self.assertRaises(ValueError):shared.update(self.connect,s)
   root['open']=0;root['variants']=[v for v in root['variants'] if v['code']!=code]
   with self.assertRaises(ValueError):shared.update(self.connect,s)
+ def test_upgrade_existing_variety_skus_preserves_colour_stock(self):
+  parent=shared.record('OLD','Old holder','Holders');parent['variants']=[dict(code='OLD-1',label='Blue',images=['/assets/b.jpg'])]
+  child=shared.record('OLD-1','Old holder - Blue','Holders');child.update(variantOf='OLD',variantLabel='Blue',open=9,made=4,sold=2,cp=50,sp=200)
+  with self.connect() as db:
+   for p,published in [(parent,1),(child,0)]:
+    db.execute('INSERT INTO products VALUES(?,?,?,?,?,?,?,?,?)',(p['code'],p['name'],p['cat'],'',p['sp'],0,1,published,1));db.execute('INSERT INTO inventory VALUES(?,?)',(p['code'],json.dumps(p)))
+   db.execute("INSERT INTO shared_meta VALUES('variant_skus_v1',1)")
+  variants.migrate(self.connect,self.root)
+  now={p['code']:p for p in shared.state(self.connect)['products']};self.assertEqual(len(now),2);self.assertEqual(shared.stock(now['OLD-1']),11);self.assertEqual(shared.stock(now['OLD']),0);self.assertEqual(now['OLD-1']['parentCode'],'OLD');self.assertEqual(shared.catalog(self.connect)['variants']['OLD'][0]['stock'],11)
+  self.assertEqual(excel.export_data(self.connect)['rows'][0][0],'OLD-1')
+  state=shared.state(self.connect);shared.update(self.connect,state);self.assertEqual(shared.stock(next(p for p in shared.state(self.connect)['products'] if p['code']=='OLD-1')),11)
 if __name__=='__main__':unittest.main()

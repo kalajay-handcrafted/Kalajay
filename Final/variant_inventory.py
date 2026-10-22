@@ -15,6 +15,12 @@ def prepare(products, previous):
     """Expand option descriptors without copying a parent's stock to every colour."""
     import shared_store as shared
     result = copy.deepcopy(products)
+    previous = copy.deepcopy(previous)
+    # The first variety-stock release called this relationship variantOf.
+    # Keep every existing SKU and quantity when upgrading that release.
+    for p in result + previous:
+        if p.get('variantOf') and not p.get('parentCode'):
+            p['parentCode'] = p['variantOf']
     old = {p['code']: p for p in previous}
     by_code = {p['code']: p for p in result}
     for parent in list(result):
@@ -118,6 +124,11 @@ def migrate(connect, data_dir):
                            (p['code'], p['name'], p['cat'], p['image'], p['sp'],
                             int(sum(p.get(k, 0) * (-1 if k in ('sold', 'dmg') else 1) for k in COUNTERS) <= 0),
                             3000 + index, 1, 1))
+            elif p.get('parentCode'):
+                # Child SKUs were previously unpublished. The catalogue filters
+                # them into their parent listing; checkout still needs their IDs.
+                db.execute('UPDATE products SET published=1,sold_out=? WHERE product_code=?',
+                           (int(sum(p.get(k, 0) * (-1 if k in ('sold', 'dmg') else 1) for k in COUNTERS) <= 0),p['code']))
             db.execute('INSERT OR REPLACE INTO inventory VALUES (?,?)', (p['code'], json.dumps(p)))
         db.execute("INSERT INTO shared_meta VALUES ('variety_skus_v1',1)")
         db.execute("UPDATE shared_meta SET value=value+1 WHERE key='revision'")

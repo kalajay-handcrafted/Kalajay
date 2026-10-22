@@ -610,8 +610,8 @@ class Component extends DCLogic {
       ...p,
       priceLabel: "₹" + p.price.toLocaleString("en-IN"),
       open: () => this.setState({ active: p, activeImage: 0, galleryImage: null }),
-      add: () => (out ? null : VARIANTS[p.code]?.length ? this.setState({ active: p, activeImage: 0, galleryImage: null }) : this.addToCart(p)),
-      addLabel: out ? "Out of stock" : VARIANTS[p.code]?.length ? "Choose option" : added ? "Added ✓" : inCart ? "Add another" : "Add to cart",
+      add: () => (VARIANTS[p.code]?.length ? this.setState({ active: p, activeImage: 0, galleryImage: null }) : out ? null : this.addToCart(p)),
+      addLabel: VARIANTS[p.code]?.length ? "Choose option" : out ? "Out of stock" : added ? "Added ✓" : inCart ? "Add another" : "Add to cart",
       wrapStyle: {
         display: "flex",
         flexDirection: "column",
