@@ -8,7 +8,9 @@ def export_data(connect):
  with connect() as db:
   rows=[]
   for r in db.execute('SELECT p.*,i.record FROM products p JOIN inventory i USING(product_code) WHERE active=1 AND published=1 ORDER BY position'):
-   p=json.loads(r['record']);rows.append([r['product_code'],r['name'],r['category'],shared.stock(p),None,r['price'],None])
+   p=json.loads(r['record'])
+   if shared.varieties.is_group(p):continue
+   rows.append([r['product_code'],r['name'],r['category'],shared.stock(p),None,r['price'],None])
   return dict(rows=rows,revision=db.execute("SELECT value FROM shared_meta WHERE key='revision'").fetchone()[0])
 def parse(raw):
  try:
@@ -58,7 +60,7 @@ def import_sheet(connect,raw,apply=False):
  with connect() as db:
   db.execute('BEGIN IMMEDIATE')
   if revision!=db.execute("SELECT value FROM shared_meta WHERE key='revision'").fetchone()[0]:raise shared.Conflict('The catalogue changed after this sheet was downloaded. Download a fresh sheet and copy your changes into it.')
-  existing={r['product_code']:r for r in db.execute('SELECT * FROM products WHERE active=1 AND published=1')}
+  existing={r['product_code']:r for r in db.execute('SELECT p.*,i.record FROM products p JOIN inventory i USING(product_code) WHERE active=1 AND published=1') if not shared.varieties.is_group(json.loads(r['record']))}
   unknown=codes-set(existing)
   if unknown:raise ValueError('Unknown product code: '+sorted(unknown)[0])
   changes=[]
@@ -102,3 +104,4 @@ def export_workbook(connect):
    for i in (5,6):row[i].number_format='0.00'
  for col,width in [('A',20),('B',48),('C',24),('D',20),('E',20),('F',24),('G',24)]:ws.column_dimensions[col].width=width
  out=io.BytesIO();wb.save(out);return out.getvalue()
+

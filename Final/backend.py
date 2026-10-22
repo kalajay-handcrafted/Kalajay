@@ -7,6 +7,7 @@ import sqlite3
 import uuid
 import shared_store as shared
 import stock_reset
+import variant_inventory
 import website_refresh
 import team_store as team
 import team_images
@@ -52,6 +53,7 @@ def initialize():
     DB.chmod(0o600)
     shared.migrate(connect, ROOT, ERP_ROOT)
     stock_reset.apply_once(connect, DATA_DIR)
+    variant_inventory.migrate(connect, DATA_DIR)
     team.initialize(connect)
     team_images.initialize(connect, DATA_DIR)
     auth.initialize(connect, DATA_DIR)
@@ -321,4 +323,5 @@ if __name__ == '__main__':
     initialize()
     print(f'Kalajay running at http://127.0.0.1:{args.port}', flush=True)
     ThreadingHTTPServer(('0.0.0.0' if PRODUCTION else '127.0.0.1', args.port), Handler).serve_forever()
+
 
