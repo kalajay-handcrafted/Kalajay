@@ -46,17 +46,21 @@ class VarietyTests(unittest.TestCase):
         product=next(p for p in state['products'] if p['code']==code)
         product['variants'].append({'label':'Green','images':['/assets/green.jpg']})
         state=self.save(state)
-        self.assertEqual(len(state['products']),before)
+        self.assertEqual(len(state['products']),before+1)
         catalogue=shared.catalog(backend.connect)
         self.assertEqual([v['code'] for v in catalogue['variants'][code]],[code+'-2',code+'-1',code+'-4'])
-        # Shared inventory and one catalogue product, with validated option snapshots.
-        with backend.connect() as db:db.execute('UPDATE products SET sold_out=0 WHERE product_code=?',(code,))
+        # Each selected colour owns its stock and its order line.
+        for child in state['products']:
+            if child['code'] in (code+'-1',code+'-2'):child['open']=5
+        state=self.save(state)
         data={'customer':{'name':'Fixture','phone':'9876543210','address':'Test address'},'items':[{'code':code,'quantity':3,'varieties':[{'code':code+'-2','quantity':1},{'code':code+'-1','quantity':2}]}]}
         order=shared.save_order(backend.connect,data)
         stored=next(o for o in shared.state(backend.connect)['orders'] if o['id']==order['orderId'])
-        self.assertEqual(stored['items'][0]['varieties'][0]['label'],'Navy blue')
+        self.assertEqual({i['product_code'] for i in stored['items']},{code+'-1',code+'-2'})
+        self.assertIn('Navy blue',next(i for i in stored['items'] if i['product_code']==code+'-2')['name_snapshot'])
         shared.confirm(backend.connect,order['orderId'])
-        self.assertEqual(next(p for p in shared.state(backend.connect)['products'] if p['code']==code)['sold'],3)
+        self.assertEqual(next(p for p in shared.state(backend.connect)['products'] if p['code']==code)['sold'],0)
+        self.assertEqual(next(p for p in shared.state(backend.connect)['products'] if p['code']==code+'-1')['sold'],2)
         data['items'][0]['varieties'][0]['code']='unknown-1'
         with self.assertRaises(ValueError):shared.save_order(backend.connect,data)
         backend.initialize()
@@ -100,3 +104,4 @@ class VarietyTests(unittest.TestCase):
         self.assertEqual(sum(e['amount'] if e['type']=='income' else -e['amount'] for e in saved['book']['entries']),38000)
 
 if __name__=='__main__':unittest.main()
+

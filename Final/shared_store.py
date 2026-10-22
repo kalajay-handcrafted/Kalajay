@@ -2,6 +2,7 @@
 import json, re, sqlite3, uuid, math
 import team_store as team
 import inventory_costing
+import variant_inventory as varieties
 from datetime import datetime, timezone
 
 NUMBERS=('open','purch','made','sold','dmg','reorder','cp','sp','mrp','gst')
@@ -163,13 +164,18 @@ def migrate(connect,root,erp_root):
 
 def catalog(connect):
  with connect() as db:
-  rows=db.execute('SELECT * FROM products WHERE active=1 AND published=1 ORDER BY category, name COLLATE NOCASE').fetchall()
+  rows=db.execute('SELECT p.*,i.record FROM products p JOIN inventory i USING(product_code) WHERE p.active=1 AND p.published=1 ORDER BY p.category,p.name COLLATE NOCASE').fetchall()
+  records=[json.loads(r['record']) for r in rows]
+  shown=[r for r in rows if not json.loads(r['record']).get('parentCode')]
   cats=json.loads(db.execute("SELECT value FROM content WHERE key='collections'").fetchone()[0])
-  for r in rows:
+  for r in shown:
    if r['category'] not in [c[0] for c in cats]:cats.append([r['category'],'Handcrafted pieces','assets/kalajay-brand.png'])
-  variants={row['product_code']:display_variants(json.loads(row['record'])) for row in db.execute('SELECT product_code,record FROM inventory')}
+  options={p['code']:varieties.options_for(p,records,stock) for p in records if varieties.is_group(p)}
   sold=dict(db.execute('SELECT product_code,COALESCE(SUM(quantity),0) FROM order_items GROUP BY product_code').fetchall())
-  return {'cityCount':db.execute("SELECT value FROM shared_meta WHERE key='city_count'").fetchone()[0], 'memberCount':team.count(db), 'collections':cats,'products':[[r['name'],r['image'],r['category'],r['product_code']] for r in rows], 'prices':{r['product_code']:r['price'] for r in rows},'soldOut':[r['product_code'] for r in rows if r['sold_out']], 'soldCounts':sold, 'defaultPrice':500,'variants':variants}
+  for parent in records:
+   if varieties.is_group(parent):sold[parent['code']]=sold.get(parent['code'],0)+sum(sold.get(p['code'],0) for p in records if p.get('parentCode')==parent['code'])
+  unavailable=[r['product_code'] for r in shown if (all(v['soldOut'] for v in options[r['product_code']]) if r['product_code'] in options else r['sold_out'])]
+  return {'cityCount':db.execute("SELECT value FROM shared_meta WHERE key='city_count'").fetchone()[0], 'memberCount':team.count(db), 'collections':cats,'products':[[r['name'],r['image'],r['category'],r['product_code']] for r in shown], 'prices':{r['product_code']:r['price'] for r in rows},'soldOut':unavailable, 'soldCounts':sold, 'defaultPrice':500,'variants':options}
 
 def state(connect):
  with connect() as db:
@@ -208,6 +214,10 @@ class Conflict(ValueError):pass
 
 def update(connect,data):
  if not isinstance(data,dict) or not isinstance(data.get('products'),list) or not isinstance(data.get('txns'),list):raise ValueError('Invalid ERP data.')
+ if any(not isinstance(p,dict) or not isinstance(p.get('code'),str) or not isinstance(p.get('variants',[]),list) or any(not isinstance(v,dict) or not isinstance(v.get('label'),str) or not isinstance(v.get('images'),list) or not v['images'] or ('code' in v and not isinstance(v['code'],str)) for v in p.get('variants',[])) for p in data['products']):raise ValueError('Invalid product / variety data.')
+ with connect() as db:
+  previous=[json.loads(r[0]) for r in db.execute('SELECT i.record FROM inventory i JOIN products p USING(product_code) WHERE p.active=1')]
+ data={**data,'products':varieties.prepare(data['products'],previous)}
  if len(data['products'])>10000 or len(data['txns'])>100000:raise ValueError('Too many records.')
  seen=set()
  for p in data['products']:
@@ -248,9 +258,8 @@ def update(connect,data):
    previous=json.loads(prior_record[0]) if prior_record else {}
    inventory_costing.normalize(p, previous)
    if 'variants' not in p:p['variants']=previous.get('variants',[])
-   p['variants'],p['variantSequence']=numbered_variants(p,previous)
    for variant in p['variants']:
-    if variant['code'] in seen or variant['code'] in option_codes:raise ValueError('A variety code conflicts with another product. Use a different base product code.')
+    if variant['code'] in option_codes:raise ValueError('A variety code conflicts with another product. Use a different base product code.')
     option_codes.add(variant['code'])
    image=p.get('image','') if isinstance(p.get('image',''),str) else ''
    if old:
@@ -261,12 +270,14 @@ def update(connect,data):
    old_inv=db.execute('SELECT record FROM inventory WHERE product_code=?',(code,)).fetchone()
    if 'variants' not in p and old_inv:p['variants']=json.loads(old_inv[0]).get('variants',[])
    # Availability follows inventory once inventory quantities are actually changed.
-   if old_inv and any(p[k]!=json.loads(old_inv[0]).get(k,0) for k in ('open','purch','made','sold','dmg')):
+   if p.get('parentCode') or (old_inv and any(p.get(k,0)!=json.loads(old_inv[0]).get(k,0) for k in ('open','purch','made','sold','dmg','adjustment'))):
     db.execute('UPDATE products SET sold_out=? WHERE product_code=?',(int(stock(p)<=0),code))
    db.execute('INSERT OR REPLACE INTO inventory VALUES (?,?)',(code,json.dumps(p)))
   for t in data['txns']:
    if not db.execute('SELECT 1 FROM products WHERE product_code=?',(t['code'],)).fetchone():raise ValueError('Transaction has an unknown product code.')
    prior=db.execute('SELECT record FROM inventory_transactions WHERE id=?',(t['id'],)).fetchone()
+   inv=db.execute('SELECT record FROM inventory WHERE product_code=?',(t['code'],)).fetchone()
+   if not prior and inv and varieties.is_group(json.loads(inv[0])):raise ValueError('Record stock transactions against an individual colour / variety.')
    if prior and json.loads(prior[0])!=t:raise ValueError('Existing stock transactions cannot be rewritten.')
    db.execute('INSERT OR IGNORE INTO inventory_transactions VALUES (?,?,?)',(t['id'],t['code'],json.dumps(t)))
   if data.get('importLegacy'):db.execute("UPDATE shared_meta SET value=1 WHERE key='browser_imported'")
@@ -290,21 +301,28 @@ def save_order(connect,data):
   for item in items:
    if not isinstance(item,dict) or not isinstance(item.get('code'),str):raise ValueError('Product code is required. Refresh the page.')
    code=item['code'];qty=item.get('quantity')
-   if code in seen or type(qty)is not int or not 1<=qty<=100:raise ValueError('Invalid quantity or duplicate product.')
-   seen.add(code)
-   p=db.execute('SELECT * FROM products WHERE product_code=? AND active=1 AND published=1',(code,)).fetchone()
-   if not p or p['sold_out']:raise ValueError('Product unavailable: '+code)
-   choices=item.get('varieties',[])
-   if not isinstance(choices,list) or len(choices)>30:raise ValueError('Invalid variety selection.')
-   record=db.execute('SELECT record FROM inventory WHERE product_code=?',(code,)).fetchone()
-   options={v['code']:v for v in display_variants(json.loads(record[0]))} if record else {}
-   selected=[];selected_codes=set();selected_qty=0
-   for choice in choices:
-    if not isinstance(choice,dict) or not isinstance(choice.get('code'),str) or choice['code'] not in options or choice['code'] in selected_codes or type(choice.get('quantity')) is not int or not 1<=choice['quantity']<=100:raise ValueError('This variety is unavailable. Refresh and choose again.')
-    selected_codes.add(choice['code']);selected_qty+=choice['quantity']
-    selected.append(dict(code=choice['code'],label=options[choice['code']]['label'],quantity=choice['quantity']))
-   if selected_qty>qty:raise ValueError('Variety quantities do not match the product quantity.')
-   saved.append(dict(code=code,name=p['name'],quantity=qty,unitPrice=p['price'],varieties=selected));total+=qty*p['price']
+   if type(qty)is not int or not 1<=qty<=100:raise ValueError('Invalid quantity.')
+   row=db.execute('SELECT p.*,i.record FROM products p JOIN inventory i USING(product_code) WHERE product_code=? AND active=1 AND published=1',(code,)).fetchone()
+   if not row:raise ValueError('Product unavailable: '+code)
+   product=json.loads(row['record'])
+   selections=item.get('varieties',[])
+   if not isinstance(selections,list):raise ValueError('Invalid variety selection.')
+   if varieties.is_group(product):
+    allowed={v['code'] for v in product['variants']}
+    if not selections or any(not isinstance(v,dict) or v.get('code') not in allowed or type(v.get('quantity')) is not int or not 1<=v['quantity']<=100 for v in selections) or sum(v['quantity'] for v in selections)!=qty:
+     raise ValueError('Choose a colour / variety for each item.')
+    lines=[(v['code'],v['quantity']) for v in selections]
+   else:
+    if selections:raise ValueError('Refresh the page and choose the variety again.')
+    lines=[(code,qty)]
+   for sku,quantity in lines:
+    if sku in seen:raise ValueError('Duplicate product / variety.')
+    seen.add(sku)
+    child=db.execute('SELECT p.*,i.record FROM products p JOIN inventory i USING(product_code) WHERE product_code=? AND active=1 AND published=1',(sku,)).fetchone()
+    if not child:raise ValueError('Product unavailable: '+sku)
+    inv=json.loads(child['record'])
+    if inv.get('unassignedVariety') or child['sold_out'] or (inv.get('parentCode') and stock(inv)<quantity):raise ValueError('Insufficient stock for '+child['name'])
+    saved.append(dict(code=sku,name=child['name'],quantity=quantity,unitPrice=child['price'],varieties=[]));total+=quantity*child['price']
   oid='KJ-'+uuid.uuid4().hex[:16].upper()
   db.execute('INSERT INTO orders (id,created_at,customer,items,total,note) VALUES (?,?,?,?,?,?)',(oid,datetime.now(timezone.utc).isoformat(),json.dumps(clean),json.dumps(saved),total,note))
   db.executemany('INSERT INTO order_items VALUES (?,?,?,?,?)',[(oid,i['code'],i['quantity'],i['unitPrice'],i['name']) for i in saved])
@@ -316,16 +334,32 @@ def confirm(connect,oid):
   order=db.execute('SELECT * FROM orders WHERE id=?',(oid,)).fetchone()
   if not order:raise ValueError('Order not found.')
   if order['status']=='confirmed':return {'status':'confirmed'}
+  lines=[]
+  snapshots={i['code']:i for i in json.loads(order['items'])}
   for item in db.execute('SELECT * FROM order_items WHERE order_id=?',(oid,)).fetchall():
    p=json.loads(db.execute('SELECT record FROM inventory WHERE product_code=?',(item['product_code'],)).fetchone()[0])
-   if stock(p)<item['quantity']:raise ValueError('Insufficient stock for '+item['product_code']+'. Record production or stock-in first.')
-   p['sold']+=item['quantity'];p['upd']=datetime.now().date().isoformat()
+   if varieties.is_group(p):
+    choices=snapshots.get(p['code'],{}).get('varieties',[])
+    allowed={v['code'] for v in p['variants']}
+    if not choices or sum(v['quantity'] for v in choices)!=item['quantity'] or any(v['code'] not in allowed for v in choices):raise ValueError('This older order needs its colour / variety confirmed before recording the sale.')
+    lines.extend((v['code'],v['quantity'],item['unit_price']) for v in choices)
+   else:lines.append((p['code'],item['quantity'],item['unit_price']))
+  quantities={}
+  for code,quantity,price in lines:
+   quantities[code]=quantities.get(code,0)+quantity
+  for code,quantity in quantities.items():
+   row=db.execute('SELECT i.record FROM inventory i JOIN products p USING(product_code) WHERE product_code=? AND p.active=1',(code,)).fetchone()
+   if not row or stock(json.loads(row[0]))<quantity:raise ValueError('Insufficient stock for '+code+'. Record production or stock-in first.')
+  for code,quantity,price in lines:
+   p=json.loads(db.execute('SELECT record FROM inventory WHERE product_code=?',(code,)).fetchone()[0])
+   p['sold']+=quantity;p['upd']=datetime.now().date().isoformat()
    db.execute('UPDATE inventory SET record=? WHERE product_code=?',(json.dumps(p),p['code']))
    db.execute('UPDATE products SET sold_out=? WHERE product_code=?',(int(stock(p)<=0),p['code']))
-   t=dict(id=oid+'-'+p['code'],date=p['upd'],type='Sale',code=p['code'],qty=item['quantity'],ref=oid,rate=item['unit_price'])
+   t=dict(id=oid+'-'+p['code'],date=p['upd'],type='Sale',code=p['code'],qty=quantity,ref=oid,rate=price)
    db.execute('INSERT INTO inventory_transactions VALUES (?,?,?)',(t['id'],p['code'],json.dumps(t)))
   db.execute("UPDATE orders SET status='confirmed' WHERE id=?",(oid,))
   db.execute("UPDATE shared_meta SET value=value+1 WHERE key='revision'")
  return {'status':'confirmed'}
+
 
 

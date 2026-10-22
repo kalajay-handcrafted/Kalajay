@@ -444,7 +444,7 @@ class Component extends DCLogic {
     try {
       const stored = JSON.parse(sessionStorage.getItem('kalajay-cart') || '{}');
       const cart = {};
-      Object.entries(stored).forEach(([key,item]) => { const p=PRODUCTS.find(p=>p[3]===item.code); if(p && Number.isInteger(item.qty) && item.qty>0) cart[key]={...item,key,code:p[3],name:p[0],cat:p[2],price:PRICES[p[3]]}; });
+      Object.entries(stored).forEach(([key,item]) => { const p=PRODUCTS.find(p=>p[3]===item.code); if(p && Number.isInteger(item.qty) && item.qty>0) cart[key]={...item,key,code:p[3],name:p[0],cat:p[2],price:PRICES[item.variantCode || p[3]]}; });
       this.setState({ cart });
     } catch (_) {}
     this._saveCart = () => { try { sessionStorage.setItem('kalajay-cart', JSON.stringify(this.state.cart)); } catch (_) {} };
@@ -463,7 +463,7 @@ class Component extends DCLogic {
       const cart = {};
       Object.values(this.state.cart).forEach(item => {
         const product = data.products.find(p => p[3] === item.code);
-        if (product) cart[item.key || item.code] = { ...item, name: product[0], cat: product[2], price: data.prices[item.code] };
+        if (product) cart[item.key || item.code] = { ...item, name: product[0], cat: product[2], price: data.prices[item.variantCode || item.code] };
       });
       this.setState({ cart, memberCount: data.memberCount, cityCount: data.cityCount });
     }).catch(() => {});
@@ -535,6 +535,9 @@ class Component extends DCLogic {
   componentWillUnmount() { document.removeEventListener("click", this._closeShop); document.removeEventListener("keydown", this._closeShop); if (this._flyingEmblem) this._flyingEmblem.remove(); window.removeEventListener("popstate", this._urlChange); window.removeEventListener("pagehide", this._saveCart); clearInterval(this._catalogueTimer); window.removeEventListener("focus", this._catalogueRefresh); clearTimeout(this._i); clearTimeout(this._t); }
 
   addToCart(p) {
+    const option=(VARIANTS[p.code] || []).find(v=>v.code===p.variantCode);
+    const already=Object.values(this.state.cart).filter(i=>(i.variantCode||i.code)===(p.variantCode||p.code)).reduce((n,i)=>n+i.qty,0);
+    if(option && (option.soldOut || already>=option.stock)) return this.setState({orderMessage:'This variety has no more stock available.'});
     const key=p.code + (p.variantCode ? "::" + p.variantCode : p.colour ? "::" + p.colour : "");
     this.setState(s => ({
       cart: { ...s.cart, [key]: { ...p, key, qty: (s.cart[key] ? s.cart[key].qty : 0) + 1 } },
@@ -548,6 +551,8 @@ class Component extends DCLogic {
     this.setState(s => {
       const cart = { ...s.cart };
       const q = (cart[name].qty || 0) + d;
+      const item=cart[name],option=(VARIANTS[item.code]||[]).find(v=>v.code===item.variantCode);
+      if(d>0 && option && (option.soldOut || q>option.stock)) return {orderMessage:'This variety has no more stock available.'};
       if (q < 1) delete cart[name]; else cart[name] = { ...cart[name], qty: q };
       return { cart };
     });
@@ -562,7 +567,7 @@ class Component extends DCLogic {
         body: JSON.stringify({
           customer: { name: this.state.customerName, phone: this.state.customerPhone, address: this.state.customerAddress },
           note: [this.state.orderNote, ...Object.values(this.state.cart).filter(i => i.colour).map(i => (i.variantCode || i.code) + ": " + i.colour + " × " + i.qty)].filter(Boolean).join("\n"),
-          items: Object.values(Object.values(this.state.cart).reduce((all,i) => { const row=all[i.code] || {code:i.code,quantity:0,varieties:[]};row.quantity+=i.qty;if(i.variantCode)row.varieties.push({code:i.variantCode,quantity:i.qty});all[i.code]=row;return all; },{}))
+          items: Object.values(Object.values(this.state.cart).reduce((all,i) => { const code=i.variantCode || i.code; const row=all[code] || {code,quantity:0};row.quantity+=i.qty;all[code]=row;return all; },{}))
         })
       });
       const result = await response.json();
@@ -660,6 +665,7 @@ class Component extends DCLogic {
     const a = this.state.active;
     const variants = a ? VARIANTS[a.code] || [] : [];
     const selectedVariant = variants[this.state.activeImage];
+    const activeUnavailable=selectedVariant ? selectedVariant.soldOut : a ? a.soldOut : true;
     const gallery = selectedVariant ? selectedVariant.images : a ? [a.img] : [];
 
     const accent = this.props.accentColor || "#A9482A";
@@ -759,14 +765,14 @@ class Component extends DCLogic {
         : shown.length + (cat === "All" ? " pieces" : " pieces in " + cat),
       active: !!a,
       activeImg: this.state.galleryImage || (selectedVariant ? imagePath(selectedVariant.images[0]) : a ? a.img : ""),
-      activePrice: a ? this.inr(a.price) : "",
+      activePrice: selectedVariant ? this.inr(selectedVariant.price) : a ? this.inr(a.price) : "",
       activeColour: selectedVariant ? selectedVariant.label + " · " + (selectedVariant.code || a.code) : "",
-      activeColours: variants.map((v,i) => ({label:v.label, selected:i===this.state.activeImage, pick:() => this.setState({activeImage:i, galleryImage:null})})),
+      activeColours: variants.map((v,i) => ({label:v.label+(v.soldOut?' · Out of stock':''), selected:i===this.state.activeImage, pick:() => this.setState({activeImage:i, galleryImage:null})})),
       activeImages: gallery.map((src,i) => ({src:imagePath(src),label:"View image " + (i+1),pick:() => this.setState({galleryImage:imagePath(src)})})),
       keepOpen: e => e.stopPropagation(),
-      activeSoldOut: a ? a.soldOut : true,
-      activeAddLabel: a && a.soldOut ? "Out of stock" : "Add to cart",
-      addActive: () => { if(a && !a.soldOut) { this.addToCart({...a, colour:selectedVariant?.label || "", variantCode:selectedVariant?.code || "", img:selectedVariant ? imagePath(selectedVariant.images[0]) : a.img}); this.setState({active:null,galleryImage:null}); } },
+      activeSoldOut: activeUnavailable,
+      activeAddLabel: activeUnavailable ? "Out of stock" : "Add to cart",
+      addActive: () => { if(a && !activeUnavailable) { this.addToCart({...a, price:selectedVariant?.price ?? a.price, colour:selectedVariant?.label || "", variantCode:selectedVariant?.code || "", img:selectedVariant ? imagePath(selectedVariant.images[0]) : a.img}); this.setState({active:null,galleryImage:null}); } },
       activeName: a ? a.name : "",
       activeCat: a ? a.cat : "",
       close: () => this.setState({ active: null, galleryImage: null })
@@ -777,5 +783,6 @@ class Component extends DCLogic {
 </script>
 </body>
 </html>
+
 
 

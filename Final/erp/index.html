@@ -355,10 +355,10 @@
               <label style="font-size:13px">Add options to an existing product
                 <select data-admin-write="true" value="{{ editingProductCode }}" onChange="{{ selectOptionProduct }}" style="display:block;width:100%;padding:8px;margin-top:5px;border:1px solid var(--line);border-radius:6px">
                   <option value="">Choose a product, or fill in a new product above</option>
-                  <sc-for list="{{ productOptions }}" as="p"><option value="{{ p.code }}">{{ p.label }}</option></sc-for>
+                  <sc-for list="{{ editProductOptions }}" as="p"><option value="{{ p.code }}">{{ p.label }}</option></sc-for>
                 </select>
               </label>
-              <p style="margin:0;font-size:12px;color:var(--mut)">Add a colour, size or variety with its own photos. Numbered codes are assigned automatically. Options appear together on the website and share this product's price and stock.</p>
+              <p style="margin:0;font-size:12px;color:var(--mut)">Add a colour, size or variety with its own photos. Numbered codes are assigned automatically. The main product is the website display group. Each colour / variety has a separate inventory row, stock balance, cost and price. Record production and sales against the individual variety.</p>
               <sc-for list="{{ variantRows }}" as="v">
                 <div style="padding:12px;border:1px solid var(--line);border-radius:6px;display:grid;gap:8px">
                   <strong style="font-size:12px">{{ v.code }}</strong>
@@ -702,6 +702,7 @@ class Component extends DCLogic {
     const screen = this.state.screen;
     const p = this.state.products.find(x => x.code === e.code);
     const qty = this.num(e.qty);
+    if (p?.isVariantGroup) return this.setState({entryError:"Choose an individual colour / variety."});
     if (!p) return this.setState({ entryError: "Select a product first." });
     if (qty <= 0) return this.setState({ entryError: "Enter a quantity greater than zero." });
     let type = screen === "prod" ? "Production" : screen === "purch" ? "Purchase" : e.kind;
@@ -785,6 +786,7 @@ class Component extends DCLogic {
       reorder: this.num(d.reorder), cp: d.cp === undefined ? (existing?.cp || 0) : this.num(d.cp), sp: this.num(d.sp), mrp: this.num(d.mrp),
       upd: this.todayISO()
     };
+    if(variants.length && existing?.isVariantGroup) Object.assign(rec,{open:0,purch:0,made:0,sold:0,dmg:0,adjustment:0,isVariantGroup:true});
     this.applyCosting(rec);
     const products = existing
       ? this.state.products.map(p => (p.code === code ? Object.assign({}, p, rec, { purch: p.purch }) : p))
@@ -807,7 +809,7 @@ class Component extends DCLogic {
 
   renderVals() {
     const S = this.state;
-    const P = S.products;
+    const P = S.products.filter(p => !p.isVariantGroup).map((p,i)=>({...p,sno:i+1}));
     const screen = S.screen;
     const accent = this.props.accent || "#B4532A";
     const compact = (this.props.density || "Comfortable") === "Compact";
@@ -909,7 +911,7 @@ class Component extends DCLogic {
         onName: txt(p.code, "name"), onCat: txt(p.code, "cat"), onUnit: txt(p.code, "unit"),
         onHsn: txt(p.code, "hsn"), onGst: nm(p.code, "gst"),
         onReorder: nm(p.code, "reorder"), onCp: nm(p.code, "cp"), onSp: nm(p.code, "sp"), onMrp: nm(p.code, "mrp"),
-        onDelete: () => this.commit(P.filter(x => x.code !== p.code).map((x, i) => Object.assign({}, x, { sno: i + 1 })), null, p.name + " removed")
+        onDelete: () => p.parentCode ? this.editOptionProduct(p.parentCode) : this.commit(S.products.filter(x => x.code !== p.code).map((x, i) => Object.assign({}, x, { sno: i + 1 })), null, p.name + " removed")
       };
     });
 
@@ -945,7 +947,7 @@ class Component extends DCLogic {
       .sort((a, b) => (a.sold / (a.open + a.purch + a.made)) - (b.sold / (b.open + b.purch + b.made)))
       .slice(0, 6).map(p => ({ name: p.name, rate: Math.round((p.sold / (p.open + p.purch + p.made)) * 100) }));
 
-    const nameOf = c => { const p = P.find(x => x.code === c); return p ? p.name : c; };
+    const nameOf = c => { const p = S.products.find(x => x.code === c); return p ? p.name : c; };
     const toneOf = t => t === "Sale" ? "#2F6F5E" : t === "Damage" ? "#A4442C" : t === "Purchase" ? "#3A4A7A" : accent;
     const activity = S.txns.slice(0, 7).map(t => ({
       date: t.date.slice(5), type: t.type, name: nameOf(t.code), qty: t.type === "Adjustment" ? (t.qty < 0 ? "−" : "+") + Math.abs(t.qty) : (t.type === "Sale" || t.type === "Damage" ? "−" : "+") + t.qty, tone: toneOf(t.type)
@@ -980,7 +982,7 @@ class Component extends DCLogic {
       ["HSN", "hsn", "NA"], ["GST %", "gst", "0"], ["Opening stock", "open", "0"],
       ["Qty made", "made", "0"], ["Qty sold", "sold", "0"], ["Damaged", "dmg", "0"],
       ["Reorder level", "reorder", "0"], ["SP ₹", "sp", "0"], ["MRP ₹", "mrp", "0"]
-    ].map(f => ({ label: f[0], hint: f[2], value: d[f[1]] === undefined ? "" : d[f[1]], onChange: dset(f[1]) }));
+    ].filter(f=>!this.draftVariants().length || !['open','made','sold','dmg','reorder'].includes(f[1])).map(f => ({ label: f[0], hint: f[2], value: d[f[1]] === undefined ? "" : d[f[1]], onChange: dset(f[1]) }));
     const costingFields = [
       ["Quantity of beads (in kg)", "beadKg"], ["Cost of 1kg beads (₹)", "beadCostKg"],
       ["Labor Hour", "laborHours"], ["Other Material Cost (₹)", "otherMaterialCost"]
@@ -995,7 +997,7 @@ class Component extends DCLogic {
       { label: "Margin %", value: (dcp ? Math.round(((dsp - dcp) / dcp) * 100) : 0) + "%" },
       { label: "Below reorder?", value: dstock <= this.num(d.reorder) ? "Yes" : "No" }
     ];
-    const existingDraft = P.find(p => p.code === (d.code || "").trim());
+    const existingDraft = S.products.find(p => p.code === (d.code || "").trim());
     const productImage = d.image || existingDraft?.image || '';
     const productImagePreview = productImage ? (/^(\/|https?:)/.test(productImage) ? productImage : '/v2/' + productImage + (productImage.indexOf('.') < 0 ? '.jpg' : '')) : '';
 
@@ -1111,6 +1113,7 @@ class Component extends DCLogic {
       saveProduct: () => this.saveDraft(), clearProduct: () => { this._draftVersion = (this._draftVersion || 0) + 1; this.setState({ draft: {}, addError: "", imageMessage: 'JPG, PNG or WebP, up to 8 MB. Choose a photo, then save the product.' }); },
       entry: S.entry, entryFields, entryPreview, entryError: S.entryError, isSale,
       onEntryCode: eset("code"), onEntryKind: eset("kind"),
+      editProductOptions: S.products.filter(p=>!p.parentCode).map(p=>({code:p.code,label:p.code+' — '+p.name+(p.isVariantGroup?' (display group)':'')})),
       productOptions: P.map(p => ({ code: p.code, label: p.code + " — " + p.name + "  (" + stock(p) + " " + p.unit + ")" })),
       entryHeading: screen === "prod" ? "New production entry" : screen === "purch" ? "New stock-in entry" : "New sale entry",
       entryCta: screen === "prod" ? "Post production" : screen === "purch" ? "Post stock-in" : S.entry.kind === "Damage" ? "Write off stock" : "Post sale",
@@ -1169,6 +1172,7 @@ class Component extends DCLogic {
 </script>
 </body>
 </html>
+
 
 
 
