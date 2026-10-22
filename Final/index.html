@@ -13,6 +13,14 @@
 <script src="/api/catalogue.js"></script>
 <link rel="stylesheet" href="/assets/mobile-header.css">
 <script src="./support.js"></script>
+<style>
+.kj-quantity-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:13px;color:#5B4331}
+.kj-quantity-control{display:inline-flex;align-items:center;border:1px solid #DDCEAE;border-radius:999px;overflow:hidden;background:#FBF7E8;flex-shrink:0}
+.kj-quantity-control button{font:inherit;font-size:21px;width:44px;height:44px;border:0;background:transparent;color:#A9482A;cursor:pointer}
+.kj-quantity-control button:disabled{opacity:.35;cursor:not-allowed}
+.kj-quantity-control button:focus-visible{outline:2px solid #A9482A;outline-offset:-4px}
+.kj-quantity-control span{min-width:28px;text-align:center;font-size:16px;color:#40291C}
+</style>
 </head>
 <body>
 <x-dc>
@@ -159,7 +167,17 @@
             </div>
             <p style="margin: 14px 0 4px; font-size: 15px; line-height: 1.45; color: #9E5430">{{ p.name }}</p>
             <p style="margin:0 0 12px;font-size:15px;color:#40291C">{{ p.priceLabel }}</p>
-            <button onClick="{{ p.add }}" style="{{ p.addStyle }}">{{ p.addLabel }}</button>
+            <sc-if value="{{ p.showAdd }}"><button onClick="{{ p.add }}" style="{{ p.addStyle }}">{{ p.addLabel }}</button></sc-if>
+            <sc-for list="{{ p.quantities }}" as="quantity">
+              <div class="kj-quantity-row">
+                <span>{{ quantity.label }}</span>
+                <div class="kj-quantity-control" role="group" aria-label="{{ quantity.name }}">
+                  <button onClick="{{ quantity.dec }}" aria-label="{{ quantity.decreaseLabel }}">−</button>
+                  <span aria-live="polite">{{ quantity.qty }}</span>
+                  <button onClick="{{ quantity.inc }}" disabled="{{ quantity.atLimit }}" aria-label="{{ quantity.increaseLabel }}">+</button>
+                </div>
+              </div>
+            </sc-for>
           </div>
         </sc-for>
       </div>
@@ -403,7 +421,17 @@
       <h2>{{ activeName }}</h2><p>{{ activePrice }}</p><p>{{ activeColour }}</p>
       <div class="kj-gallery-options"><sc-for list="{{ activeColours }}" as="v"><button onClick="{{ v.pick }}" aria-pressed="{{ v.selected }}">{{ v.label }}</button></sc-for></div>
       <div class="kj-gallery-thumbs"><sc-for list="{{ activeImages }}" as="v"><button onClick="{{ v.pick }}" aria-label="{{ v.label }}"><img src="{{ v.src }}" alt="{{ v.label }}"></button></sc-for></div>
-      <button class="kj-gallery-add" onClick="{{ addActive }}" disabled="{{ activeSoldOut }}">{{ activeAddLabel }}</button>
+      <sc-if value="{{ activeShowAdd }}"><button class="kj-gallery-add" onClick="{{ addActive }}" disabled="{{ activeSoldOut }}">{{ activeAddLabel }}</button></sc-if>
+      <sc-for list="{{ activeQuantities }}" as="quantity">
+        <div class="kj-quantity-row">
+          <span>{{ quantity.label }}</span>
+          <div class="kj-quantity-control" role="group" aria-label="{{ quantity.name }}">
+            <button onClick="{{ quantity.dec }}" aria-label="{{ quantity.decreaseLabel }}">−</button>
+            <span aria-live="polite">{{ quantity.qty }}</span>
+            <button onClick="{{ quantity.inc }}" disabled="{{ quantity.atLimit }}" aria-label="{{ quantity.increaseLabel }}">+</button>
+          </div>
+        </div>
+      </sc-for>
     </div>
   </div>
 </sc-if>
@@ -428,7 +456,7 @@ const imagePath = path => !path ? "/assets/kalajay-brand.png" : path.includes("/
 const SOLD_COUNTS = window.KALAJAY_DATA.soldCounts || {};
 
 class Component extends DCLogic {
-  state = { cityCount: window.KALAJAY_DATA.cityCount, memberCount: window.KALAJAY_DATA.memberCount, cat: CATS.some(c => c[0] === categoryName(INITIAL_PARAMS.get("category"))) ? categoryName(INITIAL_PARAMS.get("category")) : "All", active: null, activeImage: 0, cart: {}, cartOpen: false, justAdded: null, q: INITIAL_PARAMS.get("q") || "", sortMode: INITIAL_PARAMS.get("sort") || "az", intro: !IS_SHOP && !IS_STORY && !IS_RETURNS && !IS_HAMPERS && window.location.hash !== "#top", customerName: "", customerPhone: "", customerAddress: "", orderNote: "", orderMessage: "", savingOrder: false };
+  state = { cityCount: window.KALAJAY_DATA.cityCount, memberCount: window.KALAJAY_DATA.memberCount, cat: CATS.some(c => c[0] === categoryName(INITIAL_PARAMS.get("category"))) ? categoryName(INITIAL_PARAMS.get("category")) : "All", active: null, activeImage: 0, cart: {}, cartOpen: false, q: INITIAL_PARAMS.get("q") || "", sortMode: INITIAL_PARAMS.get("sort") || "az", intro: !IS_SHOP && !IS_STORY && !IS_RETURNS && !IS_HAMPERS && window.location.hash !== "#top", customerName: "", customerPhone: "", customerAddress: "", orderNote: "", orderMessage: "", savingOrder: false };
 
   componentDidMount() {
     document.title = IS_STORY ? "Our Story | Kalajay" : IS_RETURNS ? "Return & Exchange | Kalajay" : IS_HAMPERS ? "Gifts & Celebrations | Kalajay" : IS_SHOP ? "Shop | Kalajay" : "Kalajay";
@@ -532,27 +560,27 @@ class Component extends DCLogic {
     }
   }
 
-  componentWillUnmount() { document.removeEventListener("click", this._closeShop); document.removeEventListener("keydown", this._closeShop); if (this._flyingEmblem) this._flyingEmblem.remove(); window.removeEventListener("popstate", this._urlChange); window.removeEventListener("pagehide", this._saveCart); clearInterval(this._catalogueTimer); window.removeEventListener("focus", this._catalogueRefresh); clearTimeout(this._i); clearTimeout(this._t); }
+  componentWillUnmount() { document.removeEventListener("click", this._closeShop); document.removeEventListener("keydown", this._closeShop); if (this._flyingEmblem) this._flyingEmblem.remove(); window.removeEventListener("popstate", this._urlChange); window.removeEventListener("pagehide", this._saveCart); clearInterval(this._catalogueTimer); window.removeEventListener("focus", this._catalogueRefresh); clearTimeout(this._i);  }
 
   addToCart(p) {
     const option=(VARIANTS[p.code] || []).find(v=>v.code===p.variantCode);
+    if ((VARIANTS[p.code]?.length && !option) || (!option && SOLD_OUT.includes(p.code))) return;
     const already=Object.values(this.state.cart).filter(i=>(i.variantCode||i.code)===(p.variantCode||p.code)).reduce((n,i)=>n+i.qty,0);
     if(option && (option.soldOut || already>=option.stock)) return this.setState({orderMessage:'This variety has no more stock available.'});
     const key=p.code + (p.variantCode ? "::" + p.variantCode : p.colour ? "::" + p.colour : "");
     this.setState(s => ({
-      cart: { ...s.cart, [key]: { ...p, key, qty: (s.cart[key] ? s.cart[key].qty : 0) + 1 } },
-      justAdded: p.code
+      cart: { ...s.cart, [key]: { ...p, key, qty: (s.cart[key] ? s.cart[key].qty : 0) + 1 } }
     }));
-    clearTimeout(this._t);
-    this._t = setTimeout(() => this.setState({ justAdded: null }), 1400);
   }
 
   bump(name, d) {
     this.setState(s => {
       const cart = { ...s.cart };
+      if (!cart[name]) return {};
       const q = (cart[name].qty || 0) + d;
       const item=cart[name],option=(VARIANTS[item.code]||[]).find(v=>v.code===item.variantCode);
-      if(d>0 && option && (option.soldOut || q>option.stock)) return {orderMessage:'This variety has no more stock available.'};
+      const already=Object.values(cart).filter(i=>(i.variantCode||i.code)===(item.variantCode||item.code)).reduce((n,i)=>n+i.qty,0);
+      if(d>0 && ((option && (option.soldOut || already>=option.stock)) || (!option && SOLD_OUT.includes(item.code)))) return {orderMessage:'This variety has no more stock available.'};
       if (q < 1) delete cart[name]; else cart[name] = { ...cart[name], qty: q };
       return { cart };
     });
@@ -601,17 +629,32 @@ class Component extends DCLogic {
     };
   }
 
+  quantities(p, variantCode) {
+    return Object.values(this.state.cart)
+      .filter(i => i.code === p.code && (variantCode === undefined || (i.variantCode || "") === variantCode))
+      .map(i => {
+        const option = (VARIANTS[i.code] || []).find(v => v.code === i.variantCode);
+        const name = i.name + (i.colour ? " (" + i.colour + ")" : "");
+        return { qty:i.qty, label:i.colour || "In cart", name,
+          decreaseLabel:"Decrease quantity of " + name, increaseLabel:"Increase quantity of " + name,
+          atLimit:option ? option.soldOut || i.qty >= option.stock : SOLD_OUT.includes(i.code),
+          inc:() => this.bump(i.key || i.code,1), dec:() => this.bump(i.key || i.code,-1) };
+      });
+  }
+
   card(p) {
     const accent = this.props.accentColor || "#A9482A";
-    const added = this.state.justAdded === p.code;
-    const inCart = !!this.state.cart[p.code];
+    const quantities = this.quantities(p);
+    const hasVariants = !!VARIANTS[p.code]?.length;
     const out = p.soldOut;
     return {
       ...p,
       priceLabel: "₹" + p.price.toLocaleString("en-IN"),
       open: () => this.setState({ active: p, activeImage: 0, galleryImage: null }),
       add: () => (VARIANTS[p.code]?.length ? this.setState({ active: p, activeImage: 0, galleryImage: null }) : out ? null : this.addToCart(p)),
-      addLabel: VARIANTS[p.code]?.length ? "Choose option" : out ? "Out of stock" : added ? "Added ✓" : inCart ? "Add another" : "Add to cart",
+      quantities,
+      showAdd: hasVariants || !quantities.length,
+      addLabel: hasVariants ? "Choose option" : out ? "Out of stock" : "Add to cart",
       wrapStyle: {
         display: "flex",
         flexDirection: "column",
@@ -634,11 +677,11 @@ class Component extends DCLogic {
         padding: "11px 14px",
         borderRadius: "999px",
         cursor: out ? "not-allowed" : "pointer",
-        background: added && !out ? accent : "transparent",
-        color: out ? "#8A7E68" : added ? "#FBF7E8" : "#5B4331",
+        background: "transparent",
+        color: out ? "#8A7E68" : "#5B4331",
         border: "1px dashed " + (out ? "#D3C6A8" : "transparent"),
         borderStyle: out ? "dashed" : "solid",
-        borderColor: out ? "#D3C6A8" : added ? accent : "#DDCEAE"
+        borderColor: out ? "#D3C6A8" : "#DDCEAE"
       }
     };
   }
@@ -667,6 +710,7 @@ class Component extends DCLogic {
     const selectedVariant = variants[this.state.activeImage];
     const activeUnavailable=selectedVariant ? selectedVariant.soldOut : a ? a.soldOut : true;
     const gallery = selectedVariant ? selectedVariant.images : a ? [a.img] : [];
+    const activeQuantities = a ? this.quantities(a, selectedVariant?.code || "") : [];
 
     const accent = this.props.accentColor || "#A9482A";
     const cartItems = Object.values(this.state.cart);
@@ -771,8 +815,10 @@ class Component extends DCLogic {
       activeImages: gallery.map((src,i) => ({src:imagePath(src),label:"View image " + (i+1),pick:() => this.setState({galleryImage:imagePath(src)})})),
       keepOpen: e => e.stopPropagation(),
       activeSoldOut: activeUnavailable,
+      activeQuantities,
+      activeShowAdd: !activeQuantities.length,
       activeAddLabel: activeUnavailable ? "Out of stock" : "Add to cart",
-      addActive: () => { if(a && !activeUnavailable) { this.addToCart({...a, price:selectedVariant?.price ?? a.price, colour:selectedVariant?.label || "", variantCode:selectedVariant?.code || "", img:selectedVariant ? imagePath(selectedVariant.images[0]) : a.img}); this.setState({active:null,galleryImage:null}); } },
+      addActive: () => { if(a && !activeUnavailable) { this.addToCart({...a, price:selectedVariant?.price ?? a.price, colour:selectedVariant?.label || "", variantCode:selectedVariant?.code || "", img:selectedVariant ? imagePath(selectedVariant.images[0]) : a.img}); } },
       activeName: a ? a.name : "",
       activeCat: a ? a.cat : "",
       close: () => this.setState({ active: null, galleryImage: null })
