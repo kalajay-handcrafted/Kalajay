@@ -52,4 +52,37 @@ class Tests(unittest.TestCase):
   now={p['code']:p for p in shared.state(self.connect)['products']};self.assertEqual(len(now),2);self.assertEqual(shared.stock(now['OLD-1']),11);self.assertEqual(shared.stock(now['OLD']),0);self.assertEqual(now['OLD-1']['parentCode'],'OLD');self.assertEqual(shared.catalog(self.connect)['variants']['OLD'][0]['stock'],11)
   self.assertEqual(excel.export_data(self.connect)['rows'][0][0],'OLD-1')
   state=shared.state(self.connect);shared.update(self.connect,state);self.assertEqual(shared.stock(next(p for p in shared.state(self.connect)['products'] if p['code']=='OLD-1')),11)
+ def test_marketing_giveaway_stock_cost_and_availability(self):
+  s=self.group();child=next(p for p in s['products'] if p.get('parentCode'));code=child['code'];child.update(open=3,cp=100,sp=250);s=shared.update(self.connect,s)
+  child=next(p for p in s['products'] if p['code']==code);child['marketing']=2
+  s['txns'].insert(0,dict(id='giveaway-1',date='2026-10-22',type='Marketing',code=code,qty=2,purpose='UGC',ref='Fixture creator',rate=25,unitCost=999))
+  s=shared.update(self.connect,s);child=next(p for p in s['products'] if p['code']==code)
+  self.assertEqual(shared.stock(child),1);self.assertEqual(child['sold'],0);self.assertEqual(child['dmg'],0);self.assertEqual(s['txns'][0]['unitCost'],100);self.assertEqual(s['txns'][0]['rate'],25)
+  self.assertEqual(next(r for r in excel.export_data(self.connect)['rows'] if r[0]==code)[3],1)
+  # Repeat saves and price edits preserve the original cost snapshot and stock.
+  child['cp']=150;s=shared.update(self.connect,s);self.assertEqual(s['txns'][0]['unitCost'],100);self.assertEqual(shared.stock(next(p for p in s['products'] if p['code']==code)),1)
+  next(p for p in s['products'] if p['code']==code)['marketing']=3
+  s['txns'].insert(0,dict(id='giveaway-2',date='2026-10-22',type='Marketing',code=code,qty=1,purpose='Friends and family',ref='Fixture recipient',rate=0))
+  s=shared.update(self.connect,s);self.assertEqual(s['txns'][0]['unitCost'],150)
+  option=shared.catalog(self.connect)['variants']['KJ-TEST-001'][0];self.assertEqual(option['stock'],0);self.assertTrue(option['soldOut'])
+  with self.assertRaises(ValueError):shared.save_order(self.connect,self.request([dict(code=code,quantity=1)]))
+  # An older client omitting the optional counter cannot silently restore stock.
+  for p in s['products']:p.pop('marketing',None)
+  s=shared.update(self.connect,s);self.assertEqual(shared.stock(next(p for p in s['products'] if p['code']==code)),0)
+ def test_add_varieties_after_marketing_preserves_history(self):
+  s=shared.state(self.connect);p=shared.record('SINGLE','Gift','Bags');p.update(open=5,cp=50,sp=100);s['products']=[p];s=shared.update(self.connect,s)
+  s['products'][0]['marketing']=2;s['txns']=[dict(id='gift-before-options',date='2026-10-22',type='Marketing',code='SINGLE',qty=2,purpose='Samples',ref='Fixture',rate=None)]
+  s=shared.update(self.connect,s);s['products'][0]['variants']=[dict(label='Blue',images=['/assets/b.jpg'])];s=shared.update(self.connect,s)
+  by={p['code']:p for p in s['products']};self.assertEqual(shared.stock(by['SINGLE']),0);self.assertEqual(shared.stock(by['SINGLE-UNASSIGNED']),3);self.assertEqual(by['SINGLE-UNASSIGNED']['marketing'],2);self.assertEqual(s['txns'][0]['code'],'SINGLE');self.assertEqual(s['txns'][0]['unitCost'],50)
+ def test_marketing_validation_and_overdraw(self):
+  s=self.group();child=next(p for p in s['products'] if p.get('parentCode'));child['open']=1;s=shared.update(self.connect,s);code=child['code']
+  import copy
+  original=copy.deepcopy(s)
+  for purpose,qty,ref,rate in [('Invalid',1,'Creator',0),('UGC',2,'Creator',0),('UGC',1,'',0),('UGC',1,'Creator',-1)]:
+   attempt=copy.deepcopy(original);next(p for p in attempt['products'] if p['code']==code)['marketing']=qty
+   attempt['txns'].insert(0,dict(id='bad',date='2026-10-22',type='Marketing',code=code,qty=qty,purpose=purpose,ref=ref,rate=rate))
+   with self.assertRaises(ValueError):shared.update(self.connect,attempt)
+  attempt=copy.deepcopy(original);next(p for p in attempt['products'] if p['code']==code)['marketing']=1
+  with self.assertRaises(ValueError):shared.update(self.connect,attempt)
+  self.assertEqual(shared.stock(next(p for p in shared.state(self.connect)['products'] if p['code']==code)),1)
 if __name__=='__main__':unittest.main()

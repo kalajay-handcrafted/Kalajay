@@ -33,7 +33,7 @@
     --pin-name: min(420px, 42cqw);
     --pin-total: calc(var(--pin-sno) + var(--pin-code) + var(--pin-name));
   }
-  .inventory-grid { border-collapse: separate; border-spacing: 0; table-layout: fixed; width: calc(var(--pin-total) + 3840px) !important; }
+  .inventory-grid { border-collapse: separate; border-spacing: 0; table-layout: fixed; width: calc(var(--pin-total) + 4000px) !important; }
   .inventory-grid th:nth-child(-n+3),
   .inventory-grid tbody td:nth-child(-n+3) { position: sticky; }
   .inventory-grid th:nth-child(1), .inventory-grid tbody td:nth-child(1) { left: 0; }
@@ -200,14 +200,14 @@
           <button data-admin-write="true" onClick="{{ goAdd }}" style="padding:9px 14px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#8E3F1E">+ New product</button>
           <button onClick="{{ exportCsv }}" style="padding:9px 14px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:13px;cursor:pointer" style-hover="border-color:var(--accent);color:var(--accent)">Export CSV</button>
         </div>
-        <p style="margin:0;font-size:11.5px;color:var(--mut);font-family:'IBM Plex Mono',monospace">Remaining stock = Opening + Stock-in + Made − Sold − Damaged · {{ rowCount }} rows · display-only masters show N/A and are excluded from all totals</p>
+        <p style="margin:0;font-size:11.5px;color:var(--mut);font-family:'IBM Plex Mono',monospace">Remaining stock = Opening + Stock-in + Made − Sold − Damaged − Marketing · {{ rowCount }} rows · display-only masters show N/A and are excluded from all totals</p>
         <div class="inventory-scroll" role="region" aria-label="Master inventory — first three columns stay fixed" tabindex="0" style="overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);max-height:70vh">
           <table class="inventory-grid" style="font-size:12.5px">
             <colgroup>
               <col style="width:var(--pin-sno)">
               <col style="width:var(--pin-code)">
               <col style="width:var(--pin-name)">
-              <col span="24" style="width:160px">
+              <col span="25" style="width:160px">
             </colgroup>
             <thead>
               <tr style="background:#F4EDE3">
@@ -231,6 +231,7 @@
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right"><sc-if value="{{ r.stockItem }}">{{ r.made }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#2F6F5E"><sc-if value="{{ r.stockItem }}">{{ r.sold }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#A4442C"><sc-if value="{{ r.stockItem }}">{{ r.dmg }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A6318"><sc-if value="{{ r.stockItem }}">{{ r.marketing }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);text-align:right"><sc-if value="{{ r.stockItem }}"><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;padding:2px 7px;border-radius:99px;background:{{ r.stockBg }};color:{{ r.stockFg }}">{{ r.stock }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.reorder }}" onChange="{{ r.onReorder }}" style="width:56px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Beads Used" value="{{ r.beadsUsed }}" onChange="{{ r.onbeadsUsed }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
@@ -257,6 +258,7 @@
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tMade }}</td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tSold }}</td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tDmg }}</td>
+                <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tMarketing }}</td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tStock }}</td>
                 <td colspan="10"></td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tMargin }}</td>
@@ -413,9 +415,18 @@
               <label style="display:flex;flex-direction:column;gap:5px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mut)">Entry type
                 <select data-admin-write="true" value="{{ entry.kind }}" onChange="{{ onEntryKind }}" style="border:1px solid var(--line);border-radius:6px;padding:9px 10px;font-size:13px;letter-spacing:0;text-transform:none;color:var(--ink);background:#fff">
                   <option value="Sale">Sale — reduces stock, books revenue</option>
+                  <option value="Marketing">Marketing / giveaway — reduces stock, no sales revenue</option>
                   <option value="Damage">Damage / return — writes off stock</option>
                 </select>
               </label>
+            </sc-if>
+            <sc-if value="{{ isMarketing }}">
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:12px">Giveaway category
+                <select data-admin-write="true" value="{{ entry.purpose }}" onChange="{{ onMarketingPurpose }}" style="padding:9px;border:1px solid var(--line);border-radius:6px">
+                  <option value="UGC">UGC / creator gifting</option><option value="Friends and family">Friends and family</option><option value="Samples">Samples</option><option value="Other marketing">Other marketing</option>
+                </select>
+              </label>
+              <p style="margin:0;font-size:12px;color:var(--mut)">Stock reduces by the quantity given away. Product cost is recorded as marketing cost. The optional reference price is excluded from sales revenue.</p>
             </sc-if>
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
               <button data-admin-write="true" onClick="{{ postEntry }}" style="padding:10px 18px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#8E3F1E">{{ entryCta }}</button>
@@ -441,7 +452,7 @@
                 <sc-for list="{{ entryLog }}" as="t" hint-placeholder-count="8">
                   <tr style="border-bottom:1px solid #F2EBE1">
                     <td style="padding:9px 14px;font-family:'IBM Plex Mono',monospace;color:var(--mut);white-space:nowrap">{{ t.date }}</td>
-                    <td style="padding:9px 14px">{{ t.name }}</td>
+                    <td style="padding:9px 14px">{{ t.name }}<div style="font-size:11px;color:var(--mut)">{{ t.typeLabel }}</div></td>
                     <td style="padding:9px 14px;color:var(--mut);font-size:11.5px">{{ t.ref }}</td>
                     <td style="padding:9px 14px;text-align:right;font-family:'IBM Plex Mono',monospace;color:{{ t.tone }}">{{ t.qty }}</td>
                     <td style="padding:9px 14px;text-align:right;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ t.amount }}</td>
@@ -563,7 +574,7 @@ class Component extends DCLogic {
     sortDir: 1,
     draft: {},
     imageUploading: false, imageMessage: "JPG, PNG or WebP, up to 8 MB. Choose a photo, then save the product.",
-    entry: { code: "", qty: "", date: "", ref: "", rate: "", kind: "Sale" },
+    entry: { code: "", qty: "", date: "", ref: "", rate: "", kind: "Sale", purpose: "UGC" },
     addError: "",
     entryError: "",
     toast: ""
@@ -666,11 +677,15 @@ class Component extends DCLogic {
     finally { this._saving = false; }
   }
 
-  stock(p) { if (p.isVariantGroup) return 0; return p.open + p.purch + p.made - p.sold - p.dmg + (p.adjustment || 0); }
+  stock(p) { if (p.isVariantGroup) return 0; return p.open + p.purch + p.made - p.sold - p.dmg - (p.marketing || 0) + (p.adjustment || 0); }
   stockValue(p) { return this.stock(p) * p.cp; }
   stockValueAtSp(p) { return this.stock(p) * p.sp; }
   revenue(p) { return p.isVariantGroup ? 0 : p.sold * p.sp; }
   cogs(p) { return p.isVariantGroup ? 0 : p.sold * p.cp; }
+  marketingCost(product) {
+    return this.state.txns.filter(t => t.type === 'Marketing' && (!product || t.code === product.code))
+      .reduce((sum,t) => sum + t.qty * (t.unitCost ?? 0),0);
+  }
   grossProfit(p) { return this.revenue(p) - this.cogs(p); }
   marginPct(p) { return p.cp ? ((p.sp - p.cp) / p.cp) * 100 : 0; }
   inr(n) { return "₹" + Math.round(n).toLocaleString("en-IN"); }
@@ -706,16 +721,20 @@ class Component extends DCLogic {
     if (!p) return this.setState({ entryError: "Select a product first." });
     if (qty <= 0) return this.setState({ entryError: "Enter a quantity greater than zero." });
     let type = screen === "prod" ? "Production" : screen === "purch" ? "Purchase" : e.kind;
-    if ((type === "Sale" || type === "Damage") && qty > this.stock(p)) {
+    if (!['Production','Purchase','Sale','Damage','Marketing'].includes(type)) return this.setState({entryError:'Choose an entry type.'});
+    if(type === 'Marketing' && !(e.ref || '').trim()) return this.setState({entryError:'Enter the recipient / reference.'});
+    if(type === 'Marketing' && e.rate !== '' && (!Number.isFinite(Number(e.rate)) || Number(e.rate)<0)) return this.setState({entryError:'Reference price must be zero or greater.'});
+    if ((type === "Sale" || type === "Damage" || type === 'Marketing') && qty > this.stock(p)) {
       return this.setState({ entryError: "Only " + this.stock(p) + " " + p.unit + " in stock." });
     }
-    const key = type === "Production" ? "made" : type === "Purchase" ? "purch" : type === "Sale" ? "sold" : "dmg";
+    const key = type === "Production" ? "made" : type === "Purchase" ? "purch" : type === "Sale" ? "sold" : type === "Marketing" ? "marketing" : "dmg";
     const date = e.date && /^\d{4}-\d{2}-\d{2}$/.test(e.date) ? e.date : this.todayISO();
     const products = this.state.products.map(x =>
-      x.code === p.code ? Object.assign({}, x, { [key]: x[key] + qty, upd: date }) : x
+      x.code === p.code ? Object.assign({}, x, { [key]: (x[key] || 0) + qty, upd: date }) : x
     );
     const txn = { id: "t" + Date.now(), date, type, code: p.code, qty, ref: e.ref || "NA", rate: this.num(e.rate) || null };
-    this.setState({ entryError: "", entry: { code: "", qty: "", date: "", ref: "", rate: "", kind: e.kind } });
+    if(type === 'Marketing') Object.assign(txn,{purpose:e.purpose || 'UGC',unitCost:p.cp,rate:e.rate === '' ? null : Number(e.rate)});
+    this.setState({ entryError: "", entry: { code: "", qty: "", date: "", ref: "", rate: "", kind: e.kind, purpose:e.purpose || 'UGC' } });
     this.commit(products, [txn].concat(this.state.txns), type + " of " + qty + " " + p.unit + " recorded for " + p.name);
   }
 
@@ -786,7 +805,7 @@ class Component extends DCLogic {
       reorder: this.num(d.reorder), cp: d.cp === undefined ? (existing?.cp || 0) : this.num(d.cp), sp: this.num(d.sp), mrp: this.num(d.mrp),
       upd: this.todayISO()
     };
-    if(variants.length && existing?.isVariantGroup) Object.assign(rec,{open:0,purch:0,made:0,sold:0,dmg:0,adjustment:0,isVariantGroup:true});
+    if(variants.length && existing?.isVariantGroup) Object.assign(rec,{open:0,purch:0,made:0,sold:0,dmg:0,marketing:0,adjustment:0,isVariantGroup:true});
     this.applyCosting(rec);
     const products = existing
       ? this.state.products.map(p => (p.code === code ? Object.assign({}, p, rec, { purch: p.purch }) : p))
@@ -797,8 +816,8 @@ class Component extends DCLogic {
 
   exportCsv(rows) {
     rows = rows.filter(p => !p.isVariantGroup);
-    const head = ["S.No","Product Code","Product Name","Category","Unit","HSN","GST %","Opening","Stock In","Qty Made","Qty Sold","Damaged","Remaining Stock","Reorder Level","Beads Used","Quantity of beads (kg)","Cost of 1kg beads","Labor Hour","Other Material Cost","Notes","CP","SP","MRP","Margin %","Stock Value","Last Updated"];
-    const body = rows.map(p => [p.sno, p.code, p.name, p.cat, p.unit, p.hsn, p.gst, p.open, p.purch, p.made, p.sold, p.dmg, this.stock(p), p.reorder, p.beadsUsed||"", p.beadKg||0, p.beadCostKg||0, p.laborHours||0, p.otherMaterialCost||0, p.notes||"", p.cp, p.sp, p.mrp, Math.round(this.marginPct(p)), this.stockValue(p), p.upd]);
+    const head = ["S.No","Product Code","Product Name","Category","Unit","HSN","GST %","Opening","Stock In","Qty Made","Qty Sold","Damaged","Marketing / giveaway","Remaining Stock","Reorder Level","Beads Used","Quantity of beads (kg)","Cost of 1kg beads","Labor Hour","Other Material Cost","Notes","CP","SP","MRP","Margin %","Stock Value","Last Updated"];
+    const body = rows.map(p => [p.sno, p.code, p.name, p.cat, p.unit, p.hsn, p.gst, p.open, p.purch, p.made, p.sold, p.dmg, p.marketing || 0, this.stock(p), p.reorder, p.beadsUsed||"", p.beadKg||0, p.beadCostKg||0, p.laborHours||0, p.otherMaterialCost||0, p.notes||"", p.cp, p.sp, p.mrp, Math.round(this.marginPct(p)), this.stockValue(p), p.upd]);
     const csv = [head].concat(body).map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(",")).join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
@@ -826,6 +845,8 @@ class Component extends DCLogic {
     const outs = P.filter(p => stock(p) <= 0);
     const totMade = P.reduce((s, p) => s + p.made, 0);
     const totSold = P.reduce((s, p) => s + p.sold, 0);
+    const marketingCost = this.marketingCost();
+    const marketingQty = S.txns.filter(t=>t.type==='Marketing').reduce((sum,t)=>sum+t.qty,0);
     const totDmg = P.reduce((s, p) => s + p.dmg, 0);
 
     const titles = {
@@ -834,7 +855,7 @@ class Component extends DCLogic {
       low: ["Low stock & reorder list", "Items at or below their reorder level, with suggested replenishment quantity and cost."],
       add: ["Add / edit product", "Create a new SKU or update an existing one by entering its code."],
       prod: ["Record production", "Log units beaded or crocheted by the studio units. Adds to quantity made and remaining stock."],
-      sale: ["Record sale", "Log a dispatch against an invoice, or write off damaged and returned goods."],
+      sale: ["Sales & stock-out entry", "Record a sale, marketing giveaway or damaged stock write-off."],
       purch: ["Purchase / stock-in", "Log finished pieces or crystal stock bought in from vendors against a purchase order."],
       reports: ["Reports & margin analysis", "Category-level profitability, best and worst performers, wastage."],
       team: ["Team Members Directory", "Manage Kalajay members, roles, membership types and live website member count."]
@@ -882,7 +903,7 @@ class Component extends DCLogic {
       ["S.No", "sno", "right"], ["PRODUCT Code", "code", "left"], ["Product name", "name", "left"], ["Category", "cat", "left"],
       ["Unit", "unit", "center"], ["HSN", "hsn", "left"], ["GST %", "gst", "right"],
       ["Opening", "open", "right"], ["Stock in", "purch", "right"], ["Qty made", "made", "right"], ["Qty sold", "sold", "right"],
-      ["Damaged", "dmg", "right"], ["Stock", "stock", "right"], ["Reorder", "reorder", "right"], ["Beads Used", "beadsUsed", "left"], ["Quantity of beads (kg)", "beadKg", "right"], ["Cost of 1kg beads ₹", "beadCostKg", "right"], ["Labor Hour", "laborHours", "right"], ["Other Material Cost ₹", "otherMaterialCost", "right"], ["Notes", "notes", "left"], ["CP ₹", "cp", "right"],
+      ["Damaged", "dmg", "right"], ["Marketing / giveaway", "marketing", "right"], ["Stock", "stock", "right"], ["Reorder", "reorder", "right"], ["Beads Used", "beadsUsed", "left"], ["Quantity of beads (kg)", "beadKg", "right"], ["Cost of 1kg beads ₹", "beadCostKg", "right"], ["Labor Hour", "laborHours", "right"], ["Other Material Cost ₹", "otherMaterialCost", "right"], ["Notes", "notes", "left"], ["CP ₹", "cp", "right"],
       ["SP ₹", "sp", "right"], ["MRP ₹", "mrp", "right"], ["Margin %", "margin", "right"], ["Stock value", "value", "right"],
       ["Updated", "upd", "right"], ["", "", "center"]
     ];
@@ -904,7 +925,7 @@ class Component extends DCLogic {
         editOptionsLabel: p.isVariantGroup ? 'Edit colours' : 'Edit options',
         sno: p.sno, code: p.code, name: p.name, cat: p.cat, unit: p.unit, hsn: p.hsn, gst: p.gst,
         imageSrc: p.image ? (p.image.indexOf('/') === 0 || p.image.indexOf('http') === 0 ? p.image : '/v2/' + p.image + (p.image.indexOf('.') < 0 ? '.jpg' : '')) : '/assets/kalajay-brand.png',
-        open: p.open, purch: p.purch, made: p.made, sold: p.sold, dmg: p.dmg, reorder: p.reorder,
+        open: p.open, purch: p.purch, made: p.made, sold: p.sold, dmg: p.dmg, marketing:p.marketing || 0, reorder: p.reorder,
         beadsUsed:p.beadsUsed||'', beadKg:p.beadKg||0, beadCostKg:p.beadCostKg||0, laborHours:p.laborHours||0, otherMaterialCost:p.otherMaterialCost||0, notes:p.notes||'',
         onbeadsUsed:txt(p.code,'beadsUsed'), onbeadKg:nm(p.code,'beadKg'), onbeadCostKg:nm(p.code,'beadCostKg'), onlaborHours:nm(p.code,'laborHours'), onotherMaterialCost:nm(p.code,'otherMaterialCost'), onnotes:txt(p.code,'notes'),
         cp: p.cp, sp: p.sp, mrp: p.mrp, upd: p.upd, stock: st,
@@ -954,9 +975,9 @@ class Component extends DCLogic {
       .slice(0, 6).map(p => ({ name: p.name, rate: Math.round((p.sold / (p.open + p.purch + p.made)) * 100) }));
 
     const nameOf = c => { const p = S.products.find(x => x.code === c); return p ? p.name : c; };
-    const toneOf = t => t === "Sale" ? "#2F6F5E" : t === "Damage" ? "#A4442C" : t === "Purchase" ? "#3A4A7A" : accent;
+    const toneOf = t => t === "Sale" ? "#2F6F5E" : t === "Marketing" ? "#8A6318" : t === "Damage" ? "#A4442C" : t === "Purchase" ? "#3A4A7A" : accent;
     const activity = S.txns.slice(0, 7).map(t => ({
-      date: t.date.slice(5), type: t.type, name: nameOf(t.code), qty: t.type === "Adjustment" ? (t.qty < 0 ? "−" : "+") + Math.abs(t.qty) : (t.type === "Sale" || t.type === "Damage" ? "−" : "+") + t.qty, tone: toneOf(t.type)
+      date: t.date.slice(5), type: t.type, name: nameOf(t.code), qty: t.type === "Adjustment" ? (t.qty < 0 ? "−" : "+") + Math.abs(t.qty) : (t.type === "Sale" || t.type === "Damage" || t.type === "Marketing" ? "−" : "+") + t.qty, tone: toneOf(t.type)
     }));
 
     const kpis = [
@@ -965,6 +986,8 @@ class Component extends DCLogic {
       { label: "Revenue booked", value: this.inrShort(revenue), sub: "Gross profit " + this.inrShort(revenue - cogs), tone: "#2F6F5E" },
       { label: "Low stock alerts", value: String(lows.length), sub: outs.length + " fully out of stock", tone: lows.length ? "#A4442C" : "#2F6F5E" },
       { label: "Units made / sold", value: totMade.toLocaleString("en-IN") + " / " + totSold.toLocaleString("en-IN"), sub: "Sell-through " + Math.round((totSold / Math.max(totMade, 1)) * 100) + "%", tone: "#2A241E" },
+      { label: "Marketing / giveaway cost", value:this.inrShort(marketingCost), sub:marketingQty + ' units · excluded from sales', tone:'#8A6318' },
+      { label: "After marketing", value:this.inrShort(revenue-cogs-marketingCost), sub:'Gross profit less giveaway product costs', tone:'#2F6F5E' },
       { label: "Damage rate", value: (totDmg / Math.max(totMade + totSold, 1) * 100).toFixed(1) + "%", sub: totDmg + " units written off", tone: "#B8860B" }
     ];
 
@@ -994,7 +1017,7 @@ class Component extends DCLogic {
       ["Labor Hour", "laborHours"], ["Other Material Cost (₹)", "otherMaterialCost"]
     ].map(([label,key])=>({label,value:d[key] ?? "",onChange:dset(key)}));
     const dcp = this.num(d.cp), dsp = this.num(d.sp);
-    const dstock = this.num(d.open) + this.num(d.purch) + this.num(d.made) - this.num(d.sold) - this.num(d.dmg) + this.num(d.adjustment);
+    const dstock = this.num(d.open) + this.num(d.purch) + this.num(d.made) - this.num(d.sold) - this.num(d.dmg) - this.num(d.marketing) + this.num(d.adjustment);
     const addPreview = [
       { label: "CP: kg × cost/kg + ₹50 × labor hours + other materials", value: this.inr(dcp) },
       { label: "Remaining stock", value: String(dstock) },
@@ -1009,12 +1032,13 @@ class Component extends DCLogic {
 
     // ---------- entry screens ----------
     const isSale = screen === "sale";
+    const isMarketing = isSale && S.entry.kind === 'Marketing';
     const eset = k => e => this.setState({ entry: Object.assign({}, this.state.entry, { [k]: e.target.value }), entryError: "" });
     const entryFieldDefs = screen === "prod"
       ? [["Quantity made", "qty", "0"], ["Date", "date", this.todayISO()], ["Batch / job no.", "ref", "NA"]]
       : screen === "purch"
       ? [["Quantity received", "qty", "0"], ["Date", "date", this.todayISO()], ["PO / invoice no.", "ref", "NA"], ["Rate per unit ₹", "rate", "0"]]
-      : [["Quantity", "qty", "0"], ["Date", "date", this.todayISO()], ["Invoice / customer", "ref", "NA"], ["Rate per unit ₹", "rate", "0"]];
+      : [["Quantity", "qty", "0"], ["Date", "date", this.todayISO()], [isMarketing ? "Recipient / reference" : "Invoice / customer", "ref", isMarketing ? "Creator or recipient name" : "NA"], [isMarketing ? "Reference price per unit ₹ (optional)" : "Rate per unit ₹", "rate", "0"]];
     const entryFields = entryFieldDefs.map(f => ({ label: f[0], hint: f[2], value: S.entry[f[1]], onChange: eset(f[1]) }));
 
     const sel = P.find(p => p.code === S.entry.code);
@@ -1024,14 +1048,16 @@ class Component extends DCLogic {
     const entryPreview = sel ? [
       { label: "Current stock", value: stock(sel) + " " + sel.unit, tone: "#2A241E" },
       { label: "After this entry", value: (stock(sel) + (isOut ? -eqty : eqty)) + " " + sel.unit, tone: (stock(sel) + (isOut ? -eqty : eqty)) <= sel.reorder ? "#A4442C" : "#2F6F5E" },
-      { label: screen === "prod" ? "Production cost" : screen === "purch" ? "Purchase value" : S.entry.kind === "Damage" ? "Write-off at cost" : "Invoice value", value: this.inr(eqty * (screen === "prod" || S.entry.kind === "Damage" ? sel.cp : erate)), tone: "#2A241E" }
+      { label: screen === "prod" ? "Production cost" : screen === "purch" ? "Purchase value" : isMarketing ? "Marketing cost at CP" : S.entry.kind === "Damage" ? "Write-off at cost" : "Invoice value", value: this.inr(eqty * (screen === "prod" || S.entry.kind === "Damage" || isMarketing ? sel.cp : erate)), tone: "#2A241E" }
     ] : [{ label: "Select a product", value: "—", tone: "#7E7266" }];
 
-    const logType = screen === "prod" ? ["Production"] : screen === "purch" ? ["Purchase"] : ["Sale", "Damage"];
+    if(isMarketing && sel) entryPreview.push({label:'Sales revenue added',value:this.inr(0),tone:'#2A241E'},{label:'Reference value (not revenue)',value:this.inr(eqty*this.num(S.entry.rate)),tone:'#7E7266'});
+
+    const logType = screen === "prod" ? ["Production"] : screen === "purch" ? ["Purchase"] : ["Sale", "Damage", "Marketing"];
     const entryLog = S.txns.filter(t => logType.indexOf(t.type) >= 0).slice(0, 14).map(t => {
       const p = P.find(x => x.code === t.code);
-      const rate = t.rate || (p ? (t.type === "Sale" ? p.sp : p.cp) : 0);
-      return { date: t.date, name: p ? p.name : t.code, ref: t.ref, qty: (t.type === "Sale" || t.type === "Damage" ? "−" : "+") + t.qty, amount: this.inr(t.qty * rate), tone: toneOf(t.type) };
+      const rate = t.type === 'Marketing' ? (t.unitCost ?? 0) : t.rate || (p ? (t.type === "Sale" ? p.sp : p.cp) : 0);
+      return { typeLabel:t.type + (t.purpose ? ' · ' + t.purpose : ''), date: t.date, name: p ? p.name : t.code, ref: t.ref, qty: (t.type === "Sale" || t.type === "Damage" || t.type === "Marketing" ? "−" : "+") + t.qty, amount: this.inr(t.qty * rate), tone: toneOf(t.type) };
     });
 
     // ---------- reports ----------
@@ -1057,6 +1083,12 @@ class Component extends DCLogic {
       { label: "Stock value", value: this.inrShort(totalValue), sub: "At cost price", tone: "#2A241E" },
       { label: "MRP headroom", value: Math.round((P.reduce((s, p) => s + (p.mrp - p.sp), 0) / Math.max(P.reduce((s, p) => s + p.sp, 0), 1)) * 100) + "%", sub: "Average SP to MRP gap", tone: "#B8860B" }
     ];
+
+    reportKpis.push(
+      {label:'Marketing / giveaway cost',value:this.inrShort(marketingCost),sub:marketingQty + ' units · cost price at time of entry',tone:'#8A6318'},
+      {label:'Total product costs',value:this.inrShort(cogs+marketingCost),sub:'Cost of sales plus marketing giveaways',tone:'#2A241E'},
+      {label:'After marketing',value:this.inrShort(revenue-cogs-marketingCost),sub:'Revenue less cost of sales and giveaway costs',tone:'#2F6F5E'}
+    );
 
     const rowRevenue = stockRows.reduce((s, p) => s + this.revenue(p), 0);
     const rowCogs = stockRows.reduce((s, p) => s + this.cogs(p), 0);
@@ -1085,6 +1117,7 @@ class Component extends DCLogic {
       tMade: stockRows.reduce((s, p) => s + p.made, 0).toLocaleString("en-IN"),
       tSold: stockRows.reduce((s, p) => s + p.sold, 0).toLocaleString("en-IN"),
       tDmg: stockRows.reduce((s, p) => s + p.dmg, 0).toLocaleString("en-IN"),
+      tMarketing: stockRows.reduce((sum,p)=>sum+(p.marketing || 0),0).toLocaleString('en-IN'),
       tStock: stockRows.reduce((s, p) => s + stock(p), 0).toLocaleString("en-IN"),
       tMargin: tMarginPct,
       tValue: this.inr(stockRows.reduce((s, p) => s + this.stockValue(p), 0)),
@@ -1117,13 +1150,13 @@ class Component extends DCLogic {
       })(),
       addVariant: () => { if(this._imageUploading)return;const variants=this.draftVariants();if(variants.length>=30)return this.setState({addError:'Use up to 30 colours / varieties.'});this.setState({draft:{...this.state.draft,variants:[...variants,{label:'',images:[]}]}}); },
       saveProduct: () => this.saveDraft(), clearProduct: () => { this._draftVersion = (this._draftVersion || 0) + 1; this.setState({ draft: {}, addError: "", imageMessage: 'JPG, PNG or WebP, up to 8 MB. Choose a photo, then save the product.' }); },
-      entry: S.entry, entryFields, entryPreview, entryError: S.entryError, isSale,
-      onEntryCode: eset("code"), onEntryKind: eset("kind"),
+      entry: S.entry, entryFields, entryPreview, entryError: S.entryError, isSale, isMarketing,
+      onEntryCode: eset("code"), onEntryKind: e => this.setState({entry:{...this.state.entry,kind:e.target.value,rate:"",purpose:this.state.entry.purpose || "UGC"},entryError:""}), onMarketingPurpose:eset("purpose"),
       editProductOptions: S.products.filter(p=>!p.parentCode).map(p=>({code:p.code,label:p.code+' — '+p.name+(p.isVariantGroup?' (display group)':'')})),
       productOptions: P.map(p => ({ code: p.code, label: p.code + " — " + p.name + "  (" + stock(p) + " " + p.unit + ")" })),
-      entryHeading: screen === "prod" ? "New production entry" : screen === "purch" ? "New stock-in entry" : "New sale entry",
-      entryCta: screen === "prod" ? "Post production" : screen === "purch" ? "Post stock-in" : S.entry.kind === "Damage" ? "Write off stock" : "Post sale",
-      entryLogTitle: screen === "prod" ? "Recent production" : screen === "purch" ? "Recent purchases" : "Recent sales & write-offs",
+      entryHeading: screen === "prod" ? "New production entry" : screen === "purch" ? "New stock-in entry" : isMarketing ? "Marketing / giveaway entry" : "New sale entry",
+      entryCta: screen === "prod" ? "Post production" : screen === "purch" ? "Post stock-in" : isMarketing ? "Record giveaway" : S.entry.kind === "Damage" ? "Write off stock" : "Post sale",
+      entryLogTitle: screen === "prod" ? "Recent production" : screen === "purch" ? "Recent purchases" : "Recent sales, giveaways & write-offs",
       entryLog,
       reportKpis, catRows, profitRows, damageRows,
       postEntry: () => this.postTxn(),
