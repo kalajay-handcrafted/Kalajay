@@ -4,7 +4,7 @@ import json
 import sqlite3
 from pathlib import Path
 
-COUNTERS = ('open', 'purch', 'made', 'sold', 'dmg', 'adjustment')
+COUNTERS = ('open', 'purch', 'made', 'sold', 'dmg', 'marketing', 'adjustment')
 
 
 def is_group(product):
@@ -122,13 +122,13 @@ def migrate(connect, data_dir):
                 parent = source[p['parentCode']]
                 db.execute('INSERT INTO products VALUES (?,?,?,?,?,?,?,?,?)',
                            (p['code'], p['name'], p['cat'], p['image'], p['sp'],
-                            int(sum(p.get(k, 0) * (-1 if k in ('sold', 'dmg') else 1) for k in COUNTERS) <= 0),
+                            int(sum(p.get(k, 0) * (-1 if k in ('sold', 'dmg', 'marketing') else 1) for k in COUNTERS) <= 0),
                             3000 + index, 1, 1))
             elif p.get('parentCode'):
                 # Child SKUs were previously unpublished. The catalogue filters
                 # them into their parent listing; checkout still needs their IDs.
                 db.execute('UPDATE products SET published=1,sold_out=? WHERE product_code=?',
-                           (int(sum(p.get(k, 0) * (-1 if k in ('sold', 'dmg') else 1) for k in COUNTERS) <= 0),p['code']))
+                           (int(sum(p.get(k, 0) * (-1 if k in ('sold', 'dmg', 'marketing') else 1) for k in COUNTERS) <= 0),p['code']))
             db.execute('INSERT OR REPLACE INTO inventory VALUES (?,?)', (p['code'], json.dumps(p)))
         db.execute("INSERT INTO shared_meta VALUES ('variety_skus_v1',1)")
         db.execute("UPDATE shared_meta SET value=value+1 WHERE key='revision'")

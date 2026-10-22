@@ -5,7 +5,7 @@ import inventory_costing
 import variant_inventory as varieties
 from datetime import datetime, timezone
 
-NUMBERS=('open','purch','made','sold','dmg','reorder','cp','sp','mrp','gst')
+NUMBERS=('open','purch','made','sold','dmg','marketing','reorder','cp','sp','mrp','gst')
 ALIASES={
  'Pearl Beaded Ring/Earring Box':'Pearl Beaded Ring & Earring Box',
  'Pearl Beaded Round Watch/Accessory Box':'Pearl Beaded Round Watch Box',
@@ -54,7 +54,7 @@ IMAGE_FIXES={
 def norm(s):return ' '.join(s.strip().lower().split())
 def record(code,name,cat,unit='pcs'):
  return dict(code=code,name=name,cat=cat,unit=unit,image='',hsn='NA',upd='NA',sno=0,**{k:0 for k in NUMBERS})
-def stock(p):return p['open']+p['purch']+p['made']-p['sold']-p['dmg']+p.get('adjustment',0)
+def stock(p):return p['open']+p['purch']+p['made']-p['sold']-p['dmg']-p.get('marketing',0)+p.get('adjustment',0)
 def rename_product_code(db,old,new,expected_name):
  if old==new:return
  row=db.execute('SELECT * FROM products WHERE product_code=?',(old,)).fetchone()
@@ -182,7 +182,7 @@ def state(connect):
   sync_inventory_metadata(db)
   products=[json.loads(r[0]) for r in db.execute('SELECT i.record FROM inventory i JOIN products p USING(product_code) WHERE p.active=1 ORDER BY p.category, p.name COLLATE NOCASE')]
   for i,p in enumerate(products):
-   p['sno']=i+1;p['variants']=display_variants(p)
+   p['sno']=i+1;p['variants']=display_variants(p);p.setdefault('marketing',0)
   orders=[]
   for r in db.execute('SELECT * FROM orders ORDER BY created_at DESC'):
    orders.append(dict(id=r['id'],date=r['created_at'][:10],customer=json.loads(r['customer']),items=[dict(x, varieties=next((i.get('varieties',[]) for i in json.loads(r['items']) if i.get('code')==x['product_code']),[])) for x in db.execute('SELECT * FROM order_items WHERE order_id=?',(r['id'],))],total=r['total'],status=r['status'],note=r['note']))
@@ -217,6 +217,9 @@ def update(connect,data):
  if any(not isinstance(p,dict) or not isinstance(p.get('code'),str) or not isinstance(p.get('variants',[]),list) or any(not isinstance(v,dict) or not isinstance(v.get('label'),str) or not isinstance(v.get('images'),list) or not v['images'] or ('code' in v and not isinstance(v['code'],str)) for v in p.get('variants',[])) for p in data['products']):raise ValueError('Invalid product / variety data.')
  with connect() as db:
   previous=[json.loads(r[0]) for r in db.execute('SELECT i.record FROM inventory i JOIN products p USING(product_code) WHERE p.active=1')]
+  saved_txn_ids={r[0] for r in db.execute('SELECT id FROM inventory_transactions')}
+ old_products={p['code']:p for p in previous}
+ for p in data['products']:p.setdefault('marketing',old_products.get(p['code'],{}).get('marketing',0))
  data={**data,'products':varieties.prepare(data['products'],previous)}
  if len(data['products'])>10000 or len(data['txns'])>100000:raise ValueError('Too many records.')
  seen=set()
@@ -244,7 +247,17 @@ def update(connect,data):
  for t in data['txns']:
   if not isinstance(t,dict) or not isinstance(t.get('id'),str) or t['id'] in txn_seen or len(t['id'])>100:raise ValueError('Invalid transaction ID.')
   txn_seen.add(t['id'])
-  if not isinstance(t.get('code'),str) or t.get('type') not in ('Production','Purchase','Sale','Damage','Adjustment') or type(t.get('qty')) not in (int,float) or not math.isfinite(t['qty']) or (t['qty']==0 if t.get('type')=='Adjustment' else t['qty']<=0):raise ValueError('Invalid stock transaction.')
+  if not isinstance(t.get('code'),str) or t.get('type') not in ('Production','Purchase','Sale','Damage','Marketing','Adjustment') or type(t.get('qty')) not in (int,float) or not math.isfinite(t['qty']) or (t['qty']==0 if t.get('type')=='Adjustment' else t['qty']<=0):raise ValueError('Invalid stock transaction.')
+  if t.get('type')=='Marketing':
+   if t.get('purpose') not in ('UGC','Friends and family','Samples','Other marketing'):raise ValueError('Select a marketing / giveaway category.')
+   if not isinstance(t.get('ref'),str) or not t['ref'].strip() or len(t['ref'])>300:raise ValueError('Enter a recipient / reference (up to 300 characters).')
+   if t.get('rate') is not None and (type(t['rate']) not in (int,float) or not math.isfinite(t['rate']) or not 0<=t['rate']<=1e9):raise ValueError('Invalid marketing reference price.')
+ marketing_deltas={}
+ for t in data['txns']:
+  if t['type']=='Marketing' and t['id'] not in saved_txn_ids:marketing_deltas[t['code']]=marketing_deltas.get(t['code'],0)+t['qty']
+ for p in data['products']:
+  if not math.isclose(p.get('marketing',0),old_products.get(p['code'],{}).get('marketing',0)+marketing_deltas.pop(p['code'],0),rel_tol=0,abs_tol=1e-8):raise ValueError('Marketing quantities must match giveaway entries for '+p['code'])
+ if marketing_deltas:raise ValueError('Select an active stock item for the marketing giveaway.')
  with connect() as db:
   db.execute('BEGIN IMMEDIATE')
   revision=db.execute("SELECT value FROM shared_meta WHERE key='revision'").fetchone()[0]
@@ -270,7 +283,7 @@ def update(connect,data):
    old_inv=db.execute('SELECT record FROM inventory WHERE product_code=?',(code,)).fetchone()
    if 'variants' not in p and old_inv:p['variants']=json.loads(old_inv[0]).get('variants',[])
    # Availability follows inventory once inventory quantities are actually changed.
-   if p.get('parentCode') or (old_inv and any(p.get(k,0)!=json.loads(old_inv[0]).get(k,0) for k in ('open','purch','made','sold','dmg','adjustment'))):
+   if p.get('parentCode') or (old_inv and any(p.get(k,0)!=json.loads(old_inv[0]).get(k,0) for k in ('open','purch','made','sold','dmg','marketing','adjustment'))):
     db.execute('UPDATE products SET sold_out=? WHERE product_code=?',(int(stock(p)<=0),code))
    db.execute('INSERT OR REPLACE INTO inventory VALUES (?,?)',(code,json.dumps(p)))
   for t in data['txns']:
@@ -278,6 +291,7 @@ def update(connect,data):
    prior=db.execute('SELECT record FROM inventory_transactions WHERE id=?',(t['id'],)).fetchone()
    inv=db.execute('SELECT record FROM inventory WHERE product_code=?',(t['code'],)).fetchone()
    if not prior and inv and varieties.is_group(json.loads(inv[0])):raise ValueError('Record stock transactions against an individual colour / variety.')
+   if not prior and t['type']=='Marketing':t['unitCost']=json.loads(inv[0])['cp']
    if prior and json.loads(prior[0])!=t:raise ValueError('Existing stock transactions cannot be rewritten.')
    db.execute('INSERT OR IGNORE INTO inventory_transactions VALUES (?,?,?)',(t['id'],t['code'],json.dumps(t)))
   if data.get('importLegacy'):db.execute("UPDATE shared_meta SET value=1 WHERE key='browser_imported'")
