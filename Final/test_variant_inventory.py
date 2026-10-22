@@ -69,6 +69,11 @@ class Tests(unittest.TestCase):
   # An older client omitting the optional counter cannot silently restore stock.
   for p in s['products']:p.pop('marketing',None)
   s=shared.update(self.connect,s);self.assertEqual(shared.stock(next(p for p in s['products'] if p['code']==code)),0)
+ def test_add_varieties_after_marketing_preserves_history(self):
+  s=shared.state(self.connect);p=shared.record('SINGLE','Gift','Bags');p.update(open=5,cp=50,sp=100);s['products']=[p];s=shared.update(self.connect,s)
+  s['products'][0]['marketing']=2;s['txns']=[dict(id='gift-before-options',date='2026-10-22',type='Marketing',code='SINGLE',qty=2,purpose='Samples',ref='Fixture',rate=None)]
+  s=shared.update(self.connect,s);s['products'][0]['variants']=[dict(label='Blue',images=['/assets/b.jpg'])];s=shared.update(self.connect,s)
+  by={p['code']:p for p in s['products']};self.assertEqual(shared.stock(by['SINGLE']),0);self.assertEqual(shared.stock(by['SINGLE-UNASSIGNED']),3);self.assertEqual(by['SINGLE-UNASSIGNED']['marketing'],2);self.assertEqual(s['txns'][0]['code'],'SINGLE');self.assertEqual(s['txns'][0]['unitCost'],50)
  def test_marketing_validation_and_overdraw(self):
   s=self.group();child=next(p for p in s['products'] if p.get('parentCode'));child['open']=1;s=shared.update(self.connect,s);code=child['code']
   import copy

@@ -255,8 +255,17 @@ def update(connect,data):
  marketing_deltas={}
  for t in data['txns']:
   if t['type']=='Marketing' and t['id'] not in saved_txn_ids:marketing_deltas[t['code']]=marketing_deltas.get(t['code'],0)+t['qty']
+ marketing_baselines={code:p.get('marketing',0) for code,p in old_products.items()}
+ expanded={p['code']:p for p in data['products']}
  for p in data['products']:
-  if not math.isclose(p.get('marketing',0),old_products.get(p['code'],{}).get('marketing',0)+marketing_deltas.pop(p['code'],0),rel_tol=0,abs_tol=1e-8):raise ValueError('Marketing quantities must match giveaway entries for '+p['code'])
+  old=old_products.get(p['code'],{})
+  if varieties.is_group(p) and not varieties.is_group(old) and p['code']+'-UNASSIGNED' in expanded:
+   # Converting a stocked item to varieties preserves its old movement counters
+   # in the unassigned balance while keeping historical transaction codes intact.
+   marketing_baselines[p['code']+'-UNASSIGNED']=old.get('marketing',0)
+   marketing_baselines[p['code']]=0
+ for p in data['products']:
+  if not math.isclose(p.get('marketing',0),marketing_baselines.get(p['code'],0)+marketing_deltas.pop(p['code'],0),rel_tol=0,abs_tol=1e-8):raise ValueError('Marketing quantities must match giveaway entries for '+p['code'])
  if marketing_deltas:raise ValueError('Select an active stock item for the marketing giveaway.')
  with connect() as db:
   db.execute('BEGIN IMMEDIATE')
