@@ -200,7 +200,7 @@
           <button data-admin-write="true" onClick="{{ goAdd }}" style="padding:9px 14px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#8E3F1E">+ New product</button>
           <button onClick="{{ exportCsv }}" style="padding:9px 14px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:13px;cursor:pointer" style-hover="border-color:var(--accent);color:var(--accent)">Export CSV</button>
         </div>
-        <p style="margin:0;font-size:11.5px;color:var(--mut);font-family:'IBM Plex Mono',monospace">Remaining stock = Opening + Stock-in + Made − Sold − Damaged · {{ rowCount }} rows · white cells are editable in place</p>
+        <p style="margin:0;font-size:11.5px;color:var(--mut);font-family:'IBM Plex Mono',monospace">Remaining stock = Opening + Stock-in + Made − Sold − Damaged · {{ rowCount }} rows · display-only masters show N/A and are excluded from all totals</p>
         <div class="inventory-scroll" role="region" aria-label="Master inventory — first three columns stay fixed" tabindex="0" style="overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);max-height:70vh">
           <table class="inventory-grid" style="font-size:12.5px">
             <colgroup>
@@ -221,37 +221,37 @@
                 <tr style="border-bottom:1px solid #F2EBE1;background:{{ r.rowBg }}" style-hover="background:#FBF4EA">
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;color:var(--mut);text-align:right">{{ r.sno }}</td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;white-space:nowrap;color:#4A4038">{{ r.code }}</td>
-                  <td style="padding:4px 6px;vertical-align:top"><textarea class="inventory-name" data-inventory-name data-admin-write="true" aria-label="Product name" rows="2" maxlength="300" value="{{ r.name }}" onChange="{{ r.onName }}"></textarea><div class="inventory-name-tools"><img src="{{ r.imageSrc }}" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;border:1px solid var(--line);background:#F6EFE5;flex:none"><button data-admin-write="true" onClick="{{ r.editOptions }}" title="Edit product colours and varieties" style="font-size:11px;padding:4px;white-space:normal">Edit options</button></div></td>
+                  <td style="padding:4px 6px;vertical-align:top"><textarea class="inventory-name" data-inventory-name data-admin-write="true" aria-label="Product name" rows="2" maxlength="300" value="{{ r.name }}" onChange="{{ r.onName }}"></textarea><sc-if value="{{ r.isGroup }}"><div style="font-size:10px;color:#8A6318;padding:2px 4px">Master · display only</div></sc-if><div class="inventory-name-tools"><img src="{{ r.imageSrc }}" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;border:1px solid var(--line);background:#F6EFE5;flex:none"><button data-admin-write="true" onClick="{{ r.editOptions }}" title="Edit product colours and varieties" style="font-size:11px;padding:4px;white-space:normal">{{ r.editOptionsLabel }}</button></div></td>
                   <td style="padding:4px 6px"><select data-admin-write="true" aria-label="Product category" value="{{ r.cat }}" onChange="{{ r.onCat }}" style="width:150px;border:1px solid var(--line);border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px"><option value="">Select category</option><sc-for list="{{ categoryChoices }}" as="category"><option value="{{ category }}">{{ category }}</option></sc-for></select></td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.unit }}" onChange="{{ r.onUnit }}" style="width:52px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;text-align:center" style-hover="border-color:var(--line)"></td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.hsn }}" onChange="{{ r.onHsn }}" style="width:62px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace" style-hover="border-color:var(--line)"></td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.gst }}" onChange="{{ r.onGst }}" style="width:48px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
-                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut)">{{ r.open }}</td>
-                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut)">{{ r.purch }}</td>
-                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ r.made }}</td>
-                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#2F6F5E">{{ r.sold }}</td>
-                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#A4442C">{{ r.dmg }}</td>
-                  <td style="padding:var(--pad);text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;padding:2px 7px;border-radius:99px;background:{{ r.stockBg }};color:{{ r.stockFg }}">{{ r.stock }}</span></td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.reorder }}" onChange="{{ r.onReorder }}" style="width:56px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" aria-label="Beads Used" value="{{ r.beadsUsed }}" onChange="{{ r.onbeadsUsed }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" aria-label="Quantity of beads (kg)" type="number" min="0" step="any" value="{{ r.beadKg }}" onChange="{{ r.onbeadKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" aria-label="Cost of 1kg beads" type="number" min="0" step="any" value="{{ r.beadCostKg }}" onChange="{{ r.onbeadCostKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" aria-label="Labor Hour" type="number" min="0" step="any" value="{{ r.laborHours }}" onChange="{{ r.onlaborHours }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" aria-label="Other Material Cost" type="number" min="0" step="any" value="{{ r.otherMaterialCost }}" onChange="{{ r.onotherMaterialCost }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" aria-label="Notes" value="{{ r.notes }}" onChange="{{ r.onnotes }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></td>
-                  <td style="padding:var(--pad);text-align:right" title="Bead kg × cost/kg + ₹50 × labor hours + other material cost">{{ r.cp }}</td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.sp }}" onChange="{{ r.onSp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
-                  <td style="padding:4px 6px"><input data-admin-write="true" value="{{ r.mrp }}" onChange="{{ r.onMrp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></td>
-                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:{{ r.marginFg }}">{{ r.margin }}</td>
-                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap">{{ r.value }}</td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.unit }}" onChange="{{ r.onUnit }}" style="width:52px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;text-align:center" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.hsn }}" onChange="{{ r.onHsn }}" style="width:62px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.gst }}" onChange="{{ r.onGst }}" style="width:48px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut)"><sc-if value="{{ r.stockItem }}">{{ r.open }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut)"><sc-if value="{{ r.stockItem }}">{{ r.purch }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right"><sc-if value="{{ r.stockItem }}">{{ r.made }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#2F6F5E"><sc-if value="{{ r.stockItem }}">{{ r.sold }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#A4442C"><sc-if value="{{ r.stockItem }}">{{ r.dmg }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:var(--pad);text-align:right"><sc-if value="{{ r.stockItem }}"><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;padding:2px 7px;border-radius:99px;background:{{ r.stockBg }};color:{{ r.stockFg }}">{{ r.stock }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.reorder }}" onChange="{{ r.onReorder }}" style="width:56px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Beads Used" value="{{ r.beadsUsed }}" onChange="{{ r.onbeadsUsed }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Quantity of beads (kg)" type="number" min="0" step="any" value="{{ r.beadKg }}" onChange="{{ r.onbeadKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Cost of 1kg beads" type="number" min="0" step="any" value="{{ r.beadCostKg }}" onChange="{{ r.onbeadCostKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Labor Hour" type="number" min="0" step="any" value="{{ r.laborHours }}" onChange="{{ r.onlaborHours }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Other Material Cost" type="number" min="0" step="any" value="{{ r.otherMaterialCost }}" onChange="{{ r.onotherMaterialCost }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Notes" value="{{ r.notes }}" onChange="{{ r.onnotes }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:var(--pad);text-align:right" title="Bead kg × cost/kg + ₹50 × labor hours + other material cost"><sc-if value="{{ r.stockItem }}">{{ r.cp }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.sp }}" onChange="{{ r.onSp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.mrp }}" onChange="{{ r.onMrp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:{{ r.marginFg }}"><sc-if value="{{ r.stockItem }}">{{ r.margin }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap"><sc-if value="{{ r.stockItem }}">{{ r.value }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut);white-space:nowrap">{{ r.upd }}</td>
-                  <td style="padding:var(--pad);text-align:center"><button data-admin-write="true" onClick="{{ r.onDelete }}" title="Delete row" style="border:0;background:none;color:#B9A896;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px" style-hover="color:#A4442C;background:#F8EDE7">✕</button></td>
+                  <td style="padding:var(--pad);text-align:center"><sc-if value="{{ r.stockItem }}"><button data-admin-write="true" onClick="{{ r.onDelete }}" title="Delete row" style="border:0;background:none;color:#B9A896;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px" style-hover="color:#A4442C;background:#F8EDE7">✕</button></sc-if><sc-if value="{{ r.isGroup }}"><button data-admin-write="true" onClick="{{ r.editOptions }}" style="font-size:11px;white-space:normal">Edit colours</button></sc-if></td>
                 </tr>
               </sc-for>
             </tbody>
             <tfoot>
               <tr style="background:#F4EDE3;font-weight:600">
-                <td colspan="3" style="padding:var(--pad);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#6B5F52">Totals — {{ rowCount }} products</td><td colspan="4"></td>
+                <td colspan="3" style="padding:var(--pad);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#6B5F52">Totals — {{ stockRowCount }} stock items</td><td colspan="4"></td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tOpen }}</td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tPurch }}</td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tMade }}</td>
@@ -666,11 +666,11 @@ class Component extends DCLogic {
     finally { this._saving = false; }
   }
 
-  stock(p) { return p.open + p.purch + p.made - p.sold - p.dmg + (p.adjustment || 0); }
+  stock(p) { if (p.isVariantGroup) return 0; return p.open + p.purch + p.made - p.sold - p.dmg + (p.adjustment || 0); }
   stockValue(p) { return this.stock(p) * p.cp; }
   stockValueAtSp(p) { return this.stock(p) * p.sp; }
-  revenue(p) { return p.sold * p.sp; }
-  cogs(p) { return p.sold * p.cp; }
+  revenue(p) { return p.isVariantGroup ? 0 : p.sold * p.sp; }
+  cogs(p) { return p.isVariantGroup ? 0 : p.sold * p.cp; }
   grossProfit(p) { return this.revenue(p) - this.cogs(p); }
   marginPct(p) { return p.cp ? ((p.sp - p.cp) / p.cp) * 100 : 0; }
   inr(n) { return "₹" + Math.round(n).toLocaleString("en-IN"); }
@@ -796,6 +796,7 @@ class Component extends DCLogic {
   }
 
   exportCsv(rows) {
+    rows = rows.filter(p => !p.isVariantGroup);
     const head = ["S.No","Product Code","Product Name","Category","Unit","HSN","GST %","Opening","Stock In","Qty Made","Qty Sold","Damaged","Remaining Stock","Reorder Level","Beads Used","Quantity of beads (kg)","Cost of 1kg beads","Labor Hour","Other Material Cost","Notes","CP","SP","MRP","Margin %","Stock Value","Last Updated"];
     const body = rows.map(p => [p.sno, p.code, p.name, p.cat, p.unit, p.hsn, p.gst, p.open, p.purch, p.made, p.sold, p.dmg, this.stock(p), p.reorder, p.beadsUsed||"", p.beadKg||0, p.beadCostKg||0, p.laborHours||0, p.otherMaterialCost||0, p.notes||"", p.cp, p.sp, p.mrp, Math.round(this.marginPct(p)), this.stockValue(p), p.upd]);
     const csv = [head].concat(body).map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(",")).join("\n");
@@ -810,6 +811,8 @@ class Component extends DCLogic {
   renderVals() {
     const S = this.state;
     const P = S.products.filter(p => !p.isVariantGroup).map((p,i)=>({...p,sno:i+1}));
+    const stockNumber = new Map(P.map(p => [p.code, p.sno]));
+    const inventory = S.products.map(p => ({...p, sno:stockNumber.get(p.code) || '—'}));
     const screen = S.screen;
     const accent = this.props.accent || "#B4532A";
     const compact = (this.props.density || "Comfortable") === "Compact";
@@ -827,7 +830,7 @@ class Component extends DCLogic {
 
     const titles = {
       dash: ["Operations Dashboard", "Stock value, production flow and everything that needs attention today."],
-      grid: ["Master inventory", "Every SKU with its costing and live stock position. Click any white cell to edit it in place."],
+      grid: ["Master inventory", "Stock items and display-only masters. Use Edit colours on a master to add or update its varieties."],
       low: ["Low stock & reorder list", "Items at or below their reorder level, with suggested replenishment quantity and cost."],
       add: ["Add / edit product", "Create a new SKU or update an existing one by entering its code."],
       prod: ["Record production", "Log units beaded or crocheted by the studio units. Adds to quantity made and remaining stock."],
@@ -839,7 +842,7 @@ class Component extends DCLogic {
 
     const navGroups = [
       { label: "Overview", items: [["dash", "Dashboard", lows.length ? String(lows.length) : ""]] },
-      { label: "Inventory", items: [["grid", "Master inventory", String(P.length)], ["low", "Low stock", lows.length ? String(lows.length) : ""], ["add", "Add / edit product", ""]] },
+      { label: "Inventory", items: [["grid", "Master inventory", String(inventory.length)], ["low", "Low stock", lows.length ? String(lows.length) : ""], ["add", "Add / edit product", ""]] },
       { label: "Transactions", items: [["prod", "Production entry", ""], ["sale", "Sale entry", ""], ["purch", "Purchase / stock-in", ""]] },
       { label: "Finance", items: [["expenses", "Expenses", ""]] },
       { label: "Insights", items: [["reports", "Reports", ""]] },
@@ -859,13 +862,14 @@ class Component extends DCLogic {
     }));
 
     // ---------- grid rows ----------
-    const cats = Array.from(new Set(P.map(p => p.cat).filter(cat => typeof cat === 'string' && cat.trim()))).sort((a,b) => a.localeCompare(b));
-    let rows = P.slice();
+    const cats = Array.from(new Set(inventory.map(p => p.cat).filter(cat => typeof cat === 'string' && cat.trim()))).sort((a,b) => a.localeCompare(b));
+    let rows = inventory.slice();
     const q = S.query.trim().toLowerCase();
     if (q) rows = rows.filter(p => (p.name + " " + p.code + " " + p.cat).toLowerCase().indexOf(q) >= 0);
     if (S.catFilter !== "All categories") rows = rows.filter(p => p.cat === S.catFilter);
-    if (S.stockFilter === "low") rows = rows.filter(p => stock(p) <= p.reorder);
-    if (S.stockFilter === "out") rows = rows.filter(p => stock(p) <= 0);
+    if (S.stockFilter === "low") rows = rows.filter(p => !p.isVariantGroup && stock(p) <= p.reorder);
+    if (S.stockFilter === "out") rows = rows.filter(p => !p.isVariantGroup && stock(p) <= 0);
+    const stockRows = rows.filter(p => !p.isVariantGroup);
     const sk = S.sortKey;
     rows.sort((a, b) => {
       const va = sk === "stock" ? stock(a) : sk === "value" ? this.stockValue(a) : sk === "margin" ? this.marginPct(a) : (a[sk] ?? (["beadsUsed","notes"].includes(sk) ? "" : 0));
@@ -896,6 +900,8 @@ class Component extends DCLogic {
       const low = st <= p.reorder;
       const m = this.marginPct(p);
       return {
+        isGroup: !!p.isVariantGroup, stockItem: !p.isVariantGroup,
+        editOptionsLabel: p.isVariantGroup ? 'Edit colours' : 'Edit options',
         sno: p.sno, code: p.code, name: p.name, cat: p.cat, unit: p.unit, hsn: p.hsn, gst: p.gst,
         imageSrc: p.image ? (p.image.indexOf('/') === 0 || p.image.indexOf('http') === 0 ? p.image : '/v2/' + p.image + (p.image.indexOf('.') < 0 ? '.jpg' : '')) : '/assets/kalajay-brand.png',
         open: p.open, purch: p.purch, made: p.made, sold: p.sold, dmg: p.dmg, reorder: p.reorder,
@@ -906,12 +912,12 @@ class Component extends DCLogic {
         value: this.inr(this.stockValue(p)),
         stockBg: st <= 0 ? "#F6E2DA" : low ? "#FAEFD9" : "#E7F1EC",
         stockFg: st <= 0 ? "#9B2F16" : low ? "#8A6206" : "#25604F",
-        rowBg: st <= 0 ? "#FDF7F4" : "transparent",
+        rowBg: p.isVariantGroup ? "#F4EDE3" : st <= 0 ? "#FDF7F4" : "transparent",
         editOptions: () => this.editOptionProduct(p.code),
         onName: txt(p.code, "name"), onCat: txt(p.code, "cat"), onUnit: txt(p.code, "unit"),
         onHsn: txt(p.code, "hsn"), onGst: nm(p.code, "gst"),
         onReorder: nm(p.code, "reorder"), onCp: nm(p.code, "cp"), onSp: nm(p.code, "sp"), onMrp: nm(p.code, "mrp"),
-        onDelete: () => p.parentCode ? this.editOptionProduct(p.parentCode) : this.commit(S.products.filter(x => x.code !== p.code).map((x, i) => Object.assign({}, x, { sno: i + 1 })), null, p.name + " removed")
+        onDelete: () => p.isVariantGroup ? this.editOptionProduct(p.code) : p.parentCode ? this.editOptionProduct(p.parentCode) : this.commit(S.products.filter(x => x.code !== p.code).map((x, i) => Object.assign({}, x, { sno: i + 1 })), null, p.name + " removed")
       };
     });
 
@@ -1052,8 +1058,8 @@ class Component extends DCLogic {
       { label: "MRP headroom", value: Math.round((P.reduce((s, p) => s + (p.mrp - p.sp), 0) / Math.max(P.reduce((s, p) => s + p.sp, 0), 1)) * 100) + "%", sub: "Average SP to MRP gap", tone: "#B8860B" }
     ];
 
-    const rowRevenue = rows.reduce((s, p) => s + this.revenue(p), 0);
-    const rowCogs = rows.reduce((s, p) => s + this.cogs(p), 0);
+    const rowRevenue = stockRows.reduce((s, p) => s + this.revenue(p), 0);
+    const rowCogs = stockRows.reduce((s, p) => s + this.cogs(p), 0);
     const tMarginPct = rowRevenue ? Math.round(((rowRevenue - rowCogs) / rowRevenue) * 100) + "%" : "0%";
 
     return {
@@ -1067,19 +1073,19 @@ class Component extends DCLogic {
       scrTeam: screen === "team",
       navGroups, skuCount: String(P.length), totalValue: this.inrShort(totalValue),
       kpis, trend, alerts, topSellers, slowMovers, activity,
-      columns, rows: gridRows, rowCount: String(rows.length),
+      columns, rows: gridRows, rowCount: String(rows.length), stockRowCount: String(stockRows.length),
       query: S.query, onQuery: e => this.setState({ query: e.target.value }),
       catFilter: S.catFilter, onCatFilter: e => this.setState({ catFilter: e.target.value }),
       catOptions: ["All categories"].concat(cats),
       stockFilter: S.stockFilter, onStockFilter: e => this.setState({ stockFilter: e.target.value }),
       goAdd: () => this.setState({ screen: "add" }),
-      exportCsv: () => this.exportCsv(rows),
-      tOpen: rows.reduce((s, p) => s + p.open, 0).toLocaleString("en-IN"),
-      tPurch: rows.reduce((s, p) => s + p.purch, 0).toLocaleString("en-IN"),
-      tMade: rows.reduce((s, p) => s + p.made, 0).toLocaleString("en-IN"),
-      tSold: rows.reduce((s, p) => s + p.sold, 0).toLocaleString("en-IN"),
-      tDmg: rows.reduce((s, p) => s + p.dmg, 0).toLocaleString("en-IN"),
-      tStock: rows.reduce((s, p) => s + stock(p), 0).toLocaleString("en-IN"),
+      exportCsv: () => this.exportCsv(stockRows),
+      tOpen: stockRows.reduce((s, p) => s + p.open, 0).toLocaleString("en-IN"),
+      tPurch: stockRows.reduce((s, p) => s + p.purch, 0).toLocaleString("en-IN"),
+      tMade: stockRows.reduce((s, p) => s + p.made, 0).toLocaleString("en-IN"),
+      tSold: stockRows.reduce((s, p) => s + p.sold, 0).toLocaleString("en-IN"),
+      tDmg: stockRows.reduce((s, p) => s + p.dmg, 0).toLocaleString("en-IN"),
+      tStock: stockRows.reduce((s, p) => s + stock(p), 0).toLocaleString("en-IN"),
       tMargin: tMarginPct,
       tValue: this.inr(rows.reduce((s, p) => s + this.stockValue(p), 0)),
       lowRows,
