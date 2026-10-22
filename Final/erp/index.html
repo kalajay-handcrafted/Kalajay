@@ -1087,7 +1087,7 @@ class Component extends DCLogic {
       tDmg: stockRows.reduce((s, p) => s + p.dmg, 0).toLocaleString("en-IN"),
       tStock: stockRows.reduce((s, p) => s + stock(p), 0).toLocaleString("en-IN"),
       tMargin: tMarginPct,
-      tValue: this.inr(rows.reduce((s, p) => s + this.stockValue(p), 0)),
+      tValue: this.inr(stockRows.reduce((s, p) => s + this.stockValue(p), 0)),
       lowRows,
       addFields, addPreview, addError: S.addError,
       costingFields,
