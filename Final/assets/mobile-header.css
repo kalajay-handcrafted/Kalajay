@@ -21,7 +21,7 @@
   min-width: 16px; line-height: 1; letter-spacing: 0 !important;
 }
 @media (max-width: 760px) {
-  .kj-desktop-announcement, .kj-bottom-announcement { display: none !important; }
+  .kj-desktop-announcement { display: none !important; }
   #top { padding-bottom: 0 !important; }
   .kj-header { top: 0; }
   .kj-mobile-announcement {
@@ -117,7 +117,7 @@
   .kj-best-sellers h2 { font-family:'Prata',serif; font-size:24px; margin:0 0 12px; color:#40291C; }
   .kj-featured-list { display:flex; gap:12px; overflow-x:auto; padding-bottom:10px; scroll-snap-type:x mandatory; }
   .kj-featured-card { display:flex; flex-direction:column; gap:6px; flex:0 0 78%; max-width:340px; scroll-snap-align:start; color:#40291C; font-size:15px; }
-  .kj-featured-card img { width:100%; height:210px; object-fit:cover; border-radius:10px; display:block; }
+  .kj-featured-card img { width:100%; height:auto; aspect-ratio:auto; object-fit:contain; border-radius:10px; display:block; }
   .kj-featured-card strong { font-weight:500; }
   .kj-home-hero { padding:24px 12px 0 !important; gap:20px !important; grid-template-columns:1fr !important; }
   .kj-home-hero h1 { font-size:32px !important; }
@@ -204,7 +204,7 @@
 .kj-best-sellers h2 {font:24px Prata,serif;margin:0 0 12px;}
 .kj-featured-list {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
 .kj-featured-card {display:flex;flex-direction:column;gap:5px;color:#40291C;font-size:14px;}
-.kj-featured-card img {width:100%;height:160px;object-fit:cover;border-radius:8px;}
+.kj-featured-card img {width:100%;height:auto;aspect-ratio:auto;object-fit:contain;border-radius:8px;}
 .kj-product-overlay {position:fixed;inset:0;z-index:100;background:#40291Cdd;display:flex;align-items:center;justify-content:center;padding:20px;}
 .kj-product-dialog {position:relative;background:#FBF7E8;padding:24px;border-radius:12px;width:min(640px,100%);max-height:90vh;overflow:auto;text-align:center;}
 .kj-product-dialog h2 {font:24px Prata,serif;margin:12px 0;}
@@ -230,7 +230,7 @@
 .kj-best-sellers {padding-top:14px !important;}
 .kj-featured-list {display:flex;overflow-x:auto;gap:10px;}
 .kj-featured-card {flex:0 0 44%;}
-.kj-featured-card img {height:140px;}
+.kj-featured-card img {height:auto;aspect-ratio:auto;}
 }
 
 
@@ -295,3 +295,4 @@ body::before {
 /* Keep the watermark centred in the viewport on mobile and laptop. */
 body::before {background-position:center center;opacity:.06;}
 @media(max-width:760px) {body::before {background-position:center center;}}
+
