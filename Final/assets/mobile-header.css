@@ -328,3 +328,15 @@ body::before {background-position:center center;opacity:.06;}
   grid-row:auto !important;
   align-self:start;
 }
+
+/* Fill square frames for these four photos while keeping each complete bag visible. */
+.kj-product-image[src$="/p7-4.jpg"],
+.kj-product-image[src$="/p6-4.jpg"],
+.kj-product-image[src$="/p7-5.jpg"],
+.kj-product-image[src$="/p7-2.jpg"] {
+  object-fit:cover !important;
+}
+.kj-product-image[src$="/p7-4.jpg"] {object-position:50% 40% !important;}
+.kj-product-image[src$="/p6-4.jpg"] {object-position:0% 50% !important;}
+.kj-product-image[src$="/p7-5.jpg"] {object-position:32% 50% !important;}
+.kj-product-image[src$="/p7-2.jpg"] {object-position:70% 50% !important;}
