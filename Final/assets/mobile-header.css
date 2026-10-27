@@ -372,3 +372,25 @@ body::before {background-position:center center;opacity:.06;}
   object-fit:cover !important;object-position:50% 55% !important;
 }
 .kj-product-image[src$="/p9-3.jpg"] {object-fit:cover !important;object-position:50% 35% !important;}
+
+/* Reviewed square crops: organisers, slings, AirPods cases, coasters and star mat.
+   Gentle insets preserve both desk baskets and the Sunset sling's visible chain. */
+.kj-product-image[src$="/p5-2.jpg"] {object-fit:cover !important;object-position:52% 50% !important;padding-block:10%;}
+.kj-product-image[src$="/01420a416db370ce5c995a6372b0229e4eb66657f6c53a1602a1183d71ed0263.webp"] {object-fit:cover !important;object-position:50% 25% !important;}
+.kj-product-image[src$="/9478137febb4d125b0ccca4f0480b7ef10eeeedba6625be6dd9ea04762564af0.webp"] {object-fit:cover !important;object-position:50% 25% !important;}
+.kj-product-image[src$="/p4-5.jpg"] {object-fit:cover !important;object-position:50% 100% !important;}
+.kj-product-image[src$="/p3-3.jpg"] {object-fit:cover !important;object-position:50% 35% !important;}
+.kj-product-image[src$="/p4-4.jpg"] {object-fit:cover !important;object-position:50% 75% !important;}
+.kj-product-image[src$="/p3-2.jpg"] {object-fit:cover !important;object-position:25% 50% !important;}
+.kj-product-image[src$="/p3-4.jpg"] {object-fit:cover !important;object-position:50% 75% !important;}
+.kj-product-image[src$="/p3-5.jpg"] {object-fit:cover !important;object-position:50% 75% !important;}
+.kj-product-image[src$="/p11-2.jpg"] {object-fit:cover !important;object-position:50% 65% !important;}
+.kj-product-image[src$="/p10-4.jpg"] {object-fit:cover !important;object-position:50% 75% !important;}
+.kj-product-image[src$="/p10-5.jpg"] {object-fit:cover !important;object-position:50% 60% !important;}
+.kj-product-image[src$="/p10-3.jpg"] {object-fit:cover !important;object-position:50% 42% !important;padding-inline:1%;}
+.kj-product-image[src$="/p12-3.jpg"] {object-fit:cover !important;object-position:40% 50% !important;}
+.kj-product-image[src$="/p12-2.jpg"] {object-fit:cover !important;object-position:50% 50% !important;}
+.kj-product-image[src$="/c6ba77320bf18d7c8d58f35eb9cecc5b8f79055d2b92fae00d22cfdbc40d3f85.webp"] {object-fit:cover !important;object-position:54% 50% !important;}
+.kj-product-image[src$="/p14-5.jpg"] {object-fit:cover !important;object-position:45% 50% !important;}
+.kj-product-image[src$="/11786fbf057954b5fa08859dcb413f3bb288bf74df7cd8ddc8ce16092b45ed51.webp"] {object-fit:cover !important;object-position:45% 50% !important;}
+.kj-product-image[src$="/298ce7d748a167c8f356cf934737ff8f6fca1297c6d450e1ae9f6db309e67711.webp"] {object-fit:cover !important;object-position:50% 50% !important;}
