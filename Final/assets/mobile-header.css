@@ -340,3 +340,22 @@ body::before {background-position:center center;opacity:.06;}
 .kj-product-image[src$="/p6-4.jpg"] {object-position:0% 50% !important;}
 .kj-product-image[src$="/p7-5.jpg"] {object-position:32% 50% !important;}
 .kj-product-image[src$="/p7-2.jpg"] {object-position:70% 50% !important;}
+
+/* Individually reviewed square crops for seven more pearl bag photos. */
+.kj-product-image[src$="/p8-3.jpg"],
+.kj-product-image[src$="/p6-5.jpg"],
+.kj-product-image[src$="/p7-3.jpg"],
+.kj-product-image[src$="/p8-2.jpg"],
+.kj-product-image[src$="/p8-5.jpg"],
+.kj-product-image[src$="/p6-2.jpg"],
+.kj-product-image[src$="/p8-4.jpg"] {object-fit:cover !important;}
+/* A small side inset keeps the Hobo's tall handle and base within the square. */
+.kj-product-image[src$="/p8-3.jpg"] {padding-inline:2%;object-position:50% 100% !important;}
+.kj-product-image[src$="/p6-5.jpg"] {object-position:53% 50% !important;}
+.kj-product-image[src$="/p7-3.jpg"] {object-position:50% 70% !important;}
+/* The left edge of the gold-dot clutch is already cropped in the source. */
+.kj-product-image[src$="/p8-2.jpg"] {object-position:0% 75% !important;}
+/* Preserve the Canteen body and tassels; its chain exits the source at the top. */
+.kj-product-image[src$="/p8-5.jpg"] {object-position:50% 90% !important;}
+.kj-product-image[src$="/p6-2.jpg"] {object-position:50% 50% !important;}
+.kj-product-image[src$="/p8-4.jpg"] {object-position:50% 70% !important;}
