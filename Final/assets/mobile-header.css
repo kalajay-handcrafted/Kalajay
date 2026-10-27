@@ -350,7 +350,7 @@ body::before {background-position:center center;opacity:.06;}
 .kj-product-image[src$="/p6-2.jpg"],
 .kj-product-image[src$="/p8-4.jpg"] {object-fit:cover !important;}
 /* A small side inset keeps the Hobo's tall handle and base within the square. */
-.kj-product-image[src$="/p8-3.jpg"] {padding-inline:2%;object-position:50% 100% !important;}
+.kj-product-image[src$="/p8-3.jpg"] {padding-inline:1%;object-position:50% 92% !important;}
 .kj-product-image[src$="/p6-5.jpg"] {object-position:53% 50% !important;}
 .kj-product-image[src$="/p7-3.jpg"] {object-position:50% 70% !important;}
 /* The left edge of the gold-dot clutch is already cropped in the source. */
@@ -359,3 +359,16 @@ body::before {background-position:center center;opacity:.06;}
 .kj-product-image[src$="/p8-5.jpg"] {object-position:50% 90% !important;}
 .kj-product-image[src$="/p6-2.jpg"] {object-position:50% 50% !important;}
 .kj-product-image[src$="/p8-4.jpg"] {object-position:50% 70% !important;}
+
+/* Square framing for the Cutout-Handle, Honeycomb, Lavender Bloom and Mint totes. */
+.kj-product-image[src$="/p9-2.jpg"] {object-fit:cover !important;object-position:60% 50% !important;}
+.kj-product-image[src$="/p9-4.jpg"],
+.kj-product-image[src$="/b9ea88960b80aefd3d8f30fb17d02c08bac01b5a2e57d88c2e8d72439219a5d4.webp"],
+.kj-product-image[src$="/a87cc12c74f0b50dd89773b3bd05004366cc45b40e34782fddfd7fbaf48987af.webp"],
+.kj-product-image[src$="/5e321e4b7b2a0635b210b2e16318b0fe855084cafe3a44611b1a134d449a6e6f.webp"] {
+  object-fit:cover !important;object-position:50% 30% !important;
+}
+.kj-product-image[src$="/f0c5032d0b82d3644610122d138a5c9619c7892cbc870232a52482d78e0c0722.webp"] {
+  object-fit:cover !important;object-position:50% 55% !important;
+}
+.kj-product-image[src$="/p9-3.jpg"] {object-fit:cover !important;object-position:50% 35% !important;}
