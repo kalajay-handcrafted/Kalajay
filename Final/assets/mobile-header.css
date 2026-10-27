@@ -315,3 +315,16 @@ body::before {background-position:center center;opacity:.06;}
   margin-inline:auto;
 }
 .kj-gallery-thumbs img {object-fit:contain;object-position:center;background:#FBF7E8;}
+
+/* The old hero collage forced 100% heights inside fixed grid rows. */
+.kj-home-hero .kj-hero-images {
+  height:auto !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  grid-template-rows:auto !important;
+  align-items:start;
+}
+.kj-hero-images > img.kj-product-image {
+  height:auto !important;
+  grid-row:auto !important;
+  align-self:start;
+}
