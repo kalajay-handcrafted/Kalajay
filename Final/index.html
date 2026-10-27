@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no">
 <script src="/api/catalogue.js"></script>
-<link rel="stylesheet" href="/assets/mobile-header.css">
+<link rel="stylesheet" href="/assets/mobile-header.css?v=product-squares-20261027">
 <script src="./support.js"></script>
 <style>
 .kj-quantity-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:13px;color:#5B4331}
@@ -92,16 +92,16 @@
     </div>
   </div>
   <div class="kj-hero-images" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-<img src="v2/p6-4.jpg" alt="Pearl beaded mini tote bag" style="width:100%;height:100%;min-height:240px;object-fit:cover;border-radius:200px 200px 8px 8px;grid-row:span 2">
-    <img src="v2/p3-2.jpg" alt="Pearl beaded jewellery box with mirror" style="width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:8px">
-    <img src="/assets/hero-pink-vanity.jpg" alt="Pink crystal beaded tissue box and brush holders" style="width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:8px 8px 200px 200px">
+<img class="kj-product-image" src="v2/p6-4.jpg" alt="Pearl beaded mini tote bag" style="width:100%;height:100%;min-height:240px;object-fit:cover;border-radius:200px 200px 8px 8px;grid-row:span 2">
+    <img class="kj-product-image" src="v2/p3-2.jpg" alt="Pearl beaded jewellery box with mirror" style="width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:8px">
+    <img class="kj-product-image" src="/assets/hero-pink-vanity.jpg" alt="Pink crystal beaded tissue box and brush holders" style="width:100%;height:100%;min-height:120px;object-fit:cover;border-radius:8px 8px 200px 200px">
   </div>
 </section>
 
 <section class="kj-best-sellers" aria-labelledby="best-sellers-heading">
   <h2 id="best-sellers-heading">Best sellers</h2>
   <div class="kj-featured-list" tabindex="0" role="region" aria-label="Best sellers - scroll horizontally"><sc-for list="{{ bestSellers }}" as="p" hint-placeholder-count="8">
-    <a href="{{ p.href }}" class="kj-featured-card"><img src="{{ p.img }}" alt="{{ p.name }}" fetchpriority="high"><span>{{ p.name }}</span><strong>{{ p.priceLabel }}</strong></a>
+    <a href="{{ p.href }}" class="kj-featured-card"><img class="kj-product-image" src="{{ p.img }}" alt="{{ p.name }}" fetchpriority="high"><span>{{ p.name }}</span><strong>{{ p.priceLabel }}</strong></a>
   </sc-for></div>
 </section>
 <div class="kj-mobile-hero-actions"><div class="kj-hero-cta" style="display:flex;gap:14px;flex-wrap:wrap">
@@ -117,7 +117,7 @@
   <div class="kj-category-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px">
     <sc-for list="{{ collections }}" as="c" hint-placeholder-count="9">
       <a class="kj-category-card" href="{{ c.href }}" style="display:block;background:#fff;border:1px solid #E7DCC2;border-radius:6px;overflow:hidden" style-hover="border-color:#A9482A">
-        <img src="{{ c.img }}" alt="{{ c.name }}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block">
+        <img class="kj-product-image" src="{{ c.img }}" alt="{{ c.name }}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block">
         <div style="padding:18px 20px 22px">
           <h3 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px;color:#40291C">{{ c.name }}</h3>
           </div>
@@ -158,7 +158,7 @@
         <sc-for list="{{ g.items }}" as="p" hint-placeholder-count="4">
           <div style="{{ p.wrapStyle }}">
             <div onClick="{{ p.open }}" style="position:relative;background:#fff;border:1px solid #E7DCC2;border-radius:6px;overflow:hidden;cursor:zoom-in" style-hover="border-color:#A9482A">
-              <img src="{{ p.img }}" alt="{{ p.name }}" style="{{ p.imgStyle }}">
+              <img class="kj-product-image" src="{{ p.img }}" alt="{{ p.name }}" style="{{ p.imgStyle }}">
               <sc-if value="{{ p.soldOut }}" hint-placeholder-val="{{ false }}">
                 <span style="position:absolute;left:12px;top:12px;background:#FBF7E8;border:1px solid #C6B491;color:#5B4331;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;padding:6px 11px;border-radius:999px">Sold out</span>
               </sc-if>
@@ -192,10 +192,10 @@
   <div class="kj-hamper-actions"><a href="#contact" style="display:inline-flex;margin:0 0 16px;background:#A9482A;color:#FBF7E8;padding:14px 24px;border-radius:999px;font-size:13px;letter-spacing:.16em;text-transform:uppercase">Enquire about gifting</a><a href="/shop" class="kj-catalogue-download">Browse the current collection</a></div>
   <p style="font-size:17px;line-height:1.7;color:#5B4331;max-width:68ch;margin:0 0 32px">Choose handcrafted pieces, colours, quantities, packaging style, and note cards. We prepare wedding favours, festive hampers, corporate gifting sets, and personalised beadwork bundles.</p>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px">
-    <div id="wedding" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p18-4.jpg" alt="Beaded charms for hampers" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Wedding favours</h2><p style="margin:0;color:#5B4331;line-height:1.6">Charm sets, coin bags, coasters, and keepsakes matched to your event palette.</p></div></div>
-    <div id="corporate" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p6-4.jpg" alt="Beaded mini tote gift" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Corporate gifting</h2><p style="margin:0;color:#5B4331;line-height:1.6">Desk organisers, pen stands, pouches, and branded notes for teams and clients.</p></div></div>
-    <div id="festive" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p19-2.jpg" alt="Crochet pieces for festive hampers" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Festive gift hampers</h2><p style="margin:0;color:#5B4331;line-height:1.6">Mix beadwork, crochet, candles, and personalised pieces into one ready-to-gift hamper.</p></div></div>
-    <div id="personalised" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img src="v2/p3-2.jpg" alt="Personalised handcrafted gifts" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:Prata,serif;font-size:22px;margin:0 0 8px">Custom pieces</h2><p style="margin:0;color:#5B4331;line-height:1.6">Choose colours, materials and finishing details for a piece made especially for you.</p></div></div>
+    <div id="wedding" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img class="kj-product-image" src="v2/p18-4.jpg" alt="Beaded charms for hampers" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Wedding favours</h2><p style="margin:0;color:#5B4331;line-height:1.6">Charm sets, coin bags, coasters, and keepsakes matched to your event palette.</p></div></div>
+    <div id="corporate" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img class="kj-product-image" src="v2/p6-4.jpg" alt="Beaded mini tote gift" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Corporate gifting</h2><p style="margin:0;color:#5B4331;line-height:1.6">Desk organisers, pen stands, pouches, and branded notes for teams and clients.</p></div></div>
+    <div id="festive" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img class="kj-product-image" src="v2/p19-2.jpg" alt="Crochet pieces for festive hampers" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Festive gift hampers</h2><p style="margin:0;color:#5B4331;line-height:1.6">Mix beadwork, crochet, candles, and personalised pieces into one ready-to-gift hamper.</p></div></div>
+    <div id="personalised" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img class="kj-product-image" src="v2/p3-2.jpg" alt="Personalised handcrafted gifts" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:Prata,serif;font-size:22px;margin:0 0 8px">Custom pieces</h2><p style="margin:0;color:#5B4331;line-height:1.6">Choose colours, materials and finishing details for a piece made especially for you.</p></div></div>
   </div>
   
 </section>
@@ -237,9 +237,9 @@
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <img src="v2/p3-3.jpg" alt="Pearl beaded ring and earring box" style="width:100%;height:100%;min-height:200px;object-fit:cover;border-radius:6px;grid-column:span 2">
-      <img src="v2/p18-4.jpg" alt="Rainbow beaded heart charms" style="width:100%;min-height:150px;object-fit:cover;border-radius:6px">
-      <img src="v2/p19-2.jpg" alt="Crochet charms and motifs" style="width:100%;min-height:150px;object-fit:cover;border-radius:6px">
+      <img class="kj-product-image" src="v2/p3-3.jpg" alt="Pearl beaded ring and earring box" style="width:100%;height:100%;min-height:200px;object-fit:cover;border-radius:6px;grid-column:span 2">
+      <img class="kj-product-image" src="v2/p18-4.jpg" alt="Rainbow beaded heart charms" style="width:100%;min-height:150px;object-fit:cover;border-radius:6px">
+      <img class="kj-product-image" src="v2/p19-2.jpg" alt="Crochet charms and motifs" style="width:100%;min-height:150px;object-fit:cover;border-radius:6px">
     </div>
   </div>
 </section>
@@ -248,9 +248,9 @@
   <p style="font-size:12px;letter-spacing:.25em;text-transform:uppercase;color:#8A6318">Made with care</p>
   <h2 style="font-family:'Prata',serif;font-size:32px;color:#40291C">A glimpse of Kalajay</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
-    <figure style="margin:0"><img src="v2/p6-4.jpg" alt="Pearl beaded mini tote bag" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px"><figcaption style="padding-top:12px;color:#5B4331">Beads, brought together by hand.</figcaption></figure>
-    <figure style="margin:0"><img src="v2/p19-2.jpg" alt="Colourful crochet charms" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px"><figcaption style="padding-top:12px;color:#5B4331">Little details, patiently crafted.</figcaption></figure>
-    <figure style="margin:0"><img src="v2/p3-3.jpg" alt="Hands holding a pearl beaded jewellery box" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px"><figcaption style="padding-top:12px;color:#5B4331">Pieces made to hold something special.</figcaption></figure>
+    <figure style="margin:0"><img class="kj-product-image" src="v2/p6-4.jpg" alt="Pearl beaded mini tote bag" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px"><figcaption style="padding-top:12px;color:#5B4331">Beads, brought together by hand.</figcaption></figure>
+    <figure style="margin:0"><img class="kj-product-image" src="v2/p19-2.jpg" alt="Colourful crochet charms" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px"><figcaption style="padding-top:12px;color:#5B4331">Little details, patiently crafted.</figcaption></figure>
+    <figure style="margin:0"><img class="kj-product-image" src="v2/p3-3.jpg" alt="Hands holding a pearl beaded jewellery box" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px"><figcaption style="padding-top:12px;color:#5B4331">Pieces made to hold something special.</figcaption></figure>
   </div>
 </section>
 <section id="our-team" aria-labelledby="our-team-heading" style="max-width:1200px;margin:0 auto;padding:64px 24px 0">
@@ -363,7 +363,7 @@
         </sc-if>
         <sc-for list="{{ cartItems }}" as="i" hint-placeholder-count="2">
           <div style="display:flex;gap:14px;align-items:center">
-            <img src="{{ i.img }}" alt="{{ i.name }}" style="width:68px;height:68px;object-fit:cover;border-radius:4px;border:1px solid #E7DCC2;flex:none">
+            <img src="{{ i.img }}" alt="{{ i.name }}" style="width:68px;height:68px;object-fit:contain;border-radius:4px;border:1px solid #E7DCC2;flex:none">
             <div style="flex:1;min-width:0">
               <p style="margin:0 0 4px;font-size:15px;line-height:1.4;color:#40291C">{{ i.name }}</p>
               <p style="margin:0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A6318">{{ i.cat }}</p>
@@ -409,7 +409,7 @@
   <div class="kj-product-overlay" onClick="{{ close }}">
     <div class="kj-product-dialog" onClick="{{ keepOpen }}" role="dialog" aria-modal="true" aria-label="Product details">
       <button class="kj-gallery-close" onClick="{{ close }}" aria-label="Close product details">×</button>
-      <img class="kj-gallery-main" src="{{ activeImg }}" alt="{{ activeName }}">
+      <img class="kj-product-image kj-gallery-main" src="{{ activeImg }}" alt="{{ activeName }}">
       <h2>{{ activeName }}</h2><p>{{ activePrice }}</p><p>{{ activeColour }}</p>
       <div class="kj-gallery-options"><sc-for list="{{ activeColours }}" as="v"><button onClick="{{ v.pick }}" aria-pressed="{{ v.selected }}">{{ v.label }}</button></sc-for></div>
       <div class="kj-gallery-thumbs"><sc-for list="{{ activeImages }}" as="v"><button onClick="{{ v.pick }}" aria-label="{{ v.label }}"><img src="{{ v.src }}" alt="{{ v.label }}"></button></sc-for></div>
@@ -655,9 +655,10 @@ class Component extends DCLogic {
       },
       imgStyle: {
         width: "100%",
-        aspectRatio: "auto",
+        aspectRatio: "1 / 1",
         height: "auto",
         objectFit: "contain",
+        objectPosition: "center",
         display: "block",
         filter: out ? "saturate(0.35) opacity(0.6)" : "none"
       },

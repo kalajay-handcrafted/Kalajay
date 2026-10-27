@@ -296,3 +296,22 @@ body::before {
 body::before {background-position:center center;opacity:.06;}
 @media(max-width:760px) {body::before {background-position:center center;}}
 
+
+/* One uncropped square frame for every product photo, including future uploads.
+   Contain preserves the full source image; empty space uses the brand cream. */
+.kj-product-image, .kj-featured-card img, .kj-category-card img {
+  display:block;
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  aspect-ratio:1 / 1 !important;
+  object-fit:contain !important;
+  object-position:center !important;
+  background:#FBF7E8;
+  border-radius:8px !important;
+}
+.kj-gallery-main.kj-product-image {
+  width:min(100%, 360px, 42vh) !important;
+  margin-inline:auto;
+}
+.kj-gallery-thumbs img {object-fit:contain;object-position:center;background:#FBF7E8;}
