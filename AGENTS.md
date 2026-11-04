@@ -17,3 +17,7 @@ The shared database is `/Users/som/Documents/GitHub/Kalajay/Final/private/kalaja
 - Brand description: We create pretty handcrafted beaded pieces for you that would make your daily life one bit more beautiful.
 - Contact emails: support@kalajay.in and kalajay.handcrafted@gmail.com. Ask the user which one to include when producing each document.
 - Inventory CP is bead quantity in kg × bead cost per kg + ₹50 × labor hours + other material cost. Preserve a legacy CP until costing inputs are provided.
+
+# Render workspace
+
+The user confirmed My Workspace (tea-d49kh1juibrs739916f0), linked to kalajay.handcrafted@gmail.com, for future Kalajay Render changes. Use this workspace without asking again unless the task names a different workspace.

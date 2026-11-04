@@ -55,7 +55,7 @@
 <sc-if value="{{ intro }}" hint-placeholder-val="{{ false }}">
   <div class="kj-veil" style="position:fixed;inset:0;z-index:200;background:#F7F0DE;display:flex;align-items:center;justify-content:center;overflow:hidden">
     <video class="kj-intro-video" autoplay muted playsinline preload="auto" aria-label="Kalajay elephants and lotus animation" style="display:block;width:min(720px,96vw);height:auto;max-height:90vh;object-fit:contain">
-      <source src="assets/intro-elephants-lotus.mp4" type="video/mp4">
+      <source src="/assets/intro-elephants-lotus.mp4" type="video/mp4">
     </video>
   </div>
 </sc-if>
@@ -497,6 +497,7 @@ class Component extends DCLogic {
       if (finishing) return;
       finishing = true;
       clearTimeout(this._i);
+      clearTimeout(this._introPlaybackTimer);
       const veil = document.querySelector('.kj-veil');
       const logo = document.querySelector('header img');
       if (!video || !veil || !logo || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -526,8 +527,8 @@ class Component extends DCLogic {
       this._flyingEmblem = emblem;
       video.style.visibility = 'hidden';
       veil.style.pointerEvents = 'none';
-      const duration = 160;
-      veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: 'forwards' });
+      const duration = 320;
+      veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' });
       logo.animate([{ opacity: 0 }, { opacity: 0, offset: .68 }, { opacity: 1 }], { duration, fill: 'forwards' });
       const flight = emblem.animate([
         { transform: 'translate(0,0) scale(1)', opacity: 1 },
@@ -538,21 +539,35 @@ class Component extends DCLogic {
 
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return this.setState({ intro: false });
-    this._i = setTimeout(finish, 1100);
+    // Bound loading failures separately from actual playback time.
+    this._i = setTimeout(finish, 6000);
     if (video) {
       video.muted = true;
-      video.playbackRate = 3; // Short intro; the independent deadline also bounds loading time.
+      video.playsInline = true;
+      video.playbackRate = 2; // The 3.5-second clip stays brief without skipping its sequence.
+      video.addEventListener('playing', () => {
+        if (finishing) return;
+        clearTimeout(this._i);
+        clearTimeout(this._introPlaybackTimer);
+        // Start the playback guard only once frames are actually playing.
+        const remaining = (video.duration - video.currentTime) / video.playbackRate;
+        this._introPlaybackTimer = setTimeout(finish,
+          Number.isFinite(remaining) && remaining > 0 ? remaining * 1000 + 500 : 3000);
+      });
       video.addEventListener('ended', finish, { once: true });
       video.addEventListener('error', finish, { once: true });
 
-      video.play().catch(finish);
+      try {
+        const playback = video.play();
+        if (playback && playback.catch) playback.catch(finish);
+      } catch (_) { finish(); }
 
     } else {
-
+      finish();
     }
   }
 
-  componentWillUnmount() { document.removeEventListener("click", this._closeShop); document.removeEventListener("keydown", this._closeShop); if (this._flyingEmblem) this._flyingEmblem.remove(); window.removeEventListener("popstate", this._urlChange); window.removeEventListener("pagehide", this._saveCart); clearInterval(this._catalogueTimer); window.removeEventListener("focus", this._catalogueRefresh); clearTimeout(this._i);  }
+  componentWillUnmount() { document.removeEventListener("click", this._closeShop); document.removeEventListener("keydown", this._closeShop); if (this._flyingEmblem) this._flyingEmblem.remove(); window.removeEventListener("popstate", this._urlChange); window.removeEventListener("pagehide", this._saveCart); clearInterval(this._catalogueTimer); window.removeEventListener("focus", this._catalogueRefresh); clearTimeout(this._i); clearTimeout(this._introPlaybackTimer);  }
 
   addToCart(p) {
     const option=(VARIANTS[p.code] || []).find(v=>v.code===p.variantCode);
