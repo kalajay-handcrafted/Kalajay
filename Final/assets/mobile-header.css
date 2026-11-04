@@ -382,3 +382,18 @@ body::before {background-position:center center;opacity:.06;}
 .kj-product-image[src$="/p14-5.jpg"] {object-fit:cover !important;object-position:45% 50% !important;}
 .kj-product-image[src$="/11786fbf057954b5fa08859dcb413f3bb288bf74df7cd8ddc8ce16092b45ed51.webp"] {object-fit:cover !important;object-position:45% 50% !important;}
 .kj-product-image[src$="/298ce7d748a167c8f356cf934737ff8f6fca1297c6d450e1ae9f6db309e67711.webp"] {object-fit:cover !important;object-position:50% 50% !important;}
+
+/* Keep the introduction beside its three-photo collage on every screen. */
+.kj-home-hero {
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+  text-align:left;
+}
+.kj-home-hero > div:first-child {min-width:0;}
+@media(max-width:760px) {
+  .kj-home-hero {gap:14px !important;align-items:center;}
+  .kj-home-hero h1 {font-size:22px !important;line-height:1.15 !important;}
+  .kj-home-hero h1 span:not(.kj-theme-heart) {font-size:clamp(19px,4.8vw,30px) !important;}
+  .kj-home-hero h1 span.kj-hero-secondary {font-size:clamp(17px,4.3vw,26px) !important;}
+  .kj-home-hero p {font-size:clamp(12px,3.3vw,16px) !important;line-height:1.55 !important;margin:10px 0 0;}
+  .kj-home-hero .kj-hero-images {height:clamp(200px,48vw,300px);max-width:440px;justify-self:end;gap:6px !important;}
+}
