@@ -5,6 +5,8 @@ import json
 import mimetypes
 import sqlite3
 import uuid
+import erp_audit as audit
+import erp_records as records
 import shared_store as shared
 import stock_reset
 import variant_inventory
@@ -21,7 +23,7 @@ import subprocess, tempfile
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlsplit, unquote
+from urllib.parse import urlsplit, unquote, parse_qs
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = Path(os.environ.get('KALAJAY_DATA_DIR', str(ROOT / 'private')))
@@ -34,6 +36,7 @@ if os.environ.get('RENDER_EXTERNAL_HOSTNAME'): ALLOWED_HOSTS.add(os.environ['REN
 def connect():
     db = sqlite3.connect(DB, timeout=15)
     db.row_factory = sqlite3.Row
+    audit.configure(db)
     db.execute('PRAGMA foreign_keys=ON')
     return db
 
@@ -60,6 +63,7 @@ def initialize():
     expenses.initialize(connect, DATA_DIR)
     expense_bootstrap.run(connect, DATA_DIR)
     expenses.migrate_paid_and_codes(connect, DATA_DIR)
+    audit.initialize(connect, DATA_DIR)
     with connect() as db:
         db.execute('INSERT OR REPLACE INTO content VALUES (?,?)', ('expense_page', (ROOT/'expenses.html').read_text()))
 
@@ -104,7 +108,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def erp_page(self, html):
         user=auth.current(connect,self.headers.get('Cookie'))
-        extra='<script>window.ERP_USER='+json.dumps(user)+'</script><script src="/erp/auth.js" defer></script>'
+        extra='<script>window.ERP_USER='+json.dumps(user)+'</script><script src="/erp/actions.js"></script><script src="/erp/auth.js" defer></script>'
         return self.send(200,html.replace('</head>',extra+'</head>') if '</head>' in html else html.replace('<main>',extra+'<main>'), 'text/html; charset=utf-8')
 
     def do_GET(self):
@@ -125,6 +129,16 @@ class Handler(BaseHTTPRequestHandler):
         if protected and not user:
             if path.startswith('/api/'): return self.send(401,{'error':'Please sign in to ERP.'})
             return self.send(303,'','text/plain',{'Location':'/erp/login'})
+        if path in ('/erp/records','/api/erp/records','/api/erp/history','/api/erp/history.csv'):
+            if user['role']!='admin':return self.send(403,{'error':'Admin access required.'})
+            try:
+                query=parse_qs(urlsplit(self.path).query)
+                if path=='/erp/records':return self.erp_page((ROOT/'erp-records.html').read_text())
+                if path=='/api/erp/records':return self.send(200,records.listing(connect,query.get('kind',['products'])[0]))
+                if path.endswith('.csv'):return self.send(200,audit.csv_export(connect,query),'text/csv; charset=utf-8',{'Content-Disposition':'attachment; filename=Kalajay-action-history.csv'})
+                return self.send(200,audit.history(connect,query))
+            except ValueError as error:return self.send(400,{'error':str(error)})
+        if path=='/erp/actions.js':return self.send(200,(ROOT/'erp-actions.js').read_text(),'application/javascript')
         if path in ('/erp/accounts','/api/auth/users'):
             if user['role']!='admin':return self.send(403,{'error':'Admin access required.'})
             if path=='/erp/accounts':return self.erp_page((ROOT/'auth.html').read_text())
@@ -189,12 +203,26 @@ class Handler(BaseHTTPRequestHandler):
         return self.send(200, file.read_bytes(), mimetypes.guess_type(file.name)[0] or 'application/octet-stream')
 
     def do_POST(self):
+        # One actor/request context follows all writes, including nested saves and imports.
+        user=auth.current(connect,self.headers.get('Cookie'))
+        tokens=(audit.actor.set(user['username'] if user else 'Website customer'),
+                audit.request_id.set(str(uuid.uuid4())),audit.source.set(self.path))
+        try:
+            if self.path not in ('/api/orders','/api/catalogue/import-preview','/api/auth/login','/api/auth/setup','/api/auth/logout'):
+                if not user:return self.send(401,{'error':'Please sign in to ERP.'})
+                if user['role']!='admin':return self.send(403,{'error':'Admin access required.'})
+                if self.headers.get('X-ERP-Confirmed')!='yes':return self.send(428,{'error':'Confirm the action before saving.'})
+            return self.erp_post()
+        finally:
+            audit.actor.reset(tokens[0]);audit.request_id.reset(tokens[1]);audit.source.reset(tokens[2])
+
+    def erp_post(self):
         if not self.valid_host():return self.send(400, {"error":"Invalid host."})
         if self.path in ('/api/erp/expenses', '/api/erp/expenses/import-xlsx'):
             return self.expenses_post()
         if self.path.startswith('/api/auth/'):
             return self.auth_post()
-        if self.path not in ('/api/erp/product-image', '/api/erp/cities', '/api/erp/team', '/api/orders', '/api/erp', '/api/erp/confirm', '/api/catalogue/import-preview', '/api/catalogue/import'):
+        if self.path not in ('/api/erp/record-action', '/api/erp/product-image', '/api/erp/cities', '/api/erp/team', '/api/orders', '/api/erp', '/api/erp/confirm', '/api/catalogue/import-preview', '/api/catalogue/import'):
             return self.send(404, {'error': 'Not found'})
         origin = self.headers.get('Origin')
         if origin and origin != self.expected_origin():
@@ -214,7 +242,9 @@ class Handler(BaseHTTPRequestHandler):
                 raw = self.rfile.read(size)
                 if len(raw) != size:
                     raise ValueError('Upload was interrupted. Please try again.')
-                return self.send(201, product_images.save(DATA_DIR, raw))
+                result=product_images.save(DATA_DIR, raw)
+                audit.event(connect,'product_images','upload',after=result)
+                return self.send(201, result)
             except ValueError as error:
                 return self.send(400, {'error':str(error)})
             except OSError:
@@ -225,7 +255,7 @@ class Handler(BaseHTTPRequestHandler):
                 if not 0 < size <= 5000000:
                     return self.send(413, {'error': 'Workbook must be under 5 MB.'})
                 return self.send(200, excel.import_sheet(connect, self.rfile.read(size), self.path == '/api/catalogue/import'))
-            except shared.Conflict as error:
+            except (shared.Conflict, expenses.Conflict) as error:
                 return self.send(409, {'error': str(error)})
             except (ValueError, UnicodeError) as error:
                 return self.send(400, {'error': str(error)})
@@ -235,9 +265,11 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(415, {'error': 'JSON required.'})
         try:
             size = int(self.headers.get('Content-Length', '0'))
-            if not 0 < size <= (5000000 if self.path in ('/api/erp', '/api/erp/team') else 32768):
+            if not 0 < size <= (5000000 if self.path in ('/api/erp', '/api/erp/team', '/api/erp/record-action') else 32768):
                 return self.send(413, {'error': 'Invalid request size.'})
             data = json.loads(self.rfile.read(size))
+            if self.path == '/api/erp/record-action':
+                return self.send(200, records.apply(connect, DATA_DIR, data, user['username']))
             if self.path == '/api/erp/cities':
                 return self.send(200, team.cities(connect, data))
             if self.path == '/api/erp/team':
@@ -249,7 +281,7 @@ class Handler(BaseHTTPRequestHandler):
                     raise ValueError('Order ID required.')
                 return self.send(200, shared.confirm(connect, data['orderId']))
             return self.send(201, save_order(data))
-        except shared.Conflict as error:
+        except (shared.Conflict, expenses.Conflict) as error:
             return self.send(409, {'error': str(error)})
         except (ValueError, UnicodeError) as error:
             return self.send(400, {'error': str(error)})

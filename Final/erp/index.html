@@ -221,11 +221,11 @@
                 <tr style="border-bottom:1px solid #F2EBE1;background:{{ r.rowBg }}" style-hover="background:#FBF4EA">
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;color:var(--mut);text-align:right">{{ r.sno }}</td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;white-space:nowrap;color:#4A4038">{{ r.code }}</td>
-                  <td style="padding:4px 6px;vertical-align:top"><textarea class="inventory-name" data-inventory-name data-admin-write="true" aria-label="Product name" rows="2" maxlength="300" value="{{ r.name }}" onChange="{{ r.onName }}"></textarea><sc-if value="{{ r.isGroup }}"><div style="font-size:10px;color:#8A6318;padding:2px 4px">Master · display only</div></sc-if><div class="inventory-name-tools"><img src="{{ r.imageSrc }}" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;border:1px solid var(--line);background:#F6EFE5;flex:none"><button data-admin-write="true" onClick="{{ r.editOptions }}" title="Edit product colours and varieties" style="font-size:11px;padding:4px;white-space:normal">{{ r.editOptionsLabel }}</button></div></td>
-                  <td style="padding:4px 6px"><select data-admin-write="true" aria-label="Product category" value="{{ r.cat }}" onChange="{{ r.onCat }}" style="width:150px;border:1px solid var(--line);border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px"><option value="">Select category</option><sc-for list="{{ categoryChoices }}" as="category"><option value="{{ category }}">{{ category }}</option></sc-for></select></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.unit }}" onChange="{{ r.onUnit }}" style="width:52px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;text-align:center" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.hsn }}" onChange="{{ r.onHsn }}" style="width:62px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.gst }}" onChange="{{ r.onGst }}" style="width:48px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px;vertical-align:top"><textarea class="inventory-name" data-inventory-name data-admin-write="true" aria-label="Product name" rows="2" maxlength="300" value="{{ r.name }}" onBlur="{{ r.onName }}"></textarea><sc-if value="{{ r.isGroup }}"><div style="font-size:10px;color:#8A6318;padding:2px 4px">Master · display only</div></sc-if><div class="inventory-name-tools"><img src="{{ r.imageSrc }}" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;border:1px solid var(--line);background:#F6EFE5;flex:none"><button data-admin-write="true" onClick="{{ r.editOptions }}" title="Edit product colours and varieties" style="font-size:11px;padding:4px;white-space:normal">{{ r.editOptionsLabel }}</button></div></td>
+                  <td style="padding:4px 6px"><select data-admin-write="true" aria-label="Product category" value="{{ r.cat }}" onBlur="{{ r.onCat }}" style="width:150px;border:1px solid var(--line);border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px"><option value="">Select category</option><sc-for list="{{ categoryChoices }}" as="category"><option value="{{ category }}">{{ category }}</option></sc-for></select></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.unit }}" onBlur="{{ r.onUnit }}" style="width:52px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;text-align:center" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.hsn }}" onBlur="{{ r.onHsn }}" style="width:62px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.gst }}" onBlur="{{ r.onGst }}" style="width:48px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut)"><sc-if value="{{ r.stockItem }}">{{ r.open }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut)"><sc-if value="{{ r.stockItem }}">{{ r.purch }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right"><sc-if value="{{ r.stockItem }}">{{ r.made }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
@@ -233,16 +233,16 @@
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#A4442C"><sc-if value="{{ r.stockItem }}">{{ r.dmg }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A6318"><sc-if value="{{ r.stockItem }}">{{ r.marketing }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);text-align:right"><sc-if value="{{ r.stockItem }}"><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;padding:2px 7px;border-radius:99px;background:{{ r.stockBg }};color:{{ r.stockFg }}">{{ r.stock }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.reorder }}" onChange="{{ r.onReorder }}" style="width:56px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Beads Used" value="{{ r.beadsUsed }}" onChange="{{ r.onbeadsUsed }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Quantity of beads (kg)" type="number" min="0" step="any" value="{{ r.beadKg }}" onChange="{{ r.onbeadKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Cost of 1kg beads" type="number" min="0" step="any" value="{{ r.beadCostKg }}" onChange="{{ r.onbeadCostKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Labor Hour" type="number" min="0" step="any" value="{{ r.laborHours }}" onChange="{{ r.onlaborHours }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Other Material Cost" type="number" min="0" step="any" value="{{ r.otherMaterialCost }}" onChange="{{ r.onotherMaterialCost }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Notes" value="{{ r.notes }}" onChange="{{ r.onnotes }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.reorder }}" onBlur="{{ r.onReorder }}" style="width:56px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Beads Used" value="{{ r.beadsUsed }}" onBlur="{{ r.onbeadsUsed }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Quantity of beads (kg)" type="number" min="0" step="any" value="{{ r.beadKg }}" onBlur="{{ r.onbeadKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Cost of 1kg beads" type="number" min="0" step="any" value="{{ r.beadCostKg }}" onBlur="{{ r.onbeadCostKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Labor Hour" type="number" min="0" step="any" value="{{ r.laborHours }}" onBlur="{{ r.onlaborHours }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Other Material Cost" type="number" min="0" step="any" value="{{ r.otherMaterialCost }}" onBlur="{{ r.onotherMaterialCost }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Notes" value="{{ r.notes }}" onBlur="{{ r.onnotes }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);text-align:right" title="Bead kg × cost/kg + ₹50 × labor hours + other material cost"><sc-if value="{{ r.stockItem }}">{{ r.cp }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.sp }}" onChange="{{ r.onSp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.mrp }}" onChange="{{ r.onMrp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.sp }}" onBlur="{{ r.onSp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.mrp }}" onBlur="{{ r.onMrp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:{{ r.marginFg }}"><sc-if value="{{ r.stockItem }}">{{ r.margin }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap"><sc-if value="{{ r.stockItem }}">{{ r.value }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut);white-space:nowrap">{{ r.upd }}</td>
@@ -601,27 +601,15 @@ class Component extends DCLogic {
     } catch (e) { this.setState({ toast: e.message }); }
   }
   async commit(products, txns, toast) {
-    if (this._confirming) return this.setState({ toast: 'Please wait for order confirmation to finish.' });
-    if (!this.state.loaded) return this.setState({ toast: 'Wait for the shared database to load.' });
-    const p = products || this.state.products, t = txns || this.state.txns;
-    this.setState({ products: p, txns: t, toast: 'Saving to shared database…' });
-    this._pending = { products: p, txns: t, toast };
-    if (this._saving) return;
-    this._saving = true;
+    if (this._saving || this._confirming) { this.setState({toast:'Please wait for the current save to finish.'}); return false; }
+    if (!this.state.loaded) { this.setState({toast:'Wait for the database to load.'}); return false; }
+    this._saving=true;
     try {
-      while (this._pending) {
-        const next = this._pending; this._pending = null;
-        const r = await fetch('/api/erp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ products: next.products, txns: next.txns, revision: this._revision }) });
-        const data = await r.json();
-        if (!r.ok) throw new Error(data.error || 'Save failed.');
-        this._revision = data.revision;
-        if (!this._pending) this.setState({ ...data, toast: next.toast || 'Saved to shared database' });
-      }
-      this._failed = false;
-    } catch (e) {
-      this._pending = null; this._failed = true;
-      this.setState({ toast: e.message + ' Your unsaved view is retained; export it before refreshing.' });
-    } finally { this._saving = false; }
+      const response=await fetch('/api/erp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({products:products || this.state.products,txns:txns || this.state.txns,revision:this._revision})});
+      const saved=await response.json();if(!response.ok)throw Error(saved.error || 'Save failed.');
+      this._revision=saved.revision;this._failed=false;this.setState({...saved,toast:toast || 'Saved to shared database'});return true;
+    } catch(error) { this.setState({toast:error.message});return false; }
+    finally {this._saving=false;}
   }
   async confirmOrder(id) {
     if (this._saving || this._pending || this._failed) return this.setState({ toast: 'Finish saving inventory changes before confirming orders.' });
@@ -712,7 +700,7 @@ class Component extends DCLogic {
     this.commit(products, null);
   }
 
-  postTxn() {
+  async postTxn() {
     const e = this.state.entry;
     const screen = this.state.screen;
     const p = this.state.products.find(x => x.code === e.code);
@@ -734,8 +722,8 @@ class Component extends DCLogic {
     );
     const txn = { id: "t" + Date.now(), date, type, code: p.code, qty, ref: e.ref || "NA", rate: this.num(e.rate) || null };
     if(type === 'Marketing') Object.assign(txn,{purpose:e.purpose || 'UGC',unitCost:p.cp,rate:e.rate === '' ? null : Number(e.rate)});
-    this.setState({ entryError: "", entry: { code: "", qty: "", date: "", ref: "", rate: "", kind: e.kind, purpose:e.purpose || 'UGC' } });
-    this.commit(products, [txn].concat(this.state.txns), type + " of " + qty + " " + p.unit + " recorded for " + p.name);
+    if (await this.commit(products, [txn].concat(this.state.txns), type + " of " + qty + " " + p.unit + " recorded for " + p.name))
+      this.setState({ entryError: "", entry: { code: "", qty: "", date: "", ref: "", rate: "", kind: e.kind, purpose:e.purpose || 'UGC' } });
   }
 
   draftVariants() {
@@ -750,7 +738,7 @@ class Component extends DCLogic {
     if (!product) return;
     if (this._imageUploading) return this.setState({addError:'Wait for the image upload to finish.'});
     this._draftVersion=(this._draftVersion||0)+1;
-    this.setState({draft:{...product,variants:(product.variants||[]).map(v=>({...v,images:v.images.slice()}))},screen:'add',addError:'',imageMessage:'Choose a photo, then save the product.'});
+    this.setState({draft:{...product,_originalCode:product.code,variants:(product.variants||[]).map(v=>({...v,images:v.images.slice()}))},screen:'add',addError:'',imageMessage:'Choose a photo, then save the product.'});
   }
   async uploadProductImage(e, variantIndex=null) {
     const input = e.target, file = input.files && input.files[0];
@@ -779,12 +767,14 @@ class Component extends DCLogic {
     }
   }
 
-  saveDraft() {
+  async saveDraft() {
     if (this._imageUploading) return this.setState({addError:'Please wait for the image upload to finish.'});
     const d = this.state.draft;
     if (!d.name || !String(d.name).trim()) return this.setState({ addError: "Product name is required." });
     const code = (d.code && String(d.code).trim()) || ("KJ-NEW-" + (this.state.products.length + 1));
-    const existing = this.state.products.find(p => p.code === code);
+    const collision=this.state.products.find(p=>p.code.toLowerCase()===code.toLowerCase() && p.code!==d._originalCode);
+    if(collision)return this.setState({addError:'Product code '+code+' already belongs to '+collision.name+'. Select that product explicitly to edit it, or choose a unique code.'});
+    const existing = this.state.products.find(p => p.code === d._originalCode);
     for (const key of ['beadKg','beadCostKg','laborHours','otherMaterialCost']) {
       const value = Number(d[key] ?? 0);
       if (!Number.isFinite(value) || value < 0) return this.setState({addError:'Costing quantities, costs and labor hours must be zero or greater.'});
@@ -810,8 +800,19 @@ class Component extends DCLogic {
     const products = existing
       ? this.state.products.map(p => (p.code === code ? Object.assign({}, p, rec, { purch: p.purch }) : p))
       : this.state.products.concat([rec]);
-    this.setState({ draft: {}, addError: "", screen: "grid" });
-    this.commit(products, null, (existing ? "Updated " : "Added ") + rec.name);
+    let saved=false;
+    if(existing && code!==existing.code){
+      if(this._saving)return;
+      this._saving=true;
+      try{
+        const response=await fetch('/api/erp/records?kind=products');const list=await response.json();if(!response.ok)throw Error(list.error);
+        const original=list.records.find(r=>r.id===existing.code);if(!original)throw Error('Product no longer exists. Reload first.');
+        const result=await fetch('/api/erp/record-action',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind:'products',action:'edit',id:original.id,version:original.version,revision:this._revision,data:{...existing,...rec}})});
+        const body=await result.json();if(!result.ok)throw Error(body.error);saved=true;
+      }catch(error){this.setState({addError:error.message});}finally{this._saving=false;}
+      if(saved)await this.loadShared();
+    }else saved=await this.commit(products, null, (existing ? "Updated " : "Added ") + rec.name);
+    if(saved)this.setState({ draft: {}, addError: "", screen: "grid" });
   }
 
   exportCsv(rows) {
@@ -853,7 +854,7 @@ class Component extends DCLogic {
       dash: ["Operations Dashboard", "Stock value, production flow and everything that needs attention today."],
       grid: ["Master inventory", "Stock items and display-only masters. Use Edit colours on a master to add or update its varieties."],
       low: ["Low stock & reorder list", "Items at or below their reorder level, with suggested replenishment quantity and cost."],
-      add: ["Add / edit product", "Create a new SKU or update an existing one by entering its code."],
+      add: ["Add / edit product", "Create a new SKU or select an existing product explicitly to edit it."],
       prod: ["Record production", "Log units beaded or crocheted by the studio units. Adds to quantity made and remaining stock."],
       sale: ["Sales & stock-out entry", "Record a sale, marketing giveaway or damaged stock write-off."],
       purch: ["Purchase / stock-in", "Log finished pieces or crystal stock bought in from vendors against a purchase order."],

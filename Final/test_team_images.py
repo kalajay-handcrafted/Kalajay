@@ -132,7 +132,7 @@ class TeamImageTests(unittest.TestCase):
             thread.start()
             origin='http://127.0.0.1:'+str(server.server_port)
             def request(path,role=None,data=None,request_origin=None):
-                headers={}
+                headers={'X-ERP-Confirmed':'yes'}
                 if role: headers['Cookie']=role
                 if data is not None:
                     headers['Content-Type']='application/json'

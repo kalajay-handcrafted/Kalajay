@@ -219,6 +219,12 @@ def update(connect,data):
   previous=[json.loads(r[0]) for r in db.execute('SELECT i.record FROM inventory i JOIN products p USING(product_code) WHERE p.active=1')]
   saved_txn_ids={r[0] for r in db.execute('SELECT id FROM inventory_transactions')}
  old_products={p['code']:p for p in previous}
+ codes=[p['code'].casefold() for p in data['products']]
+ if len(set(codes))!=len(codes):raise ValueError('Product code already belongs to a different product. Every product must have a unique code.')
+ with connect() as db:
+  reserved={r[0].casefold():r[0] for r in db.execute('SELECT product_code FROM products')}
+ for p in data['products']:
+  if p['code'].casefold() in reserved and p['code'] not in old_products:raise ValueError('Product code is already reserved by another or deleted product: '+p['code'])
  for p in data['products']:p.setdefault('marketing',old_products.get(p['code'],{}).get('marketing',0))
  data={**data,'products':varieties.prepare(data['products'],previous)}
  if len(data['products'])>10000 or len(data['txns'])>100000:raise ValueError('Too many records.')
@@ -272,7 +278,7 @@ def update(connect,data):
   revision=db.execute("SELECT value FROM shared_meta WHERE key='revision'").fetchone()[0]
   if data.get('revision')!=revision:raise Conflict('Data changed in another session. Refresh ERP before saving again.')
   # Soft-delete keeps historical order and transaction links intact.
-  if not data.get('importLegacy'):db.execute('UPDATE products SET active=0')
+  if not data.get('importLegacy'):db.execute('UPDATE products SET active=0 WHERE active=1 AND product_code NOT IN (SELECT value FROM json_each(?))',(json.dumps([p['code'] for p in data['products']]),))
   option_codes=set()
   for i,p in enumerate(data['products']):
    code=p['code'];old=db.execute('SELECT * FROM products WHERE product_code=?',(code,)).fetchone()
@@ -285,6 +291,7 @@ def update(connect,data):
     option_codes.add(variant['code'])
    image=p.get('image','') if isinstance(p.get('image',''),str) else ''
    if old:
+    if old['name']!=p['name']:db.execute('INSERT OR IGNORE INTO product_aliases VALUES (?,?)',(old['name'],code))
     db.execute('UPDATE products SET name=?,category=?,image=?,price=?,active=1 WHERE product_code=?',(p['name'],p['cat'],image or old['image'],p['sp'],code))
    else:
     db.execute('INSERT INTO products VALUES (?,?,?,?,?,?,?,?,?)',(code,p['name'],p['cat'],image,p['sp'],0,2000+i,1,1))
@@ -294,7 +301,7 @@ def update(connect,data):
    # Availability follows inventory once inventory quantities are actually changed.
    if p.get('parentCode') or (old_inv and any(p.get(k,0)!=json.loads(old_inv[0]).get(k,0) for k in ('open','purch','made','sold','dmg','marketing','adjustment'))):
     db.execute('UPDATE products SET sold_out=? WHERE product_code=?',(int(stock(p)<=0),code))
-   db.execute('INSERT OR REPLACE INTO inventory VALUES (?,?)',(code,json.dumps(p)))
+   db.execute('INSERT INTO inventory VALUES (?,?) ON CONFLICT(product_code) DO UPDATE SET record=excluded.record WHERE record IS NOT excluded.record',(code,json.dumps(p)))
   for t in data['txns']:
    if not db.execute('SELECT 1 FROM products WHERE product_code=?',(t['code'],)).fetchone():raise ValueError('Transaction has an unknown product code.')
    prior=db.execute('SELECT record FROM inventory_transactions WHERE id=?',(t['id'],)).fetchone()

@@ -44,7 +44,7 @@ class ProductImageTests(unittest.TestCase):
         for item in reversed(cls.patches): item.stop()
         cls.temp.cleanup()
     def request(self, path, data=None, origin=True, mime='image/png'):
-        headers = {'Content-Type':mime}
+        headers = {'Content-Type':mime,'X-ERP-Confirmed':'yes'}
         if origin: headers['Origin'] = self.origin if origin is True else origin
         try:
             response = urlopen(Request(self.origin+path, data=data, headers=headers))
@@ -52,7 +52,7 @@ class ProductImageTests(unittest.TestCase):
             response = error
         return response.status, response.read(), response.headers
     def test_upload_save_shared_reference_and_public_image(self):
-        with patch.object(backend.auth, 'current', return_value={'role':'admin'}):
+        with patch.object(backend.auth, 'current', return_value={'username':'fixture','role':'admin'}):
             status, raw, _ = self.request('/api/erp/product-image', photo())
             self.assertEqual(status, 201)
             image = json.loads(raw)['image']
@@ -79,8 +79,8 @@ class ProductImageTests(unittest.TestCase):
             self.assertEqual(decoded.size, (32,24))
         self.assertEqual(self.request('/media/products/../../kalajay.sqlite3')[0],404)
     def test_permissions_and_origin(self):
-        for user, origin, expected in [(None,True,401),({'role':'manager'},True,403),
-                                      ({'role':'admin'},False,403),({'role':'admin'},'https://other.test',403)]:
+        for user, origin, expected in [(None,True,401),({'username':'fixture','role':'manager'},True,403),
+                                      ({'username':'fixture','role':'admin'},False,403),({'username':'fixture','role':'admin'},'https://other.test',403)]:
             with patch.object(backend.auth, 'current', return_value=user):
                 self.assertEqual(self.request('/api/erp/product-image',photo(),origin)[0],expected)
     def test_image_validation_and_immutable_files(self):
@@ -92,7 +92,7 @@ class ProductImageTests(unittest.TestCase):
         with self.assertRaises(ValueError): product_images.save(self.directory,b'x'*(product_images.MAX_BYTES+1))
         with patch.object(product_images,'MAX_PIXELS',10):
             with self.assertRaises(ValueError): product_images.save(self.directory,photo())
-        with patch.object(backend.auth, 'current', return_value={'role':'admin'}):
+        with patch.object(backend.auth, 'current', return_value={'username':'fixture','role':'admin'}):
             self.assertEqual(self.request('/api/erp/product-image',b'<html>bad</html>')[0],400)
             self.assertEqual(self.request('/api/erp/product-image',photo(),mime='text/html')[0],415)
         self.assertFalse(list((self.directory/'product-images').glob('tmp*')))

@@ -182,7 +182,7 @@ class AuthorizationTests(StoreTests):
             host='127.0.0.1:'+str(server.server_port)
             base='http://'+host
             def code(path,role=None,data=None,origin=None):
-                headers={}
+                headers={'X-ERP-Confirmed':'yes'}
                 if role:headers['Cookie']=role
                 if origin:headers['Origin']=origin
                 if data is not None:headers['Content-Type']='application/json'
