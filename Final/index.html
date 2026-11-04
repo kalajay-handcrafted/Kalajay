@@ -728,10 +728,13 @@ class Component extends DCLogic {
     const delivery = subtotal > 0 && subtotal < 599 ? 75 : 0;
     const total = subtotal + delivery;
     return {
-      bestSellers: ['KJ-PRS-203', 'KJ-ORG-101', 'KJ-KEY-704', 'KJ-APC-401']
-        .map(code => items.find(p => p.code === code && !p.soldOut))
-        .filter(Boolean).concat(items.filter(p => !p.soldOut && !['KJ-PRS-203', 'KJ-ORG-101', 'KJ-KEY-704', 'KJ-APC-401'].includes(p.code)))
-        .slice(0, 8).map(p => ({ ...p, priceLabel: this.inr(p.price), href: '/shop?category=' + encodeURIComponent(p.cat) + '&q=' + encodeURIComponent(p.name) })),
+      bestSellers: CATS.filter(c => !['all', 'na', 'n/a'].includes(String(c[0]).trim().toLowerCase()))
+        .map(c => {
+          const available = items.filter(p => p.cat === c[0] && !p.soldOut);
+          return available.find(p => ['KJ-PRS-203', 'KJ-ORG-101', 'KJ-KEY-704', 'KJ-APC-401'].includes(p.code)) || available[0];
+        })
+        .filter(Boolean)
+        .map(p => ({ ...p, priceLabel: this.inr(p.price), href: '/shop?category=' + encodeURIComponent(p.cat) + '&q=' + encodeURIComponent(p.name) })),
       cityCount: this.state.cityCount,
       memberCount: this.state.memberCount,
       collections: [["All", "Browse every handcrafted piece", "v2/p6-4.jpg"]].concat(CATS).map((c, i) => ({
