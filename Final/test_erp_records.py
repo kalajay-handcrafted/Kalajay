@@ -114,6 +114,20 @@ class RecordTests(unittest.TestCase):
         with self.connect() as db:db.execute("INSERT INTO auth_users VALUES ('admin','x','y','admin')")
         with self.assertRaisesRegex(ValueError,'at least one'):self.action('users','admin',delete=True)
         self.action('settings','city_count',{'count':8});self.assertEqual(team.cities(self.connect)['count'],8)
+    def test_variety_code_edit_and_delete_reconciles_parent(self):
+        s=shared.state(self.connect);p=next(p for p in s['products'] if p['code']=='A');p.update(open=0,variants=[{'label':'Rust','images':['/assets/a.jpg']}]);shared.update(self.connect,s)
+        d=self.product('A-1');d['code']='RUST-NEW';self.action('products','A-1',d)
+        self.assertEqual(self.product('A')['variants'][0]['code'],'RUST-NEW')
+        self.assertEqual(shared.catalog(self.connect)['variants']['A'][0]['code'],'RUST-NEW')
+        self.action('products','RUST-NEW',delete=True)
+        self.assertEqual(self.product('A')['variants'],[])
+        self.assertTrue(self.product('A')['isVariantGroup'])
+        self.assertIn('A',shared.catalog(self.connect)['soldOut'])
+        self.assertNotIn('RUST-NEW',[r['id'] for r in records.listing(self.connect,'products')['records']])
+        shared.update(self.connect,shared.state(self.connect))
+        self.assertTrue(self.product('A')['isVariantGroup'])
+        d=self.product('A');d['variants']=[{'label':'Ivory','images':['/assets/a.jpg']}];self.action('products','A',d)
+        self.assertEqual(self.product('A')['variants'][0]['code'],'A-2')
     def test_uploaded_file_reference_guard_and_cleanup(self):
         import erp_files, product_images
         from test_product_images import photo

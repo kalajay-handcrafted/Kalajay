@@ -36,7 +36,7 @@ def listing(connect, root):
             key = kind + '/' + path.name
             data = {'name': path.name, 'fileType': kind, 'bytes': path.stat().st_size,
                     'usedBy': sorted(references.get(key, [])),
-                    'url': '/media/products/' + path.name if kind == 'products' else '/api/erp/expenses/bills/' + path.name}
+                    'url': '/media/products/' + path.name if kind == 'products' else '/api/erp/expenses/bills/' + path.name if kind == 'bills' else None}
             version = hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
             files.append({'id': key, 'version': version, 'data': data})
     return {'records': files}

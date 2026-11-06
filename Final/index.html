@@ -760,7 +760,7 @@ class Component extends DCLogic {
       })),
       isHome: !IS_SHOP && !IS_STORY && !IS_RETURNS && !IS_HAMPERS && !IS_GIFTING,
       isGifting: IS_GIFTING,
-      giftingProducts: CATS.flatMap(c => items.filter(p => p.cat === c[0] && /coaster|mat|organis|tray|tealight|key|pouch|box/i.test(p.name+" "+p.cat)).sort((a,b) => Number(a.soldOut)-Number(b.soldOut)).slice(0,2)).slice(0,12).map(p => ({...p,priceLabel:this.inr(p.price),href:"/shop?q="+encodeURIComponent(p.name)})),
+      giftingProducts: CATS.flatMap(c => items.filter(p => p.cat === c[0] && p.price > 0 && /coaster|mat|organis|tray|tealight|key|pouch|box/i.test(p.name+" "+p.cat)).sort((a,b) => Number(a.soldOut)-Number(b.soldOut)).slice(0,2)).slice(0,12).map(p => ({...p,priceLabel:this.inr(p.price),href:"/shop?q="+encodeURIComponent(p.name)})),
       isHampers: IS_HAMPERS,
       isStory: IS_STORY,
       isReturns: IS_RETURNS,

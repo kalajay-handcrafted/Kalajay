@@ -89,7 +89,7 @@ def export_pdf(connect, root, data_dir, include_unpublished=False):
             text.append(Paragraph(escape(str(d['description'])).replace('\n', '<br/>'), STYLE))
         options = [by_code[v['code']] for v in d.get('variants', []) if v.get('code') in by_code]
         if not options:
-            text.extend([Paragraph('INR ' + format(p['price'], ',.2f') + ' / ' + escape(d.get('unit') or 'piece'), STYLE),
+            text.extend([Paragraph(('INR ' + format(p['price'], ',.2f') + ' / ' + escape(d.get('unit') or 'piece')) if p['price'] > 0 else 'Price on request', STYLE),
                          Paragraph('Made to order / enquire for availability' if p['sold_out'] else 'Available to enquire', STYLE)])
         else:
             text.append(Paragraph(str(len(options)) + ' colour / variety options below', STYLE))
@@ -101,7 +101,7 @@ def export_pdf(connect, root, data_dir, include_unpublished=False):
             cd = child['details']
             available = cd.get('open', 0) + cd.get('purch', 0) + cd.get('made', 0) - cd.get('sold', 0) - cd.get('dmg', 0) - cd.get('marketing', 0) + cd.get('adjustment', 0)
             detail = [Paragraph(escape(p['name'] + ' / ' + (cd.get('variantLabel') or child['name'])), TITLE),
-                      Paragraph(escape(child['product_code']) + ' | INR ' + format(child['price'], ',.2f'), STYLE),
+                      Paragraph(escape(child['product_code']) + ' | ' + ('INR ' + format(child['price'], ',.2f') if child['price'] > 0 else 'Price on request'), STYLE),
                       Paragraph('Available to enquire' if available > 0 else 'Made to order / enquire for availability', STYLE)]
             story.append(Table([[photo(child['image'], root, data_dir), detail]], colWidths=[130, A4[0] - 202],
                                style=[('VALIGN', (0, 0), (-1, -1), 'TOP'), ('BOTTOMPADDING', (0, 0), (-1, -1), 14)]))

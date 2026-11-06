@@ -32,9 +32,9 @@ def prepare(products, previous):
         options = parent.get('variants', prior.get('variants', []))
         parent['variants'] = options
         if not options:
-            if prior.get('isVariantGroup'):
+            if prior.get('isVariantGroup') and prior.get('variants'):
                 raise ValueError('Keep at least one variety in a display group.')
-            parent['isVariantGroup'] = False
+            parent['isVariantGroup'] = bool(prior.get('isVariantGroup'))
             continue
         parent['variants'], parent['variantSequence'] = shared.numbered_variants(parent, prior)
         parent['isVariantGroup'] = True

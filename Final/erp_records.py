@@ -137,8 +137,14 @@ def apply(connect,root,request,username):
             erp_files.delete(root,key)
             audit.event(nested,'files','delete',before=prior)
         elif kind=='products':
-            if prior.get('parentCode') and (delete or data.get('code')!=key):raise ValueError('Remove or rename a variety through its parent product, so colour links remain consistent.')
             if delete:
+                if prior.get('parentCode'):
+                    parent_code=prior['parentCode']
+                    parent=json.loads(db.execute('SELECT record FROM inventory WHERE product_code=?',(parent_code,)).fetchone()[0])
+                    parent['variants']=[v for v in parent.get('variants',[]) if v.get('code')!=key]
+                    db.execute('UPDATE inventory SET record=? WHERE product_code=?',(json.dumps(parent),parent_code))
+                    if not parent['variants']:
+                        db.execute('UPDATE products SET sold_out=1 WHERE product_code=?',(parent_code,))
                 codes=[key]+[r[0] for r in db.execute("SELECT product_code FROM inventory WHERE json_extract(record,'$.parentCode')=?",(key,))]
                 db.executemany('UPDATE products SET active=0 WHERE product_code=?',[(c,) for c in codes]);bump(db)
             else:
