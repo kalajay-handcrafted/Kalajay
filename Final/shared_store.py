@@ -245,6 +245,11 @@ def update(connect,data):
    for image in v['images']:
     if not isinstance(image,str) or not image or len(image)>500 or '..' in image or not re.fullmatch(r'[A-Za-z0-9_./ -]+',image):raise ValueError('Use a local website image path for each colour.')
   if not p['name'].strip():raise ValueError('Product name required.')
+  if not p['cat'].strip():raise ValueError('Product category required.')
+  for field in ('description','notes','beadsUsed'):
+   if not isinstance(p.get(field,''),str) or len(p.get(field,''))>5000:raise ValueError('Invalid product '+field)
+  image_paths=[p.get('image','')]+p.get('images',[]) if isinstance(p.get('images',[]),list) else [None]
+  if len(image_paths)>13 or any(not isinstance(image,str) or len(image)>500 or '..' in image or (image and not re.fullmatch(r'[A-Za-z0-9_./ -]+',image)) for image in image_paths):raise ValueError('Use valid local image paths for product photos.')
   for k in NUMBERS:
    if type(p.get(k)) not in (int,float) or not math.isfinite(p[k]) or not 0<=p[k]<=1e9:raise ValueError('Invalid non-negative '+k)
   if type(p.get('adjustment',0)) not in (int,float) or not math.isfinite(p.get('adjustment',0)):raise ValueError('Invalid inventory adjustment.')
@@ -292,10 +297,10 @@ def update(connect,data):
    image=p.get('image','') if isinstance(p.get('image',''),str) else ''
    if old:
     if old['name']!=p['name']:db.execute('INSERT OR IGNORE INTO product_aliases VALUES (?,?)',(old['name'],code))
-    db.execute('UPDATE products SET name=?,category=?,image=?,price=?,active=1 WHERE product_code=?',(p['name'],p['cat'],image or old['image'],p['sp'],code))
+    db.execute('UPDATE products SET name=?,category=?,image=?,price=?,active=1 WHERE product_code=?',(p['name'],p['cat'],image,p['sp'],code))
    else:
     db.execute('INSERT INTO products VALUES (?,?,?,?,?,?,?,?,?)',(code,p['name'],p['cat'],image,p['sp'],0,2000+i,1,1))
-   p['image']=image or (old['image'] if old else '')
+   p['image']=image
    old_inv=db.execute('SELECT record FROM inventory WHERE product_code=?',(code,)).fetchone()
    if 'variants' not in p and old_inv:p['variants']=json.loads(old_inv[0]).get('variants',[])
    # Availability follows inventory once inventory quantities are actually changed.

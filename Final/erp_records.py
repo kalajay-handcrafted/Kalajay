@@ -9,8 +9,10 @@ from datetime import date
 import shared_store as shared
 import expense_store as expenses
 import team_store as team
+import erp_files
+import erp_audit as audit
 
-KINDS=('products','transactions','orders','expenses','income','vendors','budgets','members','settings','users')
+KINDS=('products','transactions','orders','expenses','income','vendors','budgets','members','settings','users','files')
 
 def version(record):
     return hashlib.sha256(json.dumps(record,sort_keys=True).encode()).hexdigest()
@@ -18,11 +20,18 @@ def version(record):
 def pack(key, record):
     return {'id':key,'version':version(record),'data':record}
 
-def listing(connect,kind):
+def listing(connect,kind,root=None):
     if kind not in KINDS:raise ValueError('Unknown record type.')
+    if kind=='files':
+        if root is None:raise ValueError('File storage is required.')
+        return erp_files.listing(connect,root)
     with connect() as db:
         if kind=='products':
             records=[pack(r['product_code'],json.loads(r['record'])) for r in db.execute('SELECT i.* FROM inventory i JOIN products p USING(product_code) WHERE p.active=1 ORDER BY p.name COLLATE NOCASE')]
+            for item in records:
+                item['data'].setdefault('description','')
+                item['data'].setdefault('notes','')
+                item['version']=version(item['data'])
         elif kind=='transactions':
             records=[pack(r['id'],json.loads(r['record'])) for r in db.execute('SELECT * FROM inventory_transactions ORDER BY rowid DESC')]
         elif kind=='orders':
@@ -118,11 +127,16 @@ def apply(connect,root,request,username):
     with connect() as db:
         db.execute('BEGIN IMMEDIATE');nested=same_connection(db)
         if 'revision' in request and request['revision']!=db.execute("SELECT value FROM shared_meta WHERE key='revision'").fetchone()[0]:raise shared.Conflict('Inventory changed on another device. Reload before editing.')
-        old=next((r for r in listing(nested,kind)['records'] if r['id']==key),None)
+        old=next((r for r in listing(nested,kind,root)['records'] if r['id']==key),None)
         if not old:raise ValueError('Record no longer exists. Reload the list.')
         if request.get('version')!=old['version']:raise shared.Conflict('This record changed on another device. Reload before editing.')
         prior=old['data']
-        if kind=='products':
+        if kind=='files':
+            if not delete:raise ValueError('Uploaded files can be deleted, not edited.')
+            if prior['usedBy']:raise ValueError('This file is still attached to '+', '.join(prior['usedBy'])+'. Remove or replace its attachments before deleting it.')
+            erp_files.delete(root,key)
+            audit.event(nested,'files','delete',before=prior)
+        elif kind=='products':
             if prior.get('parentCode') and (delete or data.get('code')!=key):raise ValueError('Remove or rename a variety through its parent product, so colour links remain consistent.')
             if delete:
                 codes=[key]+[r[0] for r in db.execute("SELECT product_code FROM inventory WHERE json_extract(record,'$.parentCode')=?",(key,))]

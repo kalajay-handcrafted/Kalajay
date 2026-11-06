@@ -114,6 +114,45 @@ class RecordTests(unittest.TestCase):
         with self.connect() as db:db.execute("INSERT INTO auth_users VALUES ('admin','x','y','admin')")
         with self.assertRaisesRegex(ValueError,'at least one'):self.action('users','admin',delete=True)
         self.action('settings','city_count',{'count':8});self.assertEqual(team.cities(self.connect)['count'],8)
+    def test_uploaded_file_reference_guard_and_cleanup(self):
+        import erp_files, product_images
+        from test_product_images import photo
+        image=product_images.save(self.root,photo())['image']
+        d=self.product('A');d['image']=image;self.action('products','A',d)
+        file=erp_files.listing(self.connect,self.root)['records'][0]
+        request={'kind':'files','action':'delete','id':file['id'],'version':file['version']}
+        with self.assertRaisesRegex(ValueError,'still attached'):records.apply(self.connect,self.root,request,'admin-test')
+        d=self.product('A');d['image']='';self.action('products','A',d)
+        self.assertEqual(shared.catalog(self.connect)['products'][0][1],'')
+        with self.assertRaises(shared.Conflict):records.apply(self.connect,self.root,request,'admin-test')
+        request['version']=erp_files.listing(self.connect,self.root)['records'][0]['version']
+        records.apply(self.connect,self.root,request,'admin-test')
+        self.assertEqual(erp_files.listing(self.connect,self.root)['records'],[])
+        with self.connect() as db:self.assertEqual(db.execute("SELECT count(*) FROM erp_audit WHERE entity='files' AND action='delete'").fetchone()[0],1)
+    def test_pdf_uses_latest_products_and_never_private_costs(self):
+        import catalogue_pdf, io
+        from pypdf import PdfReader
+        d=self.product('A');d.update(name='Current Alpha',description='Handcrafted gift for your desk.',notes='PRIVATE-NOTE',cp=123.45)
+        self.action('products','A',d)
+        with self.connect() as db:db.execute("UPDATE products SET published=0 WHERE product_code='B'")
+        def text(include=False):
+            raw=catalogue_pdf.export_pdf(self.connect,Path(__file__).parent,self.root,include)
+            self.assertTrue(raw.startswith(b'%PDF-'))
+            return '\n'.join(p.extract_text() for p in PdfReader(io.BytesIO(raw)).pages)
+        public=text();self.assertIn('Current Alpha',public);self.assertIn('Handcrafted gift',public)
+        self.assertNotIn('PRIVATE-NOTE',public);self.assertNotIn('123.45',public);self.assertNotIn('Beta',public)
+        self.assertIn('Beta',text(True))
+        self.action('products','A',delete=True);self.assertNotIn('Current Alpha',text())
+    def test_pdf_varieties_and_private_upload_photos(self):
+        import catalogue_pdf, io, product_images
+        from pypdf import PdfReader
+        from test_product_images import photo
+        image=product_images.save(self.root,photo())['image']
+        s=shared.state(self.connect);p=next(p for p in s['products'] if p['code']=='A');p.update(open=0,image=image,variants=[{'label':'Rust','images':[image]},{'label':'Ivory','images':[image]}]);shared.update(self.connect,s)
+        raw=catalogue_pdf.export_pdf(self.connect,Path(__file__).parent,self.root,True)
+        reader=PdfReader(io.BytesIO(raw));text=' '.join(p.extract_text() for p in reader.pages)
+        self.assertIn('Rust',text);self.assertIn('Ivory',text);self.assertIn('A-1',text)
+        self.assertTrue(any(p.images for p in reader.pages))
     def test_http_admin_confirmation_and_history_access(self):
         import backend
         with self.connect() as db:
@@ -136,6 +175,11 @@ class RecordTests(unittest.TestCase):
                 self.assertEqual(call('/api/erp/cities',body={'count':4},confirmed=True)[0],200)
                 self.assertEqual(call('/api/erp/cities',who='manager',body={'count':4},confirmed=True)[0],403)
                 self.assertEqual(call('/erp/records')[0],200)
+                self.assertEqual(call('/api/erp/records?kind=files')[0],200)
+                self.assertEqual(call('/api/erp/records?kind=files',who='manager')[0],403)
+                self.assertEqual(call('/api/catalogue.pdf',who='unknown')[0],200)
+                self.assertEqual(call('/api/erp/catalogue.pdf',who='unknown')[0],401)
+                self.assertEqual(call('/api/erp/catalogue.pdf')[0],200)
                 self.assertEqual(call('/api/erp/history.csv?all=1')[0],200)
                 with self.connect() as db:self.assertEqual(db.execute("SELECT actor FROM erp_audit WHERE source='/api/erp/cities' ORDER BY id DESC LIMIT 1").fetchone()[0],'admin')
             finally:server.shutdown();server.server_close();thread.join()

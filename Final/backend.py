@@ -19,6 +19,7 @@ import expense_store as expenses
 import expense_import
 import expense_bootstrap
 import catalogue_excel as excel
+import catalogue_pdf
 import subprocess, tempfile
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -134,7 +135,7 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 query=parse_qs(urlsplit(self.path).query)
                 if path=='/erp/records':return self.erp_page((ROOT/'erp-records.html').read_text())
-                if path=='/api/erp/records':return self.send(200,records.listing(connect,query.get('kind',['products'])[0]))
+                if path=='/api/erp/records':return self.send(200,records.listing(connect,query.get('kind',['products'])[0],DATA_DIR))
                 if path.endswith('.csv'):return self.send(200,audit.csv_export(connect,query),'text/csv; charset=utf-8',{'Content-Disposition':'attachment; filename=Kalajay-action-history.csv'})
                 return self.send(200,audit.history(connect,query))
             except ValueError as error:return self.send(400,{'error':str(error)})
@@ -175,6 +176,13 @@ class Handler(BaseHTTPRequestHandler):
         if path in ('/erp', '/erp/', '/erp/index.html'):
             with connect() as db:
                 return self.erp_page(db.execute("SELECT value FROM content WHERE key='erp_homepage'").fetchone()[0])
+        if path in ('/api/catalogue.pdf', '/api/erp/catalogue.pdf'):
+            try:
+                raw = catalogue_pdf.export_pdf(connect, ROOT, DATA_DIR, path.startswith('/api/erp/'))
+                return self.send(200, raw, 'application/pdf', {'Content-Disposition':'attachment; filename="Kalajay-Catalogue.pdf"'})
+            except Exception:
+                __import__('traceback').print_exc()
+                return self.send(503, {'error':'Catalogue download is temporarily unavailable. Please try again.'})
         if path == '/api/catalogue.xlsx':
             try:
                 return self.send(200, excel.export_workbook(connect), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -189,7 +197,7 @@ class Handler(BaseHTTPRequestHandler):
             if not allowed or not file.is_relative_to(ERP_ROOT) or not file.is_file():
                 return self.send(404, {'error': 'Not found'})
             return self.send(200, file.read_bytes(), mimetypes.guess_type(file.name)[0] or 'application/octet-stream')
-        if path in ('/', '/index.html', '/shop', '/shop/', '/story', '/story/', '/returns', '/returns/', '/hampers', '/hampers/'):
+        if path in ('/', '/index.html', '/shop', '/shop/', '/story', '/story/', '/returns', '/returns/', '/hampers', '/hampers/', '/gifting-enquiry', '/gifting-enquiry/'):
             with connect() as db:
                 return self.send(200, db.execute("SELECT value FROM content WHERE key='homepage'").fetchone()[0], 'text/html; charset=utf-8')
         if path == '/api/catalogue':

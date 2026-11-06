@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no">
 <script src="/api/catalogue.js"></script>
-<link rel="stylesheet" href="/assets/mobile-header.css?v=homepage-frames-20261027">
+<link rel="stylesheet" href="/assets/mobile-header.css?v=gifting-20261106">
 <script src="./support.js"></script>
 <style>
 .kj-quantity-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:13px;color:#5B4331}
@@ -59,10 +59,10 @@
     </video>
   </div>
 </sc-if>
-<div class="kj-desktop-announcement" style="background:#A9482A;color:#FBF7E8;font-size:12px;letter-spacing:0.22em;text-transform:none;text-align:center;padding:10px 16px">Handcrafted : One at a time ❤️ · Ships across India · Handmade to order · Free delivery for orders above INR 599 · Hand-strung beauty</div>
+<div class="kj-desktop-announcement" aria-label="Announcements"><div class="kj-announcement-track"><span>Handcrafted : One at a time ❤️ · Ships across India · Handmade to order · Free delivery for orders above INR 599 · Hand-strung beauty ·</span><span aria-hidden="true">Handcrafted : One at a time ❤️ · Ships across India · Handmade to order · Free delivery for orders above INR 599 · Hand-strung beauty ·</span></div></div>
 
 <header class="kj-header" style="position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px); border-bottom: 1px solid #E7DCC2; background-color: #FBF7E8F0">
-<div class="kj-mobile-announcement" aria-label="Announcements"><div class="kj-mobile-ticker"><div>Handcrafted : One at a time ❤️ · Ships across India · Handmade to order · Free delivery for orders above INR 599 · Hand-strung beauty ·</div><div aria-hidden="true">Handcrafted : One at a time ❤️ · Ships across India · Handmade to order · Free delivery for orders above INR 599 · Hand-strung beauty ·</div></div></div>
+<div class="kj-mobile-announcement" aria-label="Announcements"><div class="kj-mobile-ticker kj-announcement-track"><div>Handcrafted : One at a time ❤️ · Ships across India · Handmade to order · Free delivery for orders above INR 599 · Hand-strung beauty ·</div><div aria-hidden="true">Handcrafted : One at a time ❤️ · Ships across India · Handmade to order · Free delivery for orders above INR 599 · Hand-strung beauty ·</div></div></div>
   <div class="kj-header-inner" style="max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 24px; justify-content: space-between">
     <details class="kj-mobile-menu"><summary aria-label="Navigation menu"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></summary><nav aria-label="Mobile navigation"><a href="/#top">Home</a><a href="/shop">Shop</a><a href="/hampers">Gifts &amp; Celebrations</a><a href="/story">Our story</a><a href="/returns">Returns</a></nav></details>
     <a href="/" style="display:flex;align-items:center;gap:12px;min-width:0">
@@ -185,11 +185,25 @@
 </section>
 
 </sc-if>
+<sc-if value="{{ isGifting }}">
+<section class="kj-gifting-page">
+  <p><a href="/hampers">Gifts &amp; Celebrations</a> / Gifting enquiries</p>
+  <h1>Handcrafted gifts, thoughtfully chosen</h1>
+  <p class="kj-gifting-intro">Let’s make your next occasion a little more beautiful. Explore our handcrafted pieces, then talk to us about corporate gifting, bulk orders, wedding favours and custom gifts. We’ll help with colours, quantities, packaging and timelines.</p>
+  <div class="kj-gifting-actions"><a class="kj-primary-button" href="/api/catalogue.pdf" download="Kalajay-Catalogue.pdf">Download Catalog (PDF)</a><a class="kj-outline-button" href="/gifting-enquiry#gifting-contact">Talk to Our Team</a></div>
+  <h2>A few gifting favourites</h2>
+  <p>Browse a selection from our current collection. Availability and custom options can be discussed with our team.</p>
+  <div class="kj-gifting-grid"><sc-for list="{{ giftingProducts }}" as="p"><a class="kj-gifting-card" href="{{ p.href }}"><img class="kj-product-image" src="{{ p.img }}" alt="{{ p.name }}" loading="lazy"><h3>{{ p.name }}</h3><p>{{ p.priceLabel }}</p></a></sc-for></div>
+  <p><a href="/shop">Browse the full collection →</a></p>
+  <div id="gifting-contact" class="kj-gifting-contact"><h2>Let’s plan your gifts</h2><p>Tell us your occasion, approximate quantity, budget and required delivery date. We’ll help you put together something personal.</p>
+  <a class="kj-primary-button" href="https://wa.me/919740540847?text=Hello%20Kalajay!%20I%27d%20like%20to%20discuss%20gifting.%20Occasion%3A%20%20Quantity%3A%20%20Budget%3A%20%20Delivery%20date%3A%20" target="_blank" rel="noopener">Enquire About Gifting on WhatsApp</a>
+  <p><a href="tel:+919740540847">+91 97405 40847</a></p><p><a href="mailto:support@kalajay.in?subject=Gifting%20enquiry">support@kalajay.in</a><br><a href="mailto:kalajay.handcrafted@gmail.com?subject=Gifting%20enquiry">kalajay.handcrafted@gmail.com</a></p></div>
+</section></sc-if>
 <sc-if value="{{ isHampers }}">
 <section id="hampers" style="max-width:1100px;margin:0 auto;padding:64px 24px 0">
   <p style="margin:0 0 16px;font-size:13px"><a href="/#top">Home</a> / Gifts &amp; Celebrations</p>
   <h1 style="font-family:'Prata',serif;font-size:clamp(30px,4vw,44px);margin:0 0 18px;color:#40291C">Gifts &amp; Celebrations</h1>
-  <div class="kj-hamper-actions"><a href="#contact" style="display:inline-flex;margin:0 0 16px;background:#A9482A;color:#FBF7E8;padding:14px 24px;border-radius:999px;font-size:13px;letter-spacing:.16em;text-transform:uppercase">Enquire about gifting</a><a href="/shop" class="kj-catalogue-download">Browse the current collection</a></div>
+  <div class="kj-hamper-actions"><a href="/gifting-enquiry" style="display:inline-flex;margin:0 0 16px;background:#A9482A;color:#FBF7E8;padding:14px 24px;border-radius:999px;font-size:13px;letter-spacing:.16em;text-transform:uppercase">Enquire about gifting</a><a href="/shop" class="kj-catalogue-download">Browse the current collection</a></div>
   <p style="font-size:17px;line-height:1.7;color:#5B4331;max-width:68ch;margin:0 0 32px">Choose handcrafted pieces, colours, quantities, packaging style, and note cards. We prepare wedding favours, festive hampers, corporate gifting sets, and personalised beadwork bundles.</p>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px">
     <div id="wedding" style="background:#fff;border:1px solid #E7DCC2;border-radius:8px;overflow:hidden"><img class="kj-product-image" src="v2/p18-4.jpg" alt="Beaded charms for hampers" style="width:100%;aspect-ratio:4/3;object-fit:cover"><div style="padding:18px"><h2 style="font-family:'Prata',serif;font-size:22px;margin:0 0 8px">Wedding favours</h2><p style="margin:0;color:#5B4331;line-height:1.6">Charm sets, coin bags, coasters, and keepsakes matched to your event palette.</p></div></div>
@@ -318,11 +332,10 @@
     </div>
     <div style="display:grid;gap:18px;font-size:17px;align-content:start">
       <p class="kj-contact-phone" style="margin:0;color:#FBF7E8;border-bottom:1px solid rgba(251,247,232,0.35);padding-bottom:14px;display:flex;align-items:center;gap:14px"><svg viewBox="0 0 32 32" width="21" height="21" fill="currentColor" aria-hidden="true" style="flex:none"><path d="M16.04 3.2C9.01 3.2 3.3 8.91 3.3 15.94c0 2.25.59 4.44 1.71 6.38L3.2 28.8l6.65-1.74a12.7 12.7 0 0 0 6.19 1.58h.01c7.02 0 12.74-5.71 12.74-12.74 0-3.4-1.33-6.6-3.73-9.01a12.65 12.65 0 0 0-9.02-3.69Zm0 23.03h-.01a10.6 10.6 0 0 1-5.39-1.47l-.39-.23-4.01 1.05 1.07-3.9-.25-.4a10.5 10.5 0 0 1-1.62-5.63c0-5.84 4.76-10.59 10.6-10.59 2.83 0 5.49 1.1 7.49 3.11a10.5 10.5 0 0 1 3.1 7.49c0 5.84-4.75 10.57-10.59 10.57Zm5.81-7.92c-.32-.16-1.88-.93-2.17-1.03-.29-.11-.5-.16-.71.16-.21.32-.82 1.03-1 1.24-.19.21-.37.24-.68.08-.32-.16-1.34-.5-2.56-1.58-.95-.84-1.58-1.88-1.77-2.2-.19-.32-.02-.49.14-.65.14-.14.32-.37.48-.56.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.71-1.72-.98-2.35-.26-.62-.52-.54-.71-.55l-.61-.01c-.21 0-.56.08-.85.4-.29.32-1.11 1.09-1.11 2.65s1.14 3.08 1.3 3.29c.16.21 2.24 3.42 5.43 4.8.76.33 1.35.52 1.81.67.76.24 1.45.21 2 .13.61-.09 1.88-.77 2.14-1.51.26-.74.26-1.38.19-1.51-.08-.13-.29-.21-.61-.37Z"></path></svg><span>+91 97405 40847</span></p>
-      <a href="mailto:support@kalajay.in" style="color:#FBF7E8;border-bottom:1px solid rgba(251,247,232,0.35);padding-bottom:14px;display:flex;align-items:center;gap:14px" style-hover="color:#FBF7E8;border-color:#FBF7E8">
-        <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"></rect><path d="m3 6.5 9 6.5 9-6.5"></path></svg>
-        <span>support@kalajay.in</span>
-      </a>
-      <a href="mailto:kalajay.handcrafted@gmail.com" style="color:#FBF7E8;border-bottom:1px solid rgba(251,247,232,0.35);padding-bottom:14px;display:flex;align-items:center;gap:14px"><span>kalajay.handcrafted@gmail.com</span></a>
+      <div class="kj-email-row">
+        <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"></rect><path d="m3 6.5 9 6.5 9-6.5"></path></svg>
+        <div class="kj-email-links"><a href="mailto:support@kalajay.in">support@kalajay.in</a><span aria-hidden="true">|</span><a href="mailto:kalajay.handcrafted@gmail.com">kalajay.handcrafted@gmail.com</a></div>
+      </div>
       <a href="https://instagram.com/kalajay.handcrafted" target="_blank" rel="noopener" style="color:#FBF7E8;border-bottom:1px solid rgba(251,247,232,0.35);padding-bottom:14px;display:flex;align-items:center;gap:14px" style-hover="color:#FBF7E8;border-color:#FBF7E8">
         <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" style="flex:none"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4.1"></circle><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"></circle></svg>
         <span>@kalajay.handcrafted</span>
@@ -433,6 +446,11 @@
 const IS_SHOP = window.location.pathname.replace(/\/$/, "") === "/shop";
 const IS_STORY = window.location.pathname.replace(/\/$/, "") === "/story";
 const IS_RETURNS = window.location.pathname.replace(/\/$/, "") === "/returns";
+const IS_GIFTING = window.location.pathname.replace(/\/$/, "") === "/gifting-enquiry";
+const FIRST_VISIT = (() => {
+  try { const seen = window.sessionStorage.getItem("kalajay-visited"); window.sessionStorage.setItem("kalajay-visited", "yes"); return !seen; }
+  catch (_) { return typeof document === "undefined" || !document.referrer || new URL(document.referrer).origin !== window.location.origin; }
+})();
 const IS_HAMPERS = window.location.pathname.replace(/\/$/, "") === "/hampers";
 const cleanText = text => String(text || '').replace(/\u2014/g, '-');
 const categoryName = name => name === 'Special Pieces' ? 'Little Treasures' : name === 'Mats' ? 'Coasters & Mats' : cleanText(name);
@@ -448,10 +466,10 @@ const imagePath = path => !path ? "/assets/kalajay-brand.png" : path.includes("/
 const SOLD_COUNTS = window.KALAJAY_DATA.soldCounts || {};
 
 class Component extends DCLogic {
-  state = { cityCount: window.KALAJAY_DATA.cityCount, memberCount: window.KALAJAY_DATA.memberCount, cat: CATS.some(c => c[0] === categoryName(INITIAL_PARAMS.get("category"))) ? categoryName(INITIAL_PARAMS.get("category")) : "All", active: null, activeImage: 0, cart: {}, cartOpen: false, q: INITIAL_PARAMS.get("q") || "", sortMode: INITIAL_PARAMS.get("sort") || "az", intro: !IS_SHOP && !IS_STORY && !IS_RETURNS && !IS_HAMPERS && window.location.hash !== "#top", customerName: "", customerPhone: "", customerAddress: "", orderNote: "", orderMessage: "", savingOrder: false };
+  state = { cityCount: window.KALAJAY_DATA.cityCount, memberCount: window.KALAJAY_DATA.memberCount, cat: CATS.some(c => c[0] === categoryName(INITIAL_PARAMS.get("category"))) ? categoryName(INITIAL_PARAMS.get("category")) : "All", active: null, activeImage: 0, cart: {}, cartOpen: false, q: INITIAL_PARAMS.get("q") || "", sortMode: INITIAL_PARAMS.get("sort") || "az", intro: FIRST_VISIT && !IS_SHOP && !IS_STORY && !IS_RETURNS && !IS_HAMPERS && !IS_GIFTING, customerName: "", customerPhone: "", customerAddress: "", orderNote: "", orderMessage: "", savingOrder: false };
 
   componentDidMount() {
-    document.title = IS_STORY ? "Our Story | Kalajay" : IS_RETURNS ? "Return & Exchange | Kalajay" : IS_HAMPERS ? "Gifts & Celebrations | Kalajay" : IS_SHOP ? "Shop | Kalajay" : "Kalajay";
+    document.title = IS_GIFTING ? "Gifting enquiries | Kalajay" : IS_STORY ? "Our Story | Kalajay" : IS_RETURNS ? "Return & Exchange | Kalajay" : IS_HAMPERS ? "Gifts & Celebrations | Kalajay" : IS_SHOP ? "Shop | Kalajay" : "Kalajay";
     this._closeShop = e => { if(e.key === 'Escape' && this.state.active) this.setState({active:null,galleryImage:null}); document.querySelectorAll('.shop-menu, .kj-mobile-menu').forEach(menu => { if (e.key === 'Escape' || (e.type === 'click' && (!menu.contains(e.target) || e.target.closest('a')))) menu.open = false; }); };
     document.addEventListener('click', this._closeShop);
     document.addEventListener('keydown', this._closeShop);
@@ -490,7 +508,7 @@ class Component extends DCLogic {
     window.addEventListener('focus', this._catalogueRefresh);
     this._catalogueTimer = setInterval(this._catalogueRefresh, 10000);
 
-    if (IS_SHOP || IS_STORY || IS_RETURNS || IS_HAMPERS || window.location.hash === "#top" || this.props.introAnimation === false) return this.setState({ intro: false });
+    if (!this.state.intro || this.props.introAnimation === false) return this.setState({ intro: false });
     const video = document.querySelector('.kj-intro-video');
     let finishing = false;
     const finish = () => {
@@ -539,32 +557,20 @@ class Component extends DCLogic {
 
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return this.setState({ intro: false });
-    // Bound loading failures separately from actual playback time.
-    this._i = setTimeout(finish, 6000);
+    // A fixed 2.7-second presentation, including the 320ms emblem transition.
+    // Media errors and autoplay rejection dismiss the overlay immediately.
+    this._i = setTimeout(finish, 2380);
     if (video) {
       video.muted = true;
       video.playsInline = true;
-      video.playbackRate = 3.5 / 2.7; // Play the complete 3.5-second clip in 2.7 seconds.
-      video.addEventListener('playing', () => {
-        if (finishing) return;
-        clearTimeout(this._i);
-        clearTimeout(this._introPlaybackTimer);
-        // Start the playback guard only once frames are actually playing.
-        const remaining = (video.duration - video.currentTime) / video.playbackRate;
-        this._introPlaybackTimer = setTimeout(finish,
-          Number.isFinite(remaining) && remaining > 0 ? remaining * 1000 + 500 : 3000);
-      });
-      video.addEventListener('ended', finish, { once: true });
+      const fitDuration = () => { if (Number.isFinite(video.duration) && video.duration > 0) video.playbackRate = video.duration / 2.38; };
+      fitDuration();
+      video.addEventListener('loadedmetadata', fitDuration, { once: true });
       video.addEventListener('error', finish, { once: true });
+      try { const playback = video.play(); if (playback && playback.catch) playback.catch(finish); }
+      catch (_) { finish(); }
+    } else { finish(); }
 
-      try {
-        const playback = video.play();
-        if (playback && playback.catch) playback.catch(finish);
-      } catch (_) { finish(); }
-
-    } else {
-      finish();
-    }
   }
 
   componentWillUnmount() { document.removeEventListener("click", this._closeShop); document.removeEventListener("keydown", this._closeShop); if (this._flyingEmblem) this._flyingEmblem.remove(); window.removeEventListener("popstate", this._urlChange); window.removeEventListener("pagehide", this._saveCart); clearInterval(this._catalogueTimer); window.removeEventListener("focus", this._catalogueRefresh); clearTimeout(this._i); clearTimeout(this._introPlaybackTimer);  }
@@ -752,7 +758,9 @@ class Component extends DCLogic {
         current: label === cat ? 'page' : 'false',
         pick: e => { e.preventDefault(); const url = new URL('/shop', window.location.origin); if (label !== 'All') url.searchParams.set('category', label); if (this.state.q) url.searchParams.set('q', this.state.q); window.history.pushState({}, '', url); this.setState({ cat: label }); }
       })),
-      isHome: !IS_SHOP && !IS_STORY && !IS_RETURNS && !IS_HAMPERS,
+      isHome: !IS_SHOP && !IS_STORY && !IS_RETURNS && !IS_HAMPERS && !IS_GIFTING,
+      isGifting: IS_GIFTING,
+      giftingProducts: CATS.flatMap(c => items.filter(p => p.cat === c[0] && /coaster|mat|organis|tray|tealight|key|pouch|box/i.test(p.name+" "+p.cat)).sort((a,b) => Number(a.soldOut)-Number(b.soldOut)).slice(0,2)).slice(0,12).map(p => ({...p,priceLabel:this.inr(p.price),href:"/shop?q="+encodeURIComponent(p.name)})),
       isHampers: IS_HAMPERS,
       isStory: IS_STORY,
       isReturns: IS_RETURNS,

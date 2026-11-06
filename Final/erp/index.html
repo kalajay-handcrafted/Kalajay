@@ -528,6 +528,7 @@
     </div>
     <section style="padding:24px 28px;border-top:1px solid var(--line)" id="catalogue-excel">
       <h2>Catalogue Excel</h2>
+      <p><a href="/api/erp/catalogue.pdf" download="Kalajay-Catalogue.pdf" style="display:inline-block;padding:12px 18px;background:var(--accent);color:white;border-radius:8px">Download complete product catalog (PDF)</a></p><p>Share a customer-ready PDF with current product photos, categories, prices and varieties.</p>
       <p>Download the current catalogue, fill the yellow New quantity / New price cells, then upload the saved .xlsx. Blank cells keep existing values. Quantity replaces available stock; zero marks a product sold out.</p>
       <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center"><a href="/api/catalogue.xlsx" download="Kalajay-Catalogue-Update.xlsx" style="padding:10px 16px;background:var(--accent);color:#fff;border-radius:6px">Download catalogue Excel</a><label>Upload edited Excel <input data-admin-write="true" type="file" accept=".xlsx" onChange="{{ previewExcel }}"></label></div>
       <p role="status">{{ excelMessage }}</p>
