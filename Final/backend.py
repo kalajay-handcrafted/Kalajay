@@ -107,9 +107,13 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def erp_page(self, html):
-        user=auth.current(connect,self.headers.get('Cookie'))
-        extra='<script>window.ERP_USER='+json.dumps(user)+'</script><script src="/erp/actions.js"></script><script src="/erp/auth.js" defer></script>'
+    def erp_page(self, html, user):
+        hidden = '[data-admin-write]' if user['role'] == 'manager' else '[data-manager-only]'
+        extra = (
+            '<style>' + hidden + '{display:none!important}</style>'
+            '<script>window.ERP_USER=' + json.dumps(user) + '</script>'
+            '<script src="/erp/actions.js"></script><script src="/erp/auth.js" defer></script>'
+        )
         return self.send(200,html.replace('</head>',extra+'</head>') if '</head>' in html else html.replace('<main>',extra+'<main>'), 'text/html; charset=utf-8')
 
     def do_GET(self):
@@ -134,7 +138,7 @@ class Handler(BaseHTTPRequestHandler):
             if user['role']!='admin':return self.send(403,{'error':'Admin access required.'})
             try:
                 query=parse_qs(urlsplit(self.path).query)
-                if path=='/erp/records':return self.erp_page((ROOT/'erp-records.html').read_text())
+                if path=='/erp/records':return self.erp_page((ROOT/'erp-records.html').read_text(), user)
                 if path=='/api/erp/records':return self.send(200,records.listing(connect,query.get('kind',['products'])[0],DATA_DIR))
                 if path.endswith('.csv'):return self.send(200,audit.csv_export(connect,query),'text/csv; charset=utf-8',{'Content-Disposition':'attachment; filename=Kalajay-action-history.csv'})
                 return self.send(200,audit.history(connect,query))
@@ -142,12 +146,12 @@ class Handler(BaseHTTPRequestHandler):
         if path=='/erp/actions.js':return self.send(200,(ROOT/'erp-actions.js').read_text(),'application/javascript')
         if path in ('/erp/accounts','/api/auth/users'):
             if user['role']!='admin':return self.send(403,{'error':'Admin access required.'})
-            if path=='/erp/accounts':return self.erp_page((ROOT/'auth.html').read_text())
+            if path=='/erp/accounts':return self.erp_page((ROOT/'auth.html').read_text(), user)
             with connect() as db:return self.send(200,[dict(row) for row in db.execute('SELECT username,role FROM auth_users ORDER BY username')])
         if path=='/erp/auth.js':return self.send(200,(ROOT/'erp-auth.js').read_text(),'application/javascript')
         if path in ('/erp/expenses', '/erp/expenses/'):
             with connect() as db:
-                return self.erp_page(db.execute("SELECT value FROM content WHERE key='expense_page'").fetchone()[0])
+                return self.erp_page(db.execute("SELECT value FROM content WHERE key='expense_page'").fetchone()[0], user)
         if path == '/api/erp/expenses':
             return self.send(200, expenses.state(connect))
         if path == '/api/erp/expenses/backup':
@@ -159,7 +163,7 @@ class Handler(BaseHTTPRequestHandler):
             except ValueError:
                 return self.send(404, {'error':'Bill not found.'})
         if path == '/erp/team':
-            return self.erp_page((ROOT/'team.html').read_text())
+            return self.erp_page((ROOT/'team.html').read_text(), user)
         if path == '/api/erp/cities':
             return self.send(200, team.cities(connect))
         if path.startswith('/api/erp/team/images/'):
@@ -175,7 +179,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(200, team.state(connect))
         if path in ('/erp', '/erp/', '/erp/index.html'):
             with connect() as db:
-                return self.erp_page(db.execute("SELECT value FROM content WHERE key='erp_homepage'").fetchone()[0])
+                return self.erp_page(db.execute("SELECT value FROM content WHERE key='erp_homepage'").fetchone()[0], user)
         if path in ('/api/catalogue.pdf', '/api/erp/catalogue.pdf'):
             try:
                 raw = catalogue_pdf.export_pdf(connect, ROOT, DATA_DIR, path.startswith('/api/erp/'))

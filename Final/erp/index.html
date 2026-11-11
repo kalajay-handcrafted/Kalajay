@@ -54,6 +54,7 @@
     .inventory-grid tbody td:nth-child(3) img { display: none; }
     .inventory-grid th { white-space: normal !important; overflow-wrap: anywhere; }
   }
+  .inventory-view-value { white-space: pre-wrap; overflow-wrap: anywhere; }
   @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 </style>
 </helmet>
@@ -207,7 +208,7 @@
               <col style="width:var(--pin-sno)">
               <col style="width:var(--pin-code)">
               <col style="width:var(--pin-name)">
-              <col span="25" style="width:160px">
+              <col span="{{ remainingColumns }}" style="width:160px">
             </colgroup>
             <thead>
               <tr style="background:#F4EDE3">
@@ -221,11 +222,11 @@
                 <tr style="border-bottom:1px solid #F2EBE1;background:{{ r.rowBg }}" style-hover="background:#FBF4EA">
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;color:var(--mut);text-align:right">{{ r.sno }}</td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;white-space:nowrap;color:#4A4038">{{ r.code }}</td>
-                  <td style="padding:4px 6px;vertical-align:top"><textarea class="inventory-name" data-inventory-name data-admin-write="true" aria-label="Product name" rows="2" maxlength="300" value="{{ r.name }}" onBlur="{{ r.onName }}"></textarea><sc-if value="{{ r.isGroup }}"><div style="font-size:10px;color:#8A6318;padding:2px 4px">Master · display only</div></sc-if><div class="inventory-name-tools"><img src="{{ r.imageSrc }}" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;border:1px solid var(--line);background:#F6EFE5;flex:none"><button data-admin-write="true" onClick="{{ r.editOptions }}" title="Edit product colours and varieties" style="font-size:11px;padding:4px;white-space:normal">{{ r.editOptionsLabel }}</button></div></td>
-                  <td style="padding:4px 6px"><select data-admin-write="true" aria-label="Product category" value="{{ r.cat }}" onBlur="{{ r.onCat }}" style="width:150px;border:1px solid var(--line);border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px"><option value="">Select category</option><sc-for list="{{ categoryChoices }}" as="category"><option value="{{ category }}">{{ category }}</option></sc-for></select></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.unit }}" onBlur="{{ r.onUnit }}" style="width:52px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;text-align:center" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.hsn }}" onBlur="{{ r.onHsn }}" style="width:62px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.gst }}" onBlur="{{ r.onGst }}" style="width:48px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px;vertical-align:top"><textarea class="inventory-name" data-inventory-name data-admin-write="true" aria-label="Product name" rows="2" maxlength="300" value="{{ r.name }}" onBlur="{{ r.onName }}"></textarea><span data-manager-only class="inventory-view-value">{{ r.name }}</span><sc-if value="{{ r.isGroup }}"><div style="font-size:10px;color:#8A6318;padding:2px 4px">Master · display only</div></sc-if><div class="inventory-name-tools"><img src="{{ r.imageSrc }}" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;border:1px solid var(--line);background:#F6EFE5;flex:none"><button data-admin-write="true" onClick="{{ r.editOptions }}" title="Edit product colours and varieties" style="font-size:11px;padding:4px;white-space:normal">{{ r.editOptionsLabel }}</button></div></td>
+                  <td style="padding:4px 6px"><select data-admin-write="true" aria-label="Product category" value="{{ r.cat }}" onBlur="{{ r.onCat }}" style="width:150px;border:1px solid var(--line);border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px"><option value="">Select category</option><sc-for list="{{ categoryChoices }}" as="category"><option value="{{ category }}">{{ category }}</option></sc-for></select><span data-manager-only class="inventory-view-value">{{ r.cat }}</span></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.unit }}" onBlur="{{ r.onUnit }}" style="width:52px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;text-align:center" style-hover="border-color:var(--line)"><span data-manager-only class="inventory-view-value">{{ r.unit }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.hsn }}" onBlur="{{ r.onHsn }}" style="width:62px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace" style-hover="border-color:var(--line)"><span data-manager-only class="inventory-view-value">{{ r.hsn }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.gst }}" onBlur="{{ r.onGst }}" style="width:48px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"><span data-manager-only class="inventory-view-value">{{ r.gst }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut)"><sc-if value="{{ r.stockItem }}">{{ r.open }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut)"><sc-if value="{{ r.stockItem }}">{{ r.purch }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right"><sc-if value="{{ r.stockItem }}">{{ r.made }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
@@ -233,20 +234,20 @@
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#A4442C"><sc-if value="{{ r.stockItem }}">{{ r.dmg }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A6318"><sc-if value="{{ r.stockItem }}">{{ r.marketing }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);text-align:right"><sc-if value="{{ r.stockItem }}"><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;padding:2px 7px;border-radius:99px;background:{{ r.stockBg }};color:{{ r.stockFg }}">{{ r.stock }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.reorder }}" onBlur="{{ r.onReorder }}" style="width:56px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Beads Used" value="{{ r.beadsUsed }}" onBlur="{{ r.onbeadsUsed }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Quantity of beads (kg)" type="number" min="0" step="any" value="{{ r.beadKg }}" onBlur="{{ r.onbeadKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Cost of 1kg beads" type="number" min="0" step="any" value="{{ r.beadCostKg }}" onBlur="{{ r.onbeadCostKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Labor Hour" type="number" min="0" step="any" value="{{ r.laborHours }}" onBlur="{{ r.onlaborHours }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Other Material Cost" type="number" min="0" step="any" value="{{ r.otherMaterialCost }}" onBlur="{{ r.onotherMaterialCost }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Notes" value="{{ r.notes }}" onBlur="{{ r.onnotes }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.reorder }}" onBlur="{{ r.onReorder }}" style="width:56px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"><span data-manager-only class="inventory-view-value">{{ r.reorder }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Beads Used" value="{{ r.beadsUsed }}" onBlur="{{ r.onbeadsUsed }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"><span data-manager-only class="inventory-view-value">{{ r.beadsUsed }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Quantity of beads (kg)" type="number" min="0" step="any" value="{{ r.beadKg }}" onBlur="{{ r.onbeadKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"><span data-manager-only class="inventory-view-value">{{ r.beadKg }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Cost of 1kg beads" type="number" min="0" step="any" value="{{ r.beadCostKg }}" onBlur="{{ r.onbeadCostKg }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"><span data-manager-only class="inventory-view-value">{{ r.beadCostKg }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Labor Hour" type="number" min="0" step="any" value="{{ r.laborHours }}" onBlur="{{ r.onlaborHours }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"><span data-manager-only class="inventory-view-value">{{ r.laborHours }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Other Material Cost" type="number" min="0" step="any" value="{{ r.otherMaterialCost }}" onBlur="{{ r.onotherMaterialCost }}" style="width:105px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"><span data-manager-only class="inventory-view-value">{{ r.otherMaterialCost }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" aria-label="Notes" value="{{ r.notes }}" onBlur="{{ r.onnotes }}" style="width:180px;border:1px solid var(--line);border-radius:4px;padding:5px 7px"><span data-manager-only class="inventory-view-value">{{ r.notes }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);text-align:right" title="Bead kg × cost/kg + ₹50 × labor hours + other material cost"><sc-if value="{{ r.stockItem }}">{{ r.cp }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.sp }}" onBlur="{{ r.onSp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
-                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.mrp }}" onBlur="{{ r.onMrp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.sp }}" onBlur="{{ r.onSp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"><span data-manager-only class="inventory-view-value">{{ r.sp }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
+                  <td style="padding:4px 6px"><sc-if value="{{ r.stockItem }}"><input data-admin-write="true" value="{{ r.mrp }}" onBlur="{{ r.onMrp }}" style="width:70px;border:1px solid transparent;border-radius:4px;background:#fff;padding:5px 7px;font-size:12.5px;font-family:'IBM Plex Mono',monospace;text-align:right" style-hover="border-color:var(--line)"><span data-manager-only class="inventory-view-value">{{ r.mrp }}</span></sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:{{ r.marginFg }}"><sc-if value="{{ r.stockItem }}">{{ r.margin }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap"><sc-if value="{{ r.stockItem }}">{{ r.value }}</sc-if><sc-if value="{{ r.isGroup }}"><span style="display:block;padding:5px 7px;color:var(--mut)">N/A</span></sc-if></td>
                   <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--mut);white-space:nowrap">{{ r.upd }}</td>
-                  <td style="padding:var(--pad);text-align:center"><sc-if value="{{ r.stockItem }}"><button data-admin-write="true" onClick="{{ r.onDelete }}" title="Delete row" style="border:0;background:none;color:#B9A896;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px" style-hover="color:#A4442C;background:#F8EDE7">✕</button></sc-if><sc-if value="{{ r.isGroup }}"><button data-admin-write="true" onClick="{{ r.editOptions }}" style="font-size:11px;white-space:normal">Edit colours</button></sc-if></td>
+                  <td data-admin-write="true" style="padding:var(--pad);text-align:center"><sc-if value="{{ r.stockItem }}"><button data-admin-write="true" onClick="{{ r.onDelete }}" title="Delete row" style="border:0;background:none;color:#B9A896;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px" style-hover="color:#A4442C;background:#F8EDE7">✕</button></sc-if><sc-if value="{{ r.isGroup }}"><button data-admin-write="true" onClick="{{ r.editOptions }}" style="font-size:11px;white-space:normal">Edit colours</button></sc-if></td>
                 </tr>
               </sc-for>
             </tbody>
@@ -263,7 +264,7 @@
                 <td colspan="10"></td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right">{{ tMargin }}</td>
                 <td style="padding:var(--pad);font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap">{{ tValue }}</td>
-                <td colspan="2"></td>
+                <td colspan="{{ lastTotalColumns }}"></td>
               </tr>
             </tfoot>
           </table>
@@ -272,7 +273,6 @@
       <sc-if value="{{ scrTeam }}" hint-placeholder-val="{{ false }}">
         <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:12px">
           <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:20px">Team Members Directory</h2>
-          <p style="margin:0;color:var(--mut);font-size:13px;max-width:70ch">Open the secure team directory to add members, update membership type, and maintain the website’s live member count.</p>
           <a href="/erp/team" style="align-self:flex-start;padding:10px 16px;background:var(--accent);color:#fff;border-radius:6px;font-size:13px">Open team members directory</a>
         </section>
       </sc-if>
@@ -394,8 +394,8 @@
       </sc-if>
 
       <sc-if value="{{ scrEntry }}" hint-placeholder-val="{{ true }}">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;align-items:start">
-          <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px;align-items:start">
+          <section data-admin-write="true" style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:14px">
             <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:18px">{{ entryHeading }}</h2>
             <label style="display:flex;flex-direction:column;gap:5px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mut)">Product
               <select data-admin-write="true" value="{{ entry.code }}" onChange="{{ onEntryCode }}" style="border:1px solid var(--line);border-radius:6px;padding:9px 10px;font-size:13px;letter-spacing:0;text-transform:none;color:var(--ink);background:#fff">
@@ -439,7 +439,16 @@
             </div>
           </section>
           <section style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:0;overflow:auto">
-            <div style="padding:16px 18px 10px"><h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:17px">{{ entryLogTitle }}</h2></div>
+            <div style="padding:16px 18px 10px">
+              <h2 style="margin:0;font-family:Spectral,serif;font-weight:500;font-size:17px">{{ entryLogTitle }}</h2>
+              <sc-if value="{{ showEntryPages }}">
+                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:10px">
+                  <button disabled="{{ firstEntryPage }}" onClick="{{ previousEntryPage }}">Previous</button>
+                  <span>{{ entryPageLabel }}</span>
+                  <button disabled="{{ lastEntryPage }}" onClick="{{ nextEntryPage }}">Next</button>
+                </div>
+              </sc-if>
+            </div>
             <table style="width:100%;font-size:12.5px;min-width:440px">
               <thead><tr style="background:#F4EDE3">
                 <th style="text-align:left;padding:8px 14px;font-size:10px;letter-spacing:0.09em;text-transform:uppercase;color:#6B5F52">Date</th>
@@ -529,14 +538,14 @@
     <section style="padding:24px 28px;border-top:1px solid var(--line)" id="catalogue-excel">
       <h2>Catalogue Excel</h2>
       <p><a href="/api/erp/catalogue.pdf" download="Kalajay-Catalogue.pdf" style="display:inline-block;padding:12px 18px;background:var(--accent);color:white;border-radius:8px">Download complete product catalog (PDF)</a></p><p>Share a customer-ready PDF with current product photos, categories, prices and varieties.</p>
-      <p>Download the current catalogue, fill the yellow New quantity / New price cells, then upload the saved .xlsx. Blank cells keep existing values. Quantity replaces available stock; zero marks a product sold out.</p>
-      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center"><a href="/api/catalogue.xlsx" download="Kalajay-Catalogue-Update.xlsx" style="padding:10px 16px;background:var(--accent);color:#fff;border-radius:6px">Download catalogue Excel</a><label>Upload edited Excel <input data-admin-write="true" type="file" accept=".xlsx" onChange="{{ previewExcel }}"></label></div>
+      <p data-admin-write="true">Download the current catalogue, fill the yellow New quantity / New price cells, then upload the saved .xlsx. Blank cells keep existing values. Quantity replaces available stock; zero marks a product sold out.</p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center"><a href="/api/catalogue.xlsx" download="Kalajay-Catalogue-Update.xlsx" style="padding:10px 16px;background:var(--accent);color:#fff;border-radius:6px">Download catalogue Excel</a><label data-admin-write="true">Upload edited Excel <input data-admin-write="true" type="file" accept=".xlsx" onChange="{{ previewExcel }}"></label></div>
       <p role="status">{{ excelMessage }}</p>
       <sc-for list="{{ excelChanges }}" as="c"><p><strong>{{ c.code }} · {{ c.name }}</strong><br>Quantity: {{ c.oldQuantity }} → {{ c.newQuantity }} · Price: ₹{{ c.oldPrice }} → ₹{{ c.newPrice }}</p></sc-for>
       <sc-if value="{{ excelReady }}"><button data-admin-write="true" onClick="{{ applyExcel }}" style="padding:10px 16px;background:var(--accent);color:#fff;border:0;border-radius:6px">Apply updates to website &amp; ERP</button></sc-if>
     </section>
     <section style="padding:24px 28px;border-top:1px solid var(--line)">
-      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><h2>Website orders</h2><a href="/" target="_blank">Open website ↗</a><button onClick="{{ exportBackup }}">Export data backup</button><button data-admin-write="true" onClick="{{ importBrowserBackup }}">Import previous browser data</button><label>Import ERP JSON backup <input data-admin-write="true" type="file" accept=".json" onChange="{{ importBackup }}"></label></div>
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><h2>Website orders</h2><a href="/" target="_blank">Open website ↗</a><button onClick="{{ exportBackup }}">Export data backup</button><button data-admin-write="true" onClick="{{ importBrowserBackup }}">Import previous browser data</button><label data-admin-write="true">Import ERP JSON backup <input data-admin-write="true" type="file" accept=".json" onChange="{{ importBackup }}"></label></div>
       <p>Orders remain pending until confirmed. Confirmation records the sale and updates shared stock.</p>
       <sc-for list="{{ sharedOrders }}" as="o">
         <article style="padding:16px;margin:12px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel)">
@@ -568,6 +577,7 @@ class Component extends DCLogic {
     products: [],
     txns: [],
     screen: "dash",
+    entryPage: 0,
     query: "",
     catFilter: "All categories",
     stockFilter: "all",
@@ -831,6 +841,7 @@ class Component extends DCLogic {
 
   renderVals() {
     const S = this.state;
+    const manager = globalThis.ERP_USER?.role === "manager";
     const P = S.products.filter(p => !p.isVariantGroup).map((p,i)=>({...p,sno:i+1}));
     const stockNumber = new Map(P.map(p => [p.code, p.sno]));
     const inventory = S.products.map(p => ({...p, sno:stockNumber.get(p.code) || '—'}));
@@ -863,10 +874,19 @@ class Component extends DCLogic {
       team: ["Team Members Directory", "Manage Kalajay members, roles, membership types and live website member count."]
     };
 
+    if (manager) {
+      titles.grid[1] = "Stock, product details, costing and varieties.";
+      titles.prod = ["Production", "Production transactions and quantities made."];
+      titles.sale = ["Sales & stock-out", "Sales, marketing giveaways and stock write-offs."];
+      titles.purch = ["Purchases & stock-in", "Purchase and stock-in transactions."];
+      titles.adjust = ["Stock adjustments", "Adjustments to recorded stock quantities."];
+      titles.team[1] = "Kalajay members, roles, membership types and city count.";
+    }
+
     const navGroups = [
       { label: "Overview", items: [["dash", "Dashboard", lows.length ? String(lows.length) : ""]] },
-      { label: "Inventory", items: [["grid", "Master inventory", String(inventory.length)], ["low", "Low stock", lows.length ? String(lows.length) : ""], ["add", "Add / edit product", ""]] },
-      { label: "Transactions", items: [["prod", "Production entry", ""], ["sale", "Sale entry", ""], ["purch", "Purchase / stock-in", ""]] },
+      { label: "Inventory", items: [["grid", "Master inventory", String(inventory.length)], ["low", "Low stock", lows.length ? String(lows.length) : ""], ...(manager ? [] : [["add", "Add / edit product", ""]])] },
+      { label: "Transactions", items: [["prod", manager ? "Production" : "Production entry", ""], ["sale", manager ? "Sales" : "Sale entry", ""], ["purch", manager ? "Purchases" : "Purchase / stock-in", ""], ...(manager ? [["adjust", "Stock adjustments", ""]] : [])] },
       { label: "Finance", items: [["expenses", "Expenses", ""]] },
       { label: "Insights", items: [["reports", "Reports", ""]] },
       { label: "People", items: [["team", "Team Members", ""]] }
@@ -875,7 +895,7 @@ class Component extends DCLogic {
       items: g.items.map(it => {
         const on = screen === it[0];
         return {
-          label: it[1], badge: it[2], go: () => it[0] === "expenses" ? window.location.assign("/erp/expenses") : this.setState({ screen: it[0], entryError: "", addError: "" }),
+          label: it[1], badge: it[2], go: () => it[0] === "expenses" ? window.location.assign("/erp/expenses") : this.setState({ screen: it[0], entryPage: 0, entryError: "", addError: "" }),
           bg: on ? "#322B24" : "transparent", fg: on ? "#FFFFFF" : "#C9BCAC",
           mark: on ? accent : "transparent",
           badgeBg: it[2] && it[0] === "low" && lows.length ? "#5A2A18" : "transparent",
@@ -909,6 +929,7 @@ class Component extends DCLogic {
       ["SP ₹", "sp", "right"], ["MRP ₹", "mrp", "right"], ["Margin %", "margin", "right"], ["Stock value", "value", "right"],
       ["Updated", "upd", "right"], ["", "", "center"]
     ];
+    if (manager) colDefs.pop();
     const columns = colDefs.map(c => ({
       label: c[0] + (c[1] && sk === c[1] ? (S.sortDir > 0 ? " ↑" : " ↓") : ""),
       align: c[2],
@@ -1055,11 +1076,17 @@ class Component extends DCLogic {
 
     if(isMarketing && sel) entryPreview.push({label:'Sales revenue added',value:this.inr(0),tone:'#2A241E'},{label:'Reference value (not revenue)',value:this.inr(eqty*this.num(S.entry.rate)),tone:'#7E7266'});
 
-    const logType = screen === "prod" ? ["Production"] : screen === "purch" ? ["Purchase"] : ["Sale", "Damage", "Marketing"];
-    const entryLog = S.txns.filter(t => logType.indexOf(t.type) >= 0).slice(0, 14).map(t => {
+    const logTypes = { prod: ["Production"], purch: ["Purchase"], sale: ["Sale", "Damage", "Marketing"], adjust: ["Adjustment"] };
+    const logTitles = { prod: "production", purch: "purchases", sale: "sales, giveaways & write-offs", adjust: "stock adjustments" };
+    const entryTransactions = S.txns.filter(t => logTypes[screen]?.includes(t.type));
+    const entryPageSize = manager ? 50 : 14;
+    const entryPages = Math.max(1, Math.ceil(entryTransactions.length / entryPageSize));
+    const entryPage = Math.min(S.entryPage, entryPages - 1);
+    const entryLog = entryTransactions.slice(entryPage * entryPageSize, (entryPage + 1) * entryPageSize).map(t => {
       const p = P.find(x => x.code === t.code);
       const rate = t.type === 'Marketing' ? (t.unitCost ?? 0) : t.rate || (p ? (t.type === "Sale" ? p.sp : p.cp) : 0);
-      return { typeLabel:t.type + (t.purpose ? ' · ' + t.purpose : ''), date: t.date, name: p ? p.name : t.code, ref: t.ref, qty: (t.type === "Sale" || t.type === "Damage" || t.type === "Marketing" ? "−" : "+") + t.qty, amount: this.inr(t.qty * rate), tone: toneOf(t.type) };
+      const reduced = t.qty < 0 || ["Sale", "Damage", "Marketing"].includes(t.type);
+      return { typeLabel:t.type + (t.purpose ? ' · ' + t.purpose : ''), date: t.date, name: p ? p.name : t.code, ref: t.ref, qty: (reduced ? "−" : "+") + Math.abs(t.qty), amount: this.inr(t.qty * rate), tone: toneOf(t.type) };
     });
 
     // ---------- reports ----------
@@ -1101,13 +1128,13 @@ class Component extends DCLogic {
       orgName: this.props.orgName || "Kalajay",
       today: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
       screenTitle: titles[screen][0], screenSub: titles[screen][1],
-      scrDash: screen === "dash", scrGrid: screen === "grid", scrLow: screen === "low", scrAdd: screen === "add",
-      scrEntry: screen === "prod" || screen === "sale" || screen === "purch",
+      scrDash: screen === "dash", scrGrid: screen === "grid", scrLow: screen === "low", scrAdd: !manager && screen === "add",
+      scrEntry: Object.hasOwn(logTypes, screen),
       scrReports: screen === "reports",
       scrTeam: screen === "team",
       navGroups, skuCount: String(P.length), totalValue: this.inrShort(totalValue),
       kpis, trend, alerts, topSellers, slowMovers, activity,
-      columns, rows: gridRows, rowCount: String(rows.length), stockRowCount: String(stockRows.length),
+      columns, remainingColumns: columns.length - 3, lastTotalColumns: manager ? 1 : 2, rows: gridRows, rowCount: String(rows.length), stockRowCount: String(stockRows.length),
       query: S.query, onQuery: e => this.setState({ query: e.target.value }),
       catFilter: S.catFilter, onCatFilter: e => this.setState({ catFilter: e.target.value }),
       catOptions: ["All categories"].concat(cats),
@@ -1158,7 +1185,13 @@ class Component extends DCLogic {
       productOptions: P.map(p => ({ code: p.code, label: p.code + " — " + p.name + "  (" + stock(p) + " " + p.unit + ")" })),
       entryHeading: screen === "prod" ? "New production entry" : screen === "purch" ? "New stock-in entry" : isMarketing ? "Marketing / giveaway entry" : "New sale entry",
       entryCta: screen === "prod" ? "Post production" : screen === "purch" ? "Post stock-in" : isMarketing ? "Record giveaway" : S.entry.kind === "Damage" ? "Write off stock" : "Post sale",
-      entryLogTitle: screen === "prod" ? "Recent production" : screen === "purch" ? "Recent purchases" : "Recent sales, giveaways & write-offs",
+      entryLogTitle: (manager ? "All " : "Recent ") + (logTitles[screen] || "transactions"),
+      showEntryPages: manager && entryPages > 1,
+      entryPageLabel: "Page " + (entryPage + 1) + " of " + entryPages,
+      firstEntryPage: entryPage === 0,
+      lastEntryPage: entryPage === entryPages - 1,
+      previousEntryPage: () => this.setState({ entryPage: Math.max(0, entryPage - 1) }),
+      nextEntryPage: () => this.setState({ entryPage: Math.min(entryPages - 1, entryPage + 1) }),
       entryLog,
       reportKpis, catRows, profitRows, damageRows,
       postEntry: () => this.postTxn(),
