@@ -154,7 +154,8 @@ class TeamImageTests(unittest.TestCase):
                 self.assertEqual(code,200,body)
                 image=json.loads(body)['members'][0]['images'][0]
                 self.assertEqual(request(image['url'])[0],401)
-                code,raw,mime=request(image['url'],'manager')
+                self.assertEqual(request(image['url'],'manager')[0],404)
+                code,raw,mime=request(image['url'],'admin')
                 self.assertEqual(code,200)
                 self.assertEqual(raw,PIXEL+b'\x00'*40000)
                 self.assertEqual(mime,'image/png')
