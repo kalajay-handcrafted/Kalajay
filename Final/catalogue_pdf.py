@@ -63,12 +63,19 @@ def export_pdf(connect, root, data_dir, include_unpublished=False):
                           'WHERE p.active=1 ' + ('' if include_unpublished else 'AND p.published=1 ') +
                           'ORDER BY p.category,p.name COLLATE NOCASE').fetchall()
         products = [{**dict(r), 'details': json.loads(r['record'])} for r in rows]
+    return render_pdf(products, lambda path: photo(path, root, data_dir))
+
+
+def render_pdf(products, photo_for, *, demo=False):
     by_code = {p['product_code']: p for p in products}
     parents = [p for p in products if not p['details'].get('parentCode')]
     output = io.BytesIO()
+    title = 'Kalajay Demo Catalogue' if demo else 'Kalajay Product Catalogue'
     doc = SimpleDocTemplate(output, pagesize=A4, rightMargin=36, leftMargin=36,
-                            topMargin=38, bottomMargin=40, title='Kalajay Product Catalogue', author='Kalajay')
-    story = [Paragraph('KALAJAY', ParagraphStyle('brand', parent=HEADING, fontSize=26, leading=32, textColor=RUST)),
+                            topMargin=38, bottomMargin=40, title=title, author='Kalajay')
+    brand = ParagraphStyle('brand', parent=HEADING, fontSize=26, leading=32, textColor=RUST)
+    story = [Paragraph('KALAJAY DEMO', brand), Paragraph('Fictional product records for the ERP Manager demo.', STYLE)] if demo else [
+             Paragraph('KALAJAY', brand),
              Paragraph('Handcrafted with Love, One at a Time', TITLE),
              Paragraph('Product catalogue | ' + datetime.now(ZoneInfo('Asia/Kolkata')).strftime('%d %B %Y, %I:%M %p IST'), STYLE),
              Spacer(1, 8), Paragraph('Browse our handcrafted pieces for everyday moments, thoughtful gifts and special celebrations. '
@@ -93,7 +100,7 @@ def export_pdf(connect, root, data_dir, include_unpublished=False):
                          Paragraph('Made to order / enquire for availability' if p['sold_out'] else 'Available to enquire', STYLE)])
         else:
             text.append(Paragraph(str(len(options)) + ' colour / variety options below', STYLE))
-        table = Table([[photo(p['image'], root, data_dir), text]], colWidths=[130, A4[0] - 202], splitInRow=1)
+        table = Table([[photo_for(p['image']), text]], colWidths=[130, A4[0] - 202], splitInRow=1)
         table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP'), ('BOTTOMPADDING', (0, 0), (-1, -1), 16),
                                    ('TOPPADDING', (0, 0), (-1, -1), 10), ('LINEBELOW', (0, 0), (-1, -1), .5, colors.HexColor('#e7dcc2'))]))
         story.append(table)
@@ -103,13 +110,13 @@ def export_pdf(connect, root, data_dir, include_unpublished=False):
             detail = [Paragraph(escape(p['name'] + ' / ' + (cd.get('variantLabel') or child['name'])), TITLE),
                       Paragraph(escape(child['product_code']) + ' | ' + ('INR ' + format(child['price'], ',.2f') if child['price'] > 0 else 'Price on request'), STYLE),
                       Paragraph('Available to enquire' if available > 0 else 'Made to order / enquire for availability', STYLE)]
-            story.append(Table([[photo(child['image'], root, data_dir), detail]], colWidths=[130, A4[0] - 202],
+            story.append(Table([[photo_for(child['image']), detail]], colWidths=[130, A4[0] - 202],
                                style=[('VALIGN', (0, 0), (-1, -1), 'TOP'), ('BOTTOMPADDING', (0, 0), (-1, -1), 14)]))
 
     def footer(canvas, _doc):
         canvas.setFont('KJ', 8)
         canvas.setFillColor(RUST)
-        canvas.drawString(36, 22, 'www.kalajay.in | +91 97405 40847')
+        canvas.drawString(36, 22, 'Demo catalogue | Fictional data' if demo else 'www.kalajay.in | +91 97405 40847')
         canvas.drawRightString(A4[0] - 36, 22, str(_doc.page))
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
     return output.getvalue()

@@ -81,17 +81,20 @@ def import_sheet(connect,raw,apply=False):
 
 
 def export_workbook(connect):
+ return render_workbook(export_data(connect))
+
+def render_workbook(data, *, demo=False):
  from openpyxl import Workbook
  from openpyxl.styles import Font, PatternFill, Alignment
  from openpyxl.worksheet.datavalidation import DataValidation
  from openpyxl.worksheet.table import Table, TableStyleInfo
- data=export_data(connect);wb=Workbook();ws=wb.active;ws.title='Catalogue'
- ws['A2']='Kalajay catalogue updates'
+ wb=Workbook();ws=wb.active;ws.title='Catalogue'
+ ws['A2']='Kalajay demo catalogue' if demo else 'Kalajay catalogue updates'
  ws['A2'].font=Font(size=16,bold=True,color='A4502B')
- ws['A3']='Fill yellow cells only. Blank = no change; new quantity 0 = sold out.'
- ws['A4']='Upload the edited workbook in ERP → Catalogue Excel. Download a fresh sheet before editing.'
+ ws['A3']='Sample products, quantities and prices.' if demo else 'Fill yellow cells only. Blank = no change; new quantity 0 = sold out.'
+ ws['A4']='View-only example for the ERP Manager demo.' if demo else 'Upload the edited workbook in ERP → Catalogue Excel. Download a fresh sheet before editing.'
  ws['A5']='Database version';ws['B5']=data['revision']
- ws['A6']='Source: shared Kalajay catalogue'
+ ws['A6']='Source: fictional demo records' if demo else 'Source: shared Kalajay catalogue'
  for col,value in enumerate(HEADERS,1):ws.cell(7,col,value)
  for row in data['rows']:ws.append(row) if ws.max_row>=7 else None
  end=ws.max_row;ws.freeze_panes='A8'

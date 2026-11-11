@@ -6,6 +6,7 @@ import mimetypes
 import sqlite3
 import uuid
 import erp_audit as audit
+import erp_demo
 import erp_records as records
 import shared_store as shared
 import stock_reset
@@ -33,6 +34,12 @@ ERP_ROOT = Path(os.environ.get('KALAJAY_ERP_ROOT', str(ROOT / 'erp' if (ROOT / '
 PRODUCTION = os.environ.get('KALAJAY_PRODUCTION') == '1'
 ALLOWED_HOSTS = set(filter(None, os.environ.get('KALAJAY_HOSTS','www.kalajay.in,kalajay.in,erp.kalajay.in').split(',')))
 if os.environ.get('RENDER_EXTERNAL_HOSTNAME'): ALLOWED_HOSTS.add(os.environ['RENDER_EXTERNAL_HOSTNAME'])
+
+DEMO_SHARED_PATHS = frozenset({
+    '/erp/login', '/erp/auth.js', '/erp/actions.js', '/erp/support.js',
+    '/assets/kalajay-brand.png', '/assets/favicons/favicon-32.png',
+    '/assets/favicons/apple-touch-icon.png',
+})
 
 def connect():
     db = sqlite3.connect(DB, timeout=15)
@@ -97,7 +104,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header('Content-Type', kind)
         self.send_header('Content-Length', str(len(body)))
-        if kind == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+        if kind == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' and not (headers or {}).get('Content-Disposition'):
             self.send_header('Content-Disposition', 'attachment; filename=Kalajay-Catalogue-Update.xlsx')
         self.send_header('Cache-Control', 'no-store')
         self.send_header('X-Content-Type-Options', 'nosniff')
@@ -109,6 +116,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def erp_page(self, html, user):
         hidden = '[data-admin-write]' if user['role'] == 'manager' else '[data-manager-only]'
+        if user['role'] == 'admin':
+            html = html.replace('<!-- ERP_TAX_ID -->', ' · GSTIN 27FAAPS2113B1Z8')
         extra = (
             '<style>' + hidden + '{display:none!important}</style>'
             '<script>window.ERP_USER=' + json.dumps(user) + '</script>'
@@ -116,10 +125,54 @@ class Handler(BaseHTTPRequestHandler):
         )
         return self.send(200,html.replace('</head>',extra+'</head>') if '</head>' in html else html.replace('<main>',extra+'<main>'), 'text/html; charset=utf-8')
 
+    def demo_get(self, path, user):
+        # Keep this route set independent of live record readers and upload directories.
+        if path == '/':
+            return self.send(302, '', 'text/plain', {'Location': '/erp/'})
+        if path in ('/erp', '/erp/', '/erp/index.html'):
+            return self.erp_page((ERP_ROOT / 'index.html').read_text(), user)
+        if path in ('/erp/expenses', '/erp/expenses/'):
+            return self.erp_page((ROOT / 'expenses.html').read_text(), user)
+        if path == '/erp/team':
+            return self.erp_page((ROOT / 'team.html').read_text(), user)
+        if path == '/api/erp':
+            return self.send(200, erp_demo.inventory())
+        if path == '/api/erp/expenses':
+            return self.send(200, erp_demo.expense_state())
+        if path == '/api/erp/team':
+            return self.send(200, erp_demo.team())
+        if path == '/api/erp/cities':
+            return self.send(200, {'count': 1})
+        if path == '/api/erp/expenses/backup':
+            return self.send(200, erp_demo.expense_backup(),
+                             headers={'Content-Disposition': 'attachment; filename=Kalajay-demo-expenses.json'})
+        if path == erp_demo.BILL_URL:
+            return self.send(200, erp_demo.receipt(), 'application/pdf',
+                             {'Content-Disposition': 'attachment; filename=Demo-Receipt.pdf',
+                              'Content-Security-Policy': 'sandbox'})
+        if path in (erp_demo.PRODUCT_IMAGE, erp_demo.TEAM_IMAGE):
+            label = 'Sample product' if path == erp_demo.PRODUCT_IMAGE else 'Sample profile'
+            return self.send(200, erp_demo.image(label), 'image/png')
+        if path == '/api/erp/catalogue.pdf':
+            return self.send(200, erp_demo.export_pdf(), 'application/pdf',
+                             {'Content-Disposition': 'attachment; filename=Kalajay-Demo-Catalogue.pdf'})
+        if path == '/api/catalogue.xlsx':
+            return self.send(200, erp_demo.export_excel(),
+                             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                             {'Content-Disposition': 'attachment; filename=Kalajay-Demo-Catalogue.xlsx'})
+        if path.startswith(('/api/erp/expenses/bills/', '/api/erp/team/images/')):
+            return self.send(404, {'error': 'Demo attachment not found.'})
+        return self.send(403, {'error': 'Manager access is limited to the demo ERP.'})
+
     def do_GET(self):
         if not self.valid_host(): return self.send(400, {'error':'Invalid host.'})
         path = unquote(urlsplit(self.path).path)
         if path == '/healthz':return self.send(200, {'status':'ok'})
+        protected=path=='/erp' or path.startswith('/erp/') or path.startswith('/api/erp') or path in ('/api/catalogue.xlsx','/api/auth/users')
+        cookie = self.headers.get('Cookie')
+        user = auth.current(connect, cookie) if protected or cookie else None
+        if user and user['role'] == 'manager' and path not in DEMO_SHARED_PATHS:
+            return self.demo_get(path, user)
         if path.startswith('/media/products/'):
             try:
                 return self.send(200, product_images.read(DATA_DIR, path[len('/media/products/'):]), 'image/webp')
@@ -129,8 +182,6 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(302, '', 'text/plain', {'Location':'/erp/'})
         if path in ('/erp/login','/erp/setup'):
             return self.send(200,(ROOT/'auth.html').read_text(),'text/html; charset=utf-8')
-        protected=path=='/erp' or path.startswith('/erp/') or path.startswith('/api/erp') or path in ('/api/catalogue.xlsx','/api/auth/users')
-        user=auth.current(connect,self.headers.get('Cookie')) if protected else None
         if protected and not user:
             if path.startswith('/api/'): return self.send(401,{'error':'Please sign in to ERP.'})
             return self.send(303,'','text/plain',{'Location':'/erp/login'})
@@ -217,6 +268,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         # One actor/request context follows all writes, including nested saves and imports.
         user=auth.current(connect,self.headers.get('Cookie'))
+        if user and user['role'] == 'manager' and self.path not in ('/api/auth/login', '/api/auth/logout'):
+            return self.send(403, {'error': 'Manager demo access is view only.'})
         tokens=(audit.actor.set(user['username'] if user else 'Website customer'),
                 audit.request_id.set(str(uuid.uuid4())),audit.source.set(self.path))
         try:

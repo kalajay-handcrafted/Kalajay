@@ -92,7 +92,7 @@
         <p style="margin:0;font-size:13px;color:var(--mut);max-width:70ch;text-wrap:pretty">{{ screenSub }}</p>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <div style="font-size:11px;color:var(--mut);text-align:right;line-height:1.55">FY 2026–27 · GSTIN 27FAAPS2113B1Z8<br>{{ today }}</div>
+        <div style="font-size:11px;color:var(--mut);text-align:right;line-height:1.55">FY 2026–27<!-- ERP_TAX_ID --><br>{{ today }}</div>
       </div>
     </header>
 
@@ -537,15 +537,15 @@
     </div>
     <section style="padding:24px 28px;border-top:1px solid var(--line)" id="catalogue-excel">
       <h2>Catalogue Excel</h2>
-      <p><a href="/api/erp/catalogue.pdf" download="Kalajay-Catalogue.pdf" style="display:inline-block;padding:12px 18px;background:var(--accent);color:white;border-radius:8px">Download complete product catalog (PDF)</a></p><p>Share a customer-ready PDF with current product photos, categories, prices and varieties.</p>
+      <p><a href="/api/erp/catalogue.pdf" download style="display:inline-block;padding:12px 18px;background:var(--accent);color:white;border-radius:8px">{{ cataloguePdfLabel }}</a></p>
       <p data-admin-write="true">Download the current catalogue, fill the yellow New quantity / New price cells, then upload the saved .xlsx. Blank cells keep existing values. Quantity replaces available stock; zero marks a product sold out.</p>
-      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center"><a href="/api/catalogue.xlsx" download="Kalajay-Catalogue-Update.xlsx" style="padding:10px 16px;background:var(--accent);color:#fff;border-radius:6px">Download catalogue Excel</a><label data-admin-write="true">Upload edited Excel <input data-admin-write="true" type="file" accept=".xlsx" onChange="{{ previewExcel }}"></label></div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center"><a href="/api/catalogue.xlsx" download style="padding:10px 16px;background:var(--accent);color:#fff;border-radius:6px">{{ catalogueExcelLabel }}</a><label data-admin-write="true">Upload edited Excel <input data-admin-write="true" type="file" accept=".xlsx" onChange="{{ previewExcel }}"></label></div>
       <p role="status">{{ excelMessage }}</p>
       <sc-for list="{{ excelChanges }}" as="c"><p><strong>{{ c.code }} · {{ c.name }}</strong><br>Quantity: {{ c.oldQuantity }} → {{ c.newQuantity }} · Price: ₹{{ c.oldPrice }} → ₹{{ c.newPrice }}</p></sc-for>
       <sc-if value="{{ excelReady }}"><button data-admin-write="true" onClick="{{ applyExcel }}" style="padding:10px 16px;background:var(--accent);color:#fff;border:0;border-radius:6px">Apply updates to website &amp; ERP</button></sc-if>
     </section>
     <section style="padding:24px 28px;border-top:1px solid var(--line)">
-      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><h2>Website orders</h2><a href="/" target="_blank">Open website ↗</a><button onClick="{{ exportBackup }}">Export data backup</button><button data-admin-write="true" onClick="{{ importBrowserBackup }}">Import previous browser data</button><label data-admin-write="true">Import ERP JSON backup <input data-admin-write="true" type="file" accept=".json" onChange="{{ importBackup }}"></label></div>
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><h2>{{ orderHeading }}</h2><a data-admin-write="true" href="/" target="_blank">Open website ↗</a><button onClick="{{ exportBackup }}">Export data backup</button><button data-admin-write="true" onClick="{{ importBrowserBackup }}">Import previous browser data</button><label data-admin-write="true">Import ERP JSON backup <input data-admin-write="true" type="file" accept=".json" onChange="{{ importBackup }}"></label></div>
       <p>Orders remain pending until confirmed. Confirmation records the sale and updates shared stock.</p>
       <sc-for list="{{ sharedOrders }}" as="o">
         <article style="padding:16px;margin:12px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel)">
@@ -662,7 +662,7 @@ class Component extends DCLogic {
   exportBackup() {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify({ products: this.state.products, txns: this.state.txns }, null, 2)], { type: 'application/json' }));
-    a.download = 'kalajay-erp-backup.json'; a.click(); URL.revokeObjectURL(a.href);
+    a.download = globalThis.ERP_USER?.role === 'manager' ? 'kalajay-demo-erp-backup.json' : 'kalajay-erp-backup.json'; a.click(); URL.revokeObjectURL(a.href);
   }
   async importBackup(e) {
     const file = e.target.files[0]; if (!file || this._saving) return;
@@ -833,7 +833,7 @@ class Component extends DCLogic {
     const csv = [head].concat(body).map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(",")).join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    a.download = "inventory-" + this.todayISO() + ".csv";
+    a.download = (globalThis.ERP_USER?.role === "manager" ? "demo-inventory-" : "inventory-") + this.todayISO() + ".csv";
     a.click();
     this.setState({ toast: "Exported " + rows.length + " rows to CSV" });
     clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: "" }), 2600);
@@ -1029,7 +1029,7 @@ class Component extends DCLogic {
     const d = S.draft;
     const dset = k => e => this.setState({ draft: this.applyCosting(Object.assign({}, this.state.draft, { [k]: e.target.value }), ['beadKg','beadCostKg','laborHours','otherMaterialCost'].includes(k)) });
     const addFields = [
-      ["Product code", "code", "KJ-ORG-111"], ["Product name", "name", "Product name"], ["Product image path", "image", "p6-4 or assets/photo.jpg"],
+      ["Product code", "code", "KJ-CAT-000"], ["Product name", "name", "Product name"], ["Product image path", "image", "assets/photo.jpg"],
       ["Unit", "unit", "pcs"],
       ["HSN", "hsn", "NA"], ["GST %", "gst", "0"], ["Opening stock", "open", "0"],
       ["Qty made", "made", "0"], ["Qty sold", "sold", "0"], ["Damaged", "dmg", "0"],
@@ -1125,7 +1125,10 @@ class Component extends DCLogic {
 
     return {
       accent, cellPad: compact ? "5px 10px" : "9px 12px",
-      orgName: this.props.orgName || "Kalajay",
+      orgName: manager ? "Kalajay Demo" : this.props.orgName || "Kalajay",
+      cataloguePdfLabel: manager ? "Download sample catalogue (PDF)" : "Download complete product catalog (PDF)",
+      catalogueExcelLabel: manager ? "Download sample catalogue Excel" : "Download catalogue Excel",
+      orderHeading: manager ? "Sample website orders" : "Website orders",
       today: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
       screenTitle: titles[screen][0], screenSub: titles[screen][1],
       scrDash: screen === "dash", scrGrid: screen === "grid", scrLow: screen === "low", scrAdd: !manager && screen === "add",
